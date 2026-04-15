@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import SwanMotif from './SwanMotif'
-import { COUPLE, CONTACT_EMAIL, VENUE } from '@/lib/constants'
+import { COUPLE, CONTACT_EMAIL } from '@/lib/constants'
 
 export default function Footer() {
   return (
@@ -20,10 +20,6 @@ export default function Footer() {
 
         <p className="font-lora italic text-sm text-deep-ivory">
           September 12, 2026
-        </p>
-
-        <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">
-          {VENUE.shortName} · {VENUE.neighborhood} · {VENUE.city}
         </p>
 
         {/* Contact */}
