@@ -15,6 +15,8 @@ const schema = z.object({
   state: z.string().min(1, 'Please enter your state or province'),
   zip: z.string().min(3, 'Please enter your ZIP or postal code'),
   country: z.string().min(1, 'Please select your country'),
+  kidsAttending: z.number().int().min(0).optional(),
+  hotelBlockInterest: z.boolean().optional(),
   notes: z.string().optional(),
 })
 
@@ -117,7 +119,7 @@ export default function DetailForm() {
         </div>
         <div className="w-16 h-px bg-pale-gold" />
         <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">
-          September 12, 2026 · St. Joseph&apos;s Church · New York
+          September 12, 2026 · New York
         </p>
       </div>
     )
@@ -228,6 +230,50 @@ export default function DetailForm() {
               ))}
             </select>
           </Field>
+        </div>
+      </div>
+
+      {/* A Couple of Questions */}
+      <div className="flex flex-col gap-6">
+        <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray border-b border-pale-gold/40 pb-3">
+          A Couple of Questions
+        </p>
+
+        <Field
+          label="Will any children be joining you? If so, how many?"
+          error={errors.kidsAttending?.message}
+          optional
+        >
+          <input
+            {...register('kidsAttending', { valueAsNumber: true })}
+            type="number"
+            min="0"
+            placeholder="0"
+            className={inputClass}
+          />
+        </Field>
+
+        <div className="flex flex-col gap-2">
+          <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">
+            Hotel block interest
+            <span className="ml-2 normal-case tracking-normal font-crimson italic text-[11px] text-muted-rose/70">
+              optional
+            </span>
+          </p>
+          <p className="font-crimson text-sm text-deep-ivory leading-relaxed">
+            We&apos;re looking into a hotel block nearby — are you interested in hearing more about accommodation options?{' '}
+            <span className="italic text-muted-rose/80">(No commitment — we&apos;ll follow up with details.)</span>
+          </p>
+          <label className="flex items-center gap-3 cursor-pointer mt-1">
+            <input
+              {...register('hotelBlockInterest')}
+              type="checkbox"
+              className="w-4 h-4 border border-gold-line/60 accent-gold-line cursor-pointer"
+            />
+            <span className="font-crimson text-base text-dark-taupe">
+              Yes, I&apos;m interested in hotel options
+            </span>
+          </label>
         </div>
       </div>
 

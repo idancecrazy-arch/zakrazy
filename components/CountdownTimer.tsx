@@ -43,7 +43,6 @@ export default function CountdownTimer() {
 
   const units: { label: string; value: number }[] = [
     { label: 'Days', value: timeLeft.days },
-    { label: 'Hours', value: timeLeft.hours },
   ]
 
   return (

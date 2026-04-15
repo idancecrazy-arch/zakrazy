@@ -5,7 +5,7 @@ import CrossMotif from '@/components/CrossMotif'
 import CountdownTimer from '@/components/CountdownTimer'
 import FeatherDivider from '@/components/FeatherDivider'
 import ChurchImage from '@/components/ChurchImage'
-import { COUPLE, VENUE } from '@/lib/constants'
+import { COUPLE } from '@/lib/constants'
 
 export const metadata: Metadata = {
   title: 'Save the Date',
@@ -41,14 +41,6 @@ export default function HomePage() {
         {/* Date */}
         <p className="font-italiana text-2xl sm:text-3xl text-dusty-lilac tracking-[0.2em] mb-4">
           September 12, 2026
-        </p>
-
-        {/* Location */}
-        <p className="font-crimson italic text-lg text-muted-rose tracking-wide mb-2">
-          {VENUE.shortName}
-        </p>
-        <p className="font-crimson text-base text-muted-rose/80 tracking-[0.08em]">
-          {VENUE.neighborhood} · New York City
         </p>
 
         {/* Swan + Cross motifs */}
@@ -110,59 +102,6 @@ export default function HomePage() {
 
           {/* Gold rule */}
           <div className="w-16 h-px bg-pale-gold" />
-        </div>
-      </section>
-
-      {/* ── Venue preview ────────────────────────────────── */}
-      <section className="bg-warm-cream py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col items-center gap-6 text-center mb-12">
-            <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray">
-              The Venue
-            </p>
-            <h2 className="font-italiana text-4xl sm:text-5xl text-dark-taupe tracking-wide">
-              St. Joseph&apos;s Church
-            </h2>
-            <p className="font-crimson italic text-lg text-deep-ivory">
-              Greenwich Village · New York City
-            </p>
-            <FeatherDivider width={200} color="#D2C3A0" />
-          </div>
-
-          {/* Church photo hero */}
-          <div className="relative border border-pale-gold/40 overflow-hidden">
-            <div className="aspect-[16/9] bg-warm-cream flex items-center justify-center">
-              <ChurchImage
-                src="/images/st-josephs-exterior.jpg"
-                alt="The Church of St. Joseph of the Holy Family, Greenwich Village"
-              />
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-center pointer-events-none">
-                <CrossMotif size={40} color="#D2C3A0" />
-                <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray mt-2">
-                  371 Sixth Avenue · New York, NY 10014
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Interior trio */}
-          <div className="grid grid-cols-3 gap-2 mt-2">
-            {['st-josephs-interior-1.jpg', 'st-josephs-interior-2.jpg', 'st-josephs-interior-3.jpg'].map((img, i) => (
-              <div key={img} className="aspect-[4/3] bg-warm-cream border border-pale-gold/30 overflow-hidden relative">
-                <ChurchImage
-                  src={`/images/${img}`}
-                  alt={`St. Joseph's Church interior ${i + 1}`}
-                />
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-6 h-px bg-pale-gold/40" />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-center font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray mt-3">
-            The Church of St. Joseph of the Holy Family · Est. 1833 · Greek Revival
-          </p>
         </div>
       </section>
 

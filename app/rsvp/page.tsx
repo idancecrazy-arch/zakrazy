@@ -41,6 +41,10 @@ export default function RSVPPage() {
             This is not a formal RSVP — simply a way for us to make sure we
             have your current information on file.
           </p>
+
+          <p className="font-crimson italic text-base text-muted-rose max-w-sm leading-relaxed">
+            Our celebration is family friendly — children are warmly welcome.
+          </p>
         </div>
 
         {/* Form */}
