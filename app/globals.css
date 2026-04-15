@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Celestial Plié Color Palette ── */
+  --color-ivory: #FAF5EB;
+  --color-warm-cream: #F5EEE1;
+  --color-blush: #EBD2C8;
+  --color-shell-pink: #E4C3BC;
+  --color-lilac: #C8B9D2;
+  --color-dusty-lilac: #B4A5C3;
+  --color-pale-gold: #D2C3A0;
+  --color-gold-line: #C3AF82;
+  --color-soft-gray: #C3BEB9;
+  --color-dark-taupe: #5A5044;
+  --color-deep-ivory: #786E5F;
+  --color-muted-rose: #C3A59E;
+}
+
+/* ── Typography utilities ── */
+@layer utilities {
+  .font-italiana {
+    font-family: var(--font-italiana), Georgia, serif;
+  }
+  .font-poiret {
+    font-family: var(--font-poiret-one), 'Trebuchet MS', sans-serif;
+  }
+  .font-crimson {
+    font-family: var(--font-crimson-pro), Georgia, serif;
+  }
+  .font-lora {
+    font-family: var(--font-lora), Georgia, serif;
+  }
+  .font-work-sans {
+    font-family: var(--font-work-sans), Arial, sans-serif;
+  }
+}
+
+/* ── Base ── */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #FAF5EB;
+  color: #5A5044;
+  font-family: var(--font-crimson-pro), Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Gold rule draw-in ── */
+@keyframes drawLine {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.gold-rule {
+  transform-origin: center;
+  animation: drawLine 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s both;
+}
+
+/* ── Input resets ── */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+}
