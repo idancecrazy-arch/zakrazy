@@ -38,10 +38,6 @@ export default function Footer() {
 
         {/* Gold rule */}
         <div className="w-16 h-px bg-pale-gold/60" />
-
-        <p className="font-work-sans text-[9px] tracking-[0.2em] text-soft-gray uppercase">
-          Celestial Plié · A Design Principle
-        </p>
       </div>
     </footer>
   )
