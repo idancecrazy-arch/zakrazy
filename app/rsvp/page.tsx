@@ -7,7 +7,7 @@ import { COUPLE } from '@/lib/constants'
 export const metadata: Metadata = {
   title: 'Confirm Your Details',
   description:
-    'Please share your mailing address and contact details so we can send your save-the-date.',
+    'This website is the save the date for Christine & Michael. Please share your mailing address and contact details — formal invitations to follow.',
 }
 
 export default function RSVPPage() {
@@ -28,19 +28,18 @@ export default function RSVPPage() {
           </h1>
 
           <p className="font-lora italic text-lg text-deep-ivory max-w-md leading-relaxed">
-            We&apos;re collecting mailing addresses and emails so we can send
-            your save&#8209;the&#8209;date for{' '}
+            This website is the save the date for{' '}
             <span className="not-italic font-crimson text-dusty-lilac">
               {COUPLE.displayNames}
             </span>
-            .
+            . Formal invitations to follow.
           </p>
 
           <FeatherDivider width={240} color="#D2C3A0" />
 
           <p className="font-crimson text-base text-deep-ivory max-w-sm leading-relaxed">
             This is not a formal RSVP — simply a way for us to make sure we
-            have your current information. A formal invitation will follow.
+            have your current information on file.
           </p>
         </div>
 

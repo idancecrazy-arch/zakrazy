@@ -48,7 +48,7 @@ export default function HomePage() {
           {VENUE.shortName}
         </p>
         <p className="font-crimson text-base text-muted-rose/80 tracking-[0.08em]">
-          {VENUE.neighborhood} · {VENUE.city}
+          {VENUE.neighborhood} · New York City
         </p>
 
         {/* Swan + Cross motifs */}
@@ -61,6 +61,21 @@ export default function HomePage() {
         <div className="absolute bottom-10 flex flex-col items-center gap-2 animate-bounce">
           <div className="w-px h-8 bg-pale-gold/60" />
         </div>
+      </section>
+
+      {/* ── CTA ──────────────────────────────────────────── */}
+      <section className="bg-ivory py-10 flex justify-center px-6">
+        <Link
+          href="/rsvp"
+          className="
+            font-work-sans text-[12px] tracking-[0.25em] uppercase
+            px-10 py-5 bg-gold-line text-ivory
+            hover:bg-dark-taupe hover:-translate-y-0.5 hover:shadow-md
+            transition-all duration-300
+          "
+        >
+          Confirm Your Details
+        </Link>
       </section>
 
       {/* ── Feather divider ──────────────────────────────── */}
@@ -95,19 +110,6 @@ export default function HomePage() {
 
           {/* Gold rule */}
           <div className="w-16 h-px bg-pale-gold" />
-
-          {/* CTA */}
-          <Link
-            href="/rsvp"
-            className="
-              font-work-sans text-[12px] tracking-[0.25em] uppercase
-              px-10 py-5 bg-gold-line text-ivory
-              hover:bg-dark-taupe hover:-translate-y-0.5 hover:shadow-md
-              transition-all duration-300
-            "
-          >
-            Confirm Your Details
-          </Link>
         </div>
       </section>
 
