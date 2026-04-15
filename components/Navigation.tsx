@@ -9,8 +9,7 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/rsvp', label: 'RSVP' },
   { href: '/our-story', label: 'Our Story' },
-  { href: '/ceremony', label: 'Ceremony' },
-  { href: '/reception', label: 'Reception' },
+  { href: '/faq', label: 'FAQ' },
   { href: '/travel', label: 'Travel' },
   { href: '/registry', label: 'Registry' },
 ]
