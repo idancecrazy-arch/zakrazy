@@ -30,11 +30,6 @@ export default function HomePage() {
           <path d="M 100 50 C 300 120, 600 20, 800 80" stroke="#C3AF82" strokeWidth="50" fill="none" />
         </svg>
 
-        {/* Label */}
-        <p className="font-work-sans text-[9px] tracking-[0.35em] uppercase text-soft-gray mb-10">
-          Celestial Plié · A Design Principle
-        </p>
-
         {/* Gold rule */}
         <div className="w-20 h-px bg-gold-line gold-rule mb-10" />
 
@@ -102,29 +97,17 @@ export default function HomePage() {
           <div className="w-16 h-px bg-pale-gold" />
 
           {/* CTA */}
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <Link
-              href="/rsvp"
-              className="
-                font-work-sans text-[11px] tracking-[0.25em] uppercase
-                px-8 py-4 border border-gold-line text-dark-taupe
-                hover:bg-blush hover:border-shell-pink
-                transition-all duration-300
-              "
-            >
-              Confirm Your Details
-            </Link>
-            <Link
-              href="/our-story"
-              className="
-                font-work-sans text-[11px] tracking-[0.2em] uppercase
-                text-deep-ivory hover:text-dusty-lilac transition-colors duration-300
-                pb-px border-b border-pale-gold/0 hover:border-pale-gold
-              "
-            >
-              Our Story at St. Joseph's
-            </Link>
-          </div>
+          <Link
+            href="/rsvp"
+            className="
+              font-work-sans text-[12px] tracking-[0.25em] uppercase
+              px-10 py-5 bg-gold-line text-ivory
+              hover:bg-dark-taupe hover:-translate-y-0.5 hover:shadow-md
+              transition-all duration-300
+            "
+          >
+            Confirm Your Details
+          </Link>
         </div>
       </section>
 
@@ -190,9 +173,9 @@ export default function HomePage() {
         <Link
           href="/rsvp"
           className="
-            font-work-sans text-[11px] tracking-[0.25em] uppercase
-            px-8 py-4 border border-gold-line text-dark-taupe
-            hover:bg-blush hover:border-shell-pink
+            font-work-sans text-[12px] tracking-[0.25em] uppercase
+            px-10 py-5 bg-gold-line text-ivory
+            hover:bg-dark-taupe hover:-translate-y-0.5 hover:shadow-md
             transition-all duration-300
           "
         >
