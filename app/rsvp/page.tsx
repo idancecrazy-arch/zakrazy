@@ -2,12 +2,11 @@ import { Metadata } from 'next'
 import DetailForm from '@/components/DetailForm'
 import FeatherDivider from '@/components/FeatherDivider'
 import CrossMotif from '@/components/CrossMotif'
-import { COUPLE } from '@/lib/constants'
 
 export const metadata: Metadata = {
   title: 'Confirm Your Details',
   description:
-    'This website is the save the date for Christine & Michael. Please share your mailing address and contact details — formal invitations to follow.',
+    'Please share your mailing address and contact details. Formal invitations to follow.',
 }
 
 export default function RSVPPage() {
@@ -27,23 +26,11 @@ export default function RSVPPage() {
             Confirm Your Details
           </h1>
 
-          <p className="font-lora italic text-lg text-deep-ivory max-w-md leading-relaxed">
-            This website is the save the date for{' '}
-            <span className="not-italic font-crimson text-dusty-lilac">
-              {COUPLE.displayNames}
-            </span>
-            . Formal invitations to follow.
-          </p>
-
           <FeatherDivider width={240} color="#D2C3A0" />
 
           <p className="font-crimson text-base text-deep-ivory max-w-sm leading-relaxed">
-            This is not a formal RSVP — simply a way for us to make sure we
-            have your current information on file.
-          </p>
-
-          <p className="font-crimson italic text-base text-muted-rose max-w-sm leading-relaxed">
-            Our celebration is family friendly — children are warmly welcome.
+            Simply a way for us to make sure we have your current information
+            on file.
           </p>
         </div>
 

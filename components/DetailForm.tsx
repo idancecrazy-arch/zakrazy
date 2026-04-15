@@ -240,10 +240,11 @@ export default function DetailForm() {
         </p>
 
         <Field
-          label="Will any children be joining you? If so, how many?"
+          label="Will any young children be joining you? If so, how many?"
           error={errors.kidsAttending?.message}
           optional
         >
+          <p className="font-crimson italic text-sm text-muted-rose/80">Children are warmly welcome.</p>
           <input
             {...register('kidsAttending', { valueAsNumber: true })}
             type="number"
@@ -261,8 +262,8 @@ export default function DetailForm() {
             </span>
           </p>
           <p className="font-crimson text-sm text-deep-ivory leading-relaxed">
-            We&apos;re looking into a hotel block nearby — are you interested in hearing more about accommodation options?{' '}
-            <span className="italic text-muted-rose/80">(No commitment — we&apos;ll follow up with details.)</span>
+            We&apos;re looking into a hotel block nearby. Would you be interested?{' '}
+            <span className="italic text-muted-rose/80">(No commitment; we&apos;ll follow up with details.)</span>
           </p>
           <label className="flex items-center gap-3 cursor-pointer mt-1">
             <input
@@ -296,7 +297,7 @@ export default function DetailForm() {
       {/* Error state */}
       {status === 'error' && (
         <p className="font-crimson italic text-muted-rose text-sm text-center">
-          Something went wrong — please try again or email us directly.
+          Something went wrong. Please try again or email us directly.
         </p>
       )}
 
