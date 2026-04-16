@@ -68,11 +68,12 @@ describe('Airtable sync in /api/submit-details', () => {
     expect(url).toContain('Submissions')
     expect(options.method).toBe('POST')
 
-    const sent = JSON.parse(options.body as string) as { fields: Record<string, unknown> }
-    expect(sent.fields['Full Name']).toBe('Jane Smith')
-    expect(sent.fields['Email']).toBe('jane@example.com')
-    expect(sent.fields['Hotel Block Interest']).toBe('Yes')
-    expect(sent.fields['Kids Attending']).toBe(2)
+    const sent = JSON.parse(options.body as string) as { fields: { Name: string; Notes: string } }
+    expect(sent.fields['Name']).toBe('Jane Smith')
+    const details = JSON.parse(sent.fields['Notes']) as Record<string, unknown>
+    expect(details['email']).toBe('jane@example.com')
+    expect(details['hotelBlockInterest']).toBe('Yes')
+    expect(details['kidsAttending']).toBe(2)
   })
 
   it('returns airtableSync: null and warns when env vars are missing', async () => {

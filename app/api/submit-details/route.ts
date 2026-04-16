@@ -44,16 +44,12 @@ export async function POST(req: NextRequest) {
   //   AIRTABLE_BASE_ID    — base ID from the URL (starts with "app…")
   //   AIRTABLE_TABLE_NAME — table name (default: "Submissions")
   //
-  // Create the table with these fields (Field type in parentheses):
-  //   Full Name (Single line text), Email (Email),
-  //   Address 1, Address 2, City, State, ZIP, Country (Single line text),
-  //   Kids Attending (Number), Hotel Block Interest (Single line text),
-  //   Notes (Long text)
+  // No custom field setup required — uses only Airtable's two default
+  // fields that exist in every new table:
+  //   Name  — primary text field  (stores full name)
+  //   Notes — long text field     (stores all other data as JSON)
   //
-  // Airtable automatically records the creation time on every row —
-  // no "Submitted At" field needed.
-  //
-  // Export any time via Airtable → ··· menu → Download CSV.
+  // Use GET /api/admin/export-rsvp to download a structured CSV.
   const airtableKey = process.env.AIRTABLE_API_KEY
   const airtableBase = process.env.AIRTABLE_BASE_ID
   const airtableTable = process.env.AIRTABLE_TABLE_NAME ?? 'Submissions'
@@ -72,17 +68,19 @@ export async function POST(req: NextRequest) {
           },
           body: JSON.stringify({
             fields: {
-              'Full Name': parsed.data.fullName,
-              'Email': parsed.data.email,
-              'Address 1': parsed.data.address1,
-              'Address 2': parsed.data.address2 ?? '',
-              'City': parsed.data.city,
-              'State': parsed.data.state,
-              'ZIP': parsed.data.zip,
-              'Country': parsed.data.country,
-              'Kids Attending': parsed.data.kidsAttending ?? 0,
-              'Hotel Block Interest': parsed.data.hotelBlockInterest ? 'Yes' : 'No',
-              'Notes': parsed.data.notes ?? '',
+              'Name': parsed.data.fullName,
+              'Notes': JSON.stringify({
+                email: parsed.data.email,
+                address1: parsed.data.address1,
+                address2: parsed.data.address2 ?? '',
+                city: parsed.data.city,
+                state: parsed.data.state,
+                zip: parsed.data.zip,
+                country: parsed.data.country,
+                kidsAttending: parsed.data.kidsAttending ?? 0,
+                hotelBlockInterest: parsed.data.hotelBlockInterest ? 'Yes' : 'No',
+                notes: parsed.data.notes ?? '',
+              }),
             },
           }),
         },
