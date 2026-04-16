@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
 // Hoist mock variables so they're available inside vi.mock() factories
@@ -54,12 +54,19 @@ function makeRequest(body: unknown): NextRequest {
 }
 
 describe('Google Sheets sync in /api/submit-details', () => {
+  const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
   beforeEach(() => {
     mockAppend.mockClear()
     MockJWT.mockClear()
+    warnSpy.mockClear()
     delete process.env.GOOGLE_SHEET_ID
     delete process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
     delete process.env.GOOGLE_PRIVATE_KEY
+  })
+
+  afterEach(() => {
+    warnSpy.mockClear()
   })
 
   it('appends a correctly-shaped row when Google Sheets env vars are set', async () => {
@@ -67,8 +74,10 @@ describe('Google Sheets sync in /api/submit-details', () => {
 
     const { POST } = await import('./route')
     const res = await POST(makeRequest(validPayload))
+    const body = await res.json()
 
     expect(res.status).toBe(201)
+    expect(body.sheetsSync).toBe(true)
     expect(mockAppend).toHaveBeenCalledOnce()
 
     const call = mockAppend.mock.calls[0][0]
@@ -93,22 +102,29 @@ describe('Google Sheets sync in /api/submit-details', () => {
     expect(row[11]).toBe('Recently moved')  // notes
   })
 
-  it('does not call Google Sheets when env vars are absent', async () => {
+  it('does not call Google Sheets when env vars are absent and warns', async () => {
     // env vars already deleted in beforeEach
     const { POST } = await import('./route')
     const res = await POST(makeRequest(validPayload))
+    const body = await res.json()
 
     expect(res.status).toBe(201)
+    expect(body.sheetsSync).toBeNull()
     expect(mockAppend).not.toHaveBeenCalled()
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('GOOGLE_SHEET_ID'),
+    )
   })
 
-  it('still returns 201 when the Sheets API throws', async () => {
+  it('returns sheetsSync: false and still returns 201 when the Sheets API throws', async () => {
     Object.assign(process.env, SHEET_ENV)
     mockAppend.mockRejectedValueOnce(new Error('network error'))
 
     const { POST } = await import('./route')
     const res = await POST(makeRequest(validPayload))
+    const body = await res.json()
 
     expect(res.status).toBe(201)
+    expect(body.sheetsSync).toBe(false)
   })
 })

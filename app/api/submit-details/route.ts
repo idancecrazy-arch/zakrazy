@@ -76,7 +76,18 @@ export async function POST(req: NextRequest) {
   const saEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n')
 
-  if (sheetId && saEmail && privateKey) {
+  let sheetsSync: boolean | null = null // null = not configured
+
+  if (!sheetId || !saEmail || !privateKey) {
+    const missing = [
+      !sheetId && 'GOOGLE_SHEET_ID',
+      !saEmail && 'GOOGLE_SERVICE_ACCOUNT_EMAIL',
+      !privateKey && 'GOOGLE_PRIVATE_KEY',
+    ].filter(Boolean)
+    console.warn(
+      `Google Sheets sync disabled — missing env vars: ${missing.join(', ')}`,
+    )
+  } else {
     try {
       const auth = new google.auth.JWT({
         email: saEmail,
@@ -105,7 +116,9 @@ export async function POST(req: NextRequest) {
           ]],
         },
       })
+      sheetsSync = true
     } catch (err) {
+      sheetsSync = false
       console.error('Google Sheets write failed:', err)
     }
   }
@@ -147,5 +160,5 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ success: true }, { status: 201 })
+  return NextResponse.json({ success: true, sheetsSync }, { status: 201 })
 }
