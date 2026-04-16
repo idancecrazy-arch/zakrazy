@@ -13,7 +13,23 @@ import { NextRequest, NextResponse } from 'next/server'
 //   ADMIN_SECRET         — if set, requests must include ?secret=<value>
 //                          to prevent public access
 
-const CSV_COLUMNS = [
+// Field names match the Airtable table columns exactly (camelCase).
+// "Submitted At" comes from Airtable's createdTime record metadata.
+const AIRTABLE_FIELDS = [
+  'fullName',
+  'email',
+  'address1',
+  'address2',
+  'city',
+  'state',
+  'zip',
+  'country',
+  'kidsAttending',
+  'hotelBlockInterest',
+  'notes',
+] as const
+
+const CSV_HEADERS = [
   'Submitted At',
   'Full Name',
   'Email',
@@ -34,21 +50,6 @@ function escapeCSV(value: unknown): string {
     return `"${str.replace(/"/g, '""')}"`
   }
   return str
-}
-
-interface SubmissionPayload {
-  name?: string
-  email?: string
-  address1?: string
-  address2?: string
-  city?: string
-  state?: string
-  zip?: string
-  country?: string
-  kidsAttending?: number
-  hotelBlockInterest?: string
-  notes?: string
-  submittedAt?: string
 }
 
 export async function GET(req: NextRequest) {
@@ -73,9 +74,8 @@ export async function GET(req: NextRequest) {
   }
 
   // Fetch all records from Airtable (handles pagination).
-  // No sort param — records come back in Airtable's default order; we sort
-  // client-side by createdTime (always present in the API response metadata).
-  const records: { createdTime: string; payload: SubmissionPayload }[] = []
+  // Sorted client-side by createdTime (always in the API response metadata).
+  const records: { createdTime: string; fields: Record<string, unknown> }[] = []
   let offset: string | undefined
 
   do {
@@ -103,20 +103,7 @@ export async function GET(req: NextRequest) {
     }
 
     for (const record of data.records) {
-      // The submission is stored as a JSON string in the primary field
-      // (whichever field that happens to be). Find the first string value.
-      const jsonValue = Object.values(record.fields).find(
-        (v) => typeof v === 'string' && v.startsWith('{'),
-      ) as string | undefined
-
-      let payload: SubmissionPayload = {}
-      try {
-        payload = JSON.parse(jsonValue ?? '{}') as SubmissionPayload
-      } catch {
-        // malformed record — keep empty payload
-      }
-
-      records.push({ createdTime: record.createdTime, payload })
+      records.push({ createdTime: record.createdTime, fields: record.fields })
     }
     offset = data.offset
   } while (offset)
@@ -124,25 +111,10 @@ export async function GET(req: NextRequest) {
   // Sort chronologically using createdTime from the API response metadata
   records.sort((a, b) => a.createdTime.localeCompare(b.createdTime))
 
-  // Build CSV
-  const header = CSV_COLUMNS.map(escapeCSV).join(',')
-  const rows = records.map(({ createdTime, payload }) =>
-    [
-      payload.submittedAt ?? createdTime,
-      payload.name,
-      payload.email,
-      payload.address1,
-      payload.address2,
-      payload.city,
-      payload.state,
-      payload.zip,
-      payload.country,
-      payload.kidsAttending,
-      payload.hotelBlockInterest,
-      payload.notes,
-    ]
-      .map(escapeCSV)
-      .join(','),
+  // Build CSV — first column is createdTime, rest are table fields
+  const header = CSV_HEADERS.map(escapeCSV).join(',')
+  const rows = records.map(({ createdTime, fields }) =>
+    [createdTime, ...AIRTABLE_FIELDS.map((f) => fields[f])].map(escapeCSV).join(','),
   )
   const csv = [header, ...rows].join('\r\n')
 
