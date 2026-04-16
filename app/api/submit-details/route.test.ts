@@ -58,22 +58,29 @@ describe('Airtable sync in /api/submit-details', () => {
     expect(res.status).toBe(201)
     expect(body.airtableSync).toBe(true)
 
-    const airtableCall = mockFetch.mock.calls.find(
-      ([url]: [string]) => typeof url === 'string' && url.includes('airtable.com'),
+    // First call may be metadata API; find the records write call
+    const airtableWriteCall = mockFetch.mock.calls.find(
+      ([url]: [string]) =>
+        typeof url === 'string' &&
+        url.includes('airtable.com/v0') &&
+        !url.includes('/meta/'),
     )
-    expect(airtableCall).toBeDefined()
+    expect(airtableWriteCall).toBeDefined()
 
-    const [url, options] = airtableCall as [string, RequestInit]
+    const [url, options] = airtableWriteCall as [string, RequestInit]
     expect(url).toContain('appTestBase456')
     expect(url).toContain('Submissions')
     expect(options.method).toBe('POST')
 
-    const sent = JSON.parse(options.body as string) as { fields: { Name: string; Notes: string } }
-    expect(sent.fields['Name']).toBe('Jane Smith')
-    const details = JSON.parse(sent.fields['Notes']) as Record<string, unknown>
-    expect(details['email']).toBe('jane@example.com')
-    expect(details['hotelBlockInterest']).toBe('Yes')
-    expect(details['kidsAttending']).toBe(2)
+    // All data is stored as JSON in a single primary field
+    const sent = JSON.parse(options.body as string) as { fields: Record<string, string> }
+    const fieldValues = Object.values(sent.fields)
+    expect(fieldValues).toHaveLength(1)
+    const payload = JSON.parse(fieldValues[0]) as Record<string, unknown>
+    expect(payload['name']).toBe('Jane Smith')
+    expect(payload['email']).toBe('jane@example.com')
+    expect(payload['hotelBlockInterest']).toBe('Yes')
+    expect(payload['kidsAttending']).toBe(2)
   })
 
   it('returns airtableSync: null and warns when env vars are missing', async () => {
