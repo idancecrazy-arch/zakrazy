@@ -1,28 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
-// Hoist mock variables so they're available inside vi.mock() factories
-const { mockAppend, MockJWT } = vi.hoisted(() => ({
-  mockAppend: vi.fn().mockResolvedValue({}),
-  // Must use a regular function (not arrow) so `new MockJWT(...)` works
-  MockJWT: vi.fn(function MockJWT(this: Record<string, unknown>) {}),
-}))
-
-vi.mock('googleapis', () => ({
-  google: {
-    auth: { JWT: MockJWT },
-    sheets: vi.fn(() => ({
-      spreadsheets: { values: { append: mockAppend } },
-    })),
-  },
-}))
-
-const SHEET_ENV = {
-  GOOGLE_SHEET_ID: 'test-sheet-id',
-  GOOGLE_SERVICE_ACCOUNT_EMAIL: 'svc@test.iam.gserviceaccount.com',
-  GOOGLE_PRIVATE_KEY: '-----BEGIN RSA PRIVATE KEY-----\\nfake\\n-----END RSA PRIVATE KEY-----',
-}
-
 const AIRTABLE_ENV = {
   AIRTABLE_API_KEY: 'patTestKey123',
   AIRTABLE_BASE_ID: 'appTestBase456',
@@ -51,97 +29,11 @@ function makeRequest(body: unknown): NextRequest {
   })
 }
 
-describe('Google Sheets sync in /api/submit-details', () => {
-  const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
-
-  beforeEach(() => {
-    mockAppend.mockClear()
-    MockJWT.mockClear()
-    warnSpy.mockClear()
-    delete process.env.GOOGLE_SHEET_ID
-    delete process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
-    delete process.env.GOOGLE_PRIVATE_KEY
-    delete process.env.AIRTABLE_API_KEY
-    delete process.env.AIRTABLE_BASE_ID
-    delete process.env.AIRTABLE_TABLE_NAME
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 200 })))
-  })
-
-  afterEach(() => {
-    warnSpy.mockClear()
-    vi.unstubAllGlobals()
-  })
-
-  it('appends a correctly-shaped row when Google Sheets env vars are set', async () => {
-    Object.assign(process.env, SHEET_ENV)
-
-    const { POST } = await import('./route')
-    const res = await POST(makeRequest(validPayload))
-    const body = await res.json()
-
-    expect(res.status).toBe(201)
-    expect(body.sheetsSync).toBe(true)
-    expect(mockAppend).toHaveBeenCalledOnce()
-
-    const call = mockAppend.mock.calls[0][0]
-    expect(call.spreadsheetId).toBe('test-sheet-id')
-    expect(call.range).toBe('Sheet1')
-
-    const row: unknown[] = call.requestBody.values[0]
-    // Index 0 is the ISO timestamp — just verify it looks like a date string
-    expect(typeof row[0]).toBe('string')
-    expect((row[0] as string).length).toBeGreaterThan(10)
-
-    expect(row[1]).toBe('Jane Smith')       // fullName
-    expect(row[2]).toBe('jane@example.com') // email
-    expect(row[3]).toBe('123 Main St')      // address1
-    expect(row[4]).toBe('Apt 4B')           // address2
-    expect(row[5]).toBe('New York')         // city
-    expect(row[6]).toBe('NY')              // state
-    expect(row[7]).toBe('10001')            // zip
-    expect(row[8]).toBe('United States')    // country
-    expect(row[9]).toBe(2)                  // kidsAttending
-    expect(row[10]).toBe('Yes')             // hotelBlockInterest
-    expect(row[11]).toBe('Recently moved')  // notes
-  })
-
-  it('does not call Google Sheets when env vars are absent and warns', async () => {
-    // env vars already deleted in beforeEach
-    const { POST } = await import('./route')
-    const res = await POST(makeRequest(validPayload))
-    const body = await res.json()
-
-    expect(res.status).toBe(201)
-    expect(body.sheetsSync).toBeNull()
-    expect(mockAppend).not.toHaveBeenCalled()
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('GOOGLE_SHEET_ID'),
-    )
-  })
-
-  it('returns sheetsSync: false and still returns 201 when the Sheets API throws', async () => {
-    Object.assign(process.env, SHEET_ENV)
-    mockAppend.mockRejectedValueOnce(new Error('network error'))
-
-    const { POST } = await import('./route')
-    const res = await POST(makeRequest(validPayload))
-    const body = await res.json()
-
-    expect(res.status).toBe(201)
-    expect(body.sheetsSync).toBe(false)
-  })
-})
-
 describe('Airtable sync in /api/submit-details', () => {
   const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
   beforeEach(() => {
     warnSpy.mockClear()
-    MockJWT.mockClear()
-    mockAppend.mockClear()
-    delete process.env.GOOGLE_SHEET_ID
-    delete process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
-    delete process.env.GOOGLE_PRIVATE_KEY
     delete process.env.AIRTABLE_API_KEY
     delete process.env.AIRTABLE_BASE_ID
     delete process.env.AIRTABLE_TABLE_NAME
