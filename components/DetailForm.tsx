@@ -15,12 +15,7 @@ const schema = z.object({
   state: z.string().min(1, 'Please enter your state or province'),
   zip: z.string().min(3, 'Please enter your ZIP or postal code'),
   country: z.string().min(1, 'Please select your country'),
-  // valueAsNumber sends NaN for empty fields; coerce it to undefined so
-  // the optional() check passes instead of failing with a type error.
-  kidsAttending: z.preprocess(
-    (v) => (typeof v === 'number' && Number.isNaN(v) ? undefined : v),
-    z.number().int().min(0).optional(),
-  ),
+  kidsAttending: z.coerce.number().int().min(0).optional(),
   hotelBlockInterest: z.boolean().optional(),
   notes: z.string().optional(),
 })
@@ -251,7 +246,7 @@ export default function DetailForm() {
         >
           <p className="font-crimson italic text-sm text-muted-rose/80">Children are warmly welcome.</p>
           <input
-            {...register('kidsAttending', { valueAsNumber: true })}
+            {...register('kidsAttending')}
             type="number"
             min="0"
             placeholder="0"
