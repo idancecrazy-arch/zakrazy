@@ -17,18 +17,16 @@ vi.mock('googleapis', () => ({
   },
 }))
 
-vi.mock('fs', () => ({
-  promises: {
-    mkdir: vi.fn().mockResolvedValue(undefined),
-    readFile: vi.fn().mockRejectedValue(new Error('ENOENT')),
-    writeFile: vi.fn().mockResolvedValue(undefined),
-  },
-}))
-
 const SHEET_ENV = {
   GOOGLE_SHEET_ID: 'test-sheet-id',
   GOOGLE_SERVICE_ACCOUNT_EMAIL: 'svc@test.iam.gserviceaccount.com',
   GOOGLE_PRIVATE_KEY: '-----BEGIN RSA PRIVATE KEY-----\\nfake\\n-----END RSA PRIVATE KEY-----',
+}
+
+const AIRTABLE_ENV = {
+  AIRTABLE_API_KEY: 'patTestKey123',
+  AIRTABLE_BASE_ID: 'appTestBase456',
+  AIRTABLE_TABLE_NAME: 'Submissions',
 }
 
 const validPayload = {
@@ -63,10 +61,15 @@ describe('Google Sheets sync in /api/submit-details', () => {
     delete process.env.GOOGLE_SHEET_ID
     delete process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
     delete process.env.GOOGLE_PRIVATE_KEY
+    delete process.env.AIRTABLE_API_KEY
+    delete process.env.AIRTABLE_BASE_ID
+    delete process.env.AIRTABLE_TABLE_NAME
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}', { status: 200 })))
   })
 
   afterEach(() => {
     warnSpy.mockClear()
+    vi.unstubAllGlobals()
   })
 
   it('appends a correctly-shaped row when Google Sheets env vars are set', async () => {
@@ -94,7 +97,7 @@ describe('Google Sheets sync in /api/submit-details', () => {
     expect(row[3]).toBe('123 Main St')      // address1
     expect(row[4]).toBe('Apt 4B')           // address2
     expect(row[5]).toBe('New York')         // city
-    expect(row[6]).toBe('NY')               // state
+    expect(row[6]).toBe('NY')              // state
     expect(row[7]).toBe('10001')            // zip
     expect(row[8]).toBe('United States')    // country
     expect(row[9]).toBe(2)                  // kidsAttending
@@ -126,5 +129,86 @@ describe('Google Sheets sync in /api/submit-details', () => {
 
     expect(res.status).toBe(201)
     expect(body.sheetsSync).toBe(false)
+  })
+})
+
+describe('Airtable sync in /api/submit-details', () => {
+  const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+  beforeEach(() => {
+    warnSpy.mockClear()
+    MockJWT.mockClear()
+    mockAppend.mockClear()
+    delete process.env.GOOGLE_SHEET_ID
+    delete process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
+    delete process.env.GOOGLE_PRIVATE_KEY
+    delete process.env.AIRTABLE_API_KEY
+    delete process.env.AIRTABLE_BASE_ID
+    delete process.env.AIRTABLE_TABLE_NAME
+  })
+
+  afterEach(() => {
+    warnSpy.mockClear()
+    vi.unstubAllGlobals()
+  })
+
+  it('POSTs correct fields to Airtable when env vars are set', async () => {
+    Object.assign(process.env, AIRTABLE_ENV)
+    const mockFetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ id: 'recTest' }), { status: 200 }),
+    )
+    vi.stubGlobal('fetch', mockFetch)
+
+    const { POST } = await import('./route')
+    const res = await POST(makeRequest(validPayload))
+    const body = await res.json()
+
+    expect(res.status).toBe(201)
+    expect(body.airtableSync).toBe(true)
+
+    const airtableCall = mockFetch.mock.calls.find(
+      ([url]: [string]) => typeof url === 'string' && url.includes('airtable.com'),
+    )
+    expect(airtableCall).toBeDefined()
+
+    const [url, options] = airtableCall as [string, RequestInit]
+    expect(url).toContain('appTestBase456')
+    expect(url).toContain('Submissions')
+    expect(options.method).toBe('POST')
+
+    const sent = JSON.parse(options.body as string) as { fields: Record<string, unknown> }
+    expect(sent.fields['Full Name']).toBe('Jane Smith')
+    expect(sent.fields['Email']).toBe('jane@example.com')
+    expect(sent.fields['Hotel Block Interest']).toBe('Yes')
+    expect(sent.fields['Kids Attending']).toBe(2)
+  })
+
+  it('returns airtableSync: null and warns when env vars are missing', async () => {
+    vi.stubGlobal('fetch', vi.fn())
+
+    const { POST } = await import('./route')
+    const res = await POST(makeRequest(validPayload))
+    const body = await res.json()
+
+    expect(res.status).toBe(201)
+    expect(body.airtableSync).toBeNull()
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('AIRTABLE_API_KEY'),
+    )
+  })
+
+  it('returns airtableSync: false and still returns 201 when Airtable API errors', async () => {
+    Object.assign(process.env, AIRTABLE_ENV)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(new Response('Unauthorized', { status: 401 })),
+    )
+
+    const { POST } = await import('./route')
+    const res = await POST(makeRequest(validPayload))
+    const body = await res.json()
+
+    expect(res.status).toBe(201)
+    expect(body.airtableSync).toBe(false)
   })
 })

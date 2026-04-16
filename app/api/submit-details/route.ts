@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
 import { z } from 'zod'
 import { google } from 'googleapis'
 
@@ -40,43 +38,83 @@ export async function POST(req: NextRequest) {
     ip: req.headers.get('x-forwarded-for') ?? 'unknown',
   }
 
-  // ── Persist to file ──────────────────────────────────────────────
-  // In development: writes to /data/submissions.json in project root.
-  // On Vercel: the project root is read-only; set DATA_DIR=/tmp to use
-  // the writable tmp directory (ephemeral — use a database for production).
-  const dataDir = process.env.DATA_DIR ?? path.join(process.cwd(), 'data')
-  const dataFile = path.join(dataDir, 'submissions.json')
+  // ── Airtable ──────────────────────────────────────────────────────
+  // Primary storage — free tier handles thousands of RSVPs.
+  // Set these env vars to enable:
+  //   AIRTABLE_API_KEY    — personal access token from airtable.com/account
+  //   AIRTABLE_BASE_ID    — base ID from the URL (starts with "app…")
+  //   AIRTABLE_TABLE_NAME — table name (default: "Submissions")
+  //
+  // Create the table with these fields (Field type in parentheses):
+  //   Submitted At (Date/time), Full Name (Single line text),
+  //   Email (Email), Address 1, Address 2, City, State, ZIP, Country
+  //   (all Single line text), Kids Attending (Number),
+  //   Hotel Block Interest (Single line text), Notes (Long text)
+  //
+  // Export any time via Airtable → ··· menu → Download CSV.
+  const airtableKey = process.env.AIRTABLE_API_KEY
+  const airtableBase = process.env.AIRTABLE_BASE_ID
+  const airtableTable = process.env.AIRTABLE_TABLE_NAME ?? 'Submissions'
 
-  try {
-    await fs.mkdir(dataDir, { recursive: true })
+  let airtableSync: boolean | null = null
 
-    let existing: unknown[] = []
+  if (airtableKey && airtableBase) {
     try {
-      const raw = await fs.readFile(dataFile, 'utf-8')
-      existing = JSON.parse(raw)
-    } catch {
-      // file doesn't exist yet — start fresh
+      const res = await fetch(
+        `https://api.airtable.com/v0/${encodeURIComponent(airtableBase)}/${encodeURIComponent(airtableTable)}`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${airtableKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fields: {
+              'Submitted At': submission.submittedAt,
+              'Full Name': parsed.data.fullName,
+              'Email': parsed.data.email,
+              'Address 1': parsed.data.address1,
+              'Address 2': parsed.data.address2 ?? '',
+              'City': parsed.data.city,
+              'State': parsed.data.state,
+              'ZIP': parsed.data.zip,
+              'Country': parsed.data.country,
+              'Kids Attending': parsed.data.kidsAttending ?? 0,
+              'Hotel Block Interest': parsed.data.hotelBlockInterest ? 'Yes' : 'No',
+              'Notes': parsed.data.notes ?? '',
+            },
+          }),
+        },
+      )
+      if (!res.ok) {
+        const errText = await res.text()
+        throw new Error(`Airtable responded ${res.status}: ${errText}`)
+      }
+      airtableSync = true
+    } catch (err) {
+      airtableSync = false
+      console.error('Airtable write failed:', err)
     }
-
-    existing.push(submission)
-    await fs.writeFile(dataFile, JSON.stringify(existing, null, 2), 'utf-8')
-  } catch (err) {
-    // Non-fatal: log and continue — the submission is still returned OK
-    console.error('Could not write submissions file:', err)
+  } else {
+    const missing = [
+      !airtableKey && 'AIRTABLE_API_KEY',
+      !airtableBase && 'AIRTABLE_BASE_ID',
+    ].filter(Boolean)
+    console.warn(`Airtable sync disabled — missing env vars: ${missing.join(', ')}`)
   }
 
   // ── Google Sheets ────────────────────────────────────────────────
+  // Alternative storage — configure instead of or alongside Airtable.
   // Set these env vars to enable:
   //   GOOGLE_SHEET_ID              — the spreadsheet ID from the URL
   //   GOOGLE_SERVICE_ACCOUNT_EMAIL — service account client_email
   //   GOOGLE_PRIVATE_KEY           — service account private_key (newlines as \n)
-  // The sheet must be shared (Editor) with the service account email and with
-  // christineandmichaelzak@gmail.com.
+  // The sheet must be shared (Editor) with the service account email.
   const sheetId = process.env.GOOGLE_SHEET_ID
   const saEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n')
 
-  let sheetsSync: boolean | null = null // null = not configured
+  let sheetsSync: boolean | null = null
 
   if (!sheetId || !saEmail || !privateKey) {
     const missing = [
@@ -123,7 +161,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // ── Optional: email notification via Resend ──────────────────────
+  // ── Email notification via Resend ────────────────────────────────
   // Set RESEND_API_KEY and NOTIFICATION_EMAIL env vars to enable.
   const resendKey = process.env.RESEND_API_KEY
   const notifyEmail = process.env.NOTIFICATION_EMAIL
@@ -160,5 +198,5 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ success: true, sheetsSync }, { status: 201 })
+  return NextResponse.json({ success: true, airtableSync, sheetsSync }, { status: 201 })
 }
