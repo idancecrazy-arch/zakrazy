@@ -45,10 +45,13 @@ export async function POST(req: NextRequest) {
   //   AIRTABLE_TABLE_NAME — table name (default: "Submissions")
   //
   // Create the table with these fields (Field type in parentheses):
-  //   Submitted At (Date/time), Full Name (Single line text),
-  //   Email (Email), Address 1, Address 2, City, State, ZIP, Country
-  //   (all Single line text), Kids Attending (Number),
-  //   Hotel Block Interest (Single line text), Notes (Long text)
+  //   Full Name (Single line text), Email (Email),
+  //   Address 1, Address 2, City, State, ZIP, Country (Single line text),
+  //   Kids Attending (Number), Hotel Block Interest (Single line text),
+  //   Notes (Long text)
+  //
+  // Airtable automatically records the creation time on every row —
+  // no "Submitted At" field needed.
   //
   // Export any time via Airtable → ··· menu → Download CSV.
   const airtableKey = process.env.AIRTABLE_API_KEY
@@ -69,7 +72,6 @@ export async function POST(req: NextRequest) {
           },
           body: JSON.stringify({
             fields: {
-              'Submitted At': submission.submittedAt,
               'Full Name': parsed.data.fullName,
               'Email': parsed.data.email,
               'Address 1': parsed.data.address1,

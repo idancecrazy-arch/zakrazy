@@ -13,8 +13,9 @@ import { NextRequest, NextResponse } from 'next/server'
 //   ADMIN_SECRET         — if set, requests must include ?secret=<value>
 //                          to prevent public access
 
-const CSV_COLUMNS = [
-  'Submitted At',
+// "Submitted At" is sourced from Airtable's built-in createdTime, not a
+// table field — so it always exists regardless of how the table was set up.
+const FIELD_COLUMNS = [
   'Full Name',
   'Email',
   'Address 1',
@@ -58,14 +59,15 @@ export async function GET(req: NextRequest) {
   }
 
   // Fetch all records from Airtable (handles pagination)
-  const records: Record<string, unknown>[] = []
+  const records: { createdTime: string; fields: Record<string, unknown> }[] = []
   let offset: string | undefined
 
   do {
     const url = new URL(
       `https://api.airtable.com/v0/${encodeURIComponent(airtableBase)}/${encodeURIComponent(airtableTable)}`,
     )
-    url.searchParams.set('sort[0][field]', 'Submitted At')
+    // Sort by creation time (built-in on every record, no field needed)
+    url.searchParams.set('sort[0][field]', 'Created')
     url.searchParams.set('sort[0][direction]', 'asc')
     if (offset) url.searchParams.set('offset', offset)
 
@@ -83,20 +85,20 @@ export async function GET(req: NextRequest) {
     }
 
     const data = (await res.json()) as {
-      records: { fields: Record<string, unknown> }[]
+      records: { id: string; createdTime: string; fields: Record<string, unknown> }[]
       offset?: string
     }
 
     for (const record of data.records) {
-      records.push(record.fields)
+      records.push({ createdTime: record.createdTime, fields: record.fields })
     }
     offset = data.offset
   } while (offset)
 
-  // Build CSV
-  const header = CSV_COLUMNS.map(escapeCSV).join(',')
-  const rows = records.map((fields) =>
-    CSV_COLUMNS.map((col) => escapeCSV(fields[col])).join(','),
+  // Build CSV — first column is Airtable's createdTime, rest are table fields
+  const header = ['Submitted At', ...FIELD_COLUMNS].map(escapeCSV).join(',')
+  const rows = records.map(({ createdTime, fields }) =>
+    [createdTime, ...FIELD_COLUMNS.map((col) => fields[col])].map(escapeCSV).join(','),
   )
   const csv = [header, ...rows].join('\r\n')
 
