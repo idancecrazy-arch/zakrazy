@@ -80,7 +80,7 @@ describe('Airtable sync in /api/submit-details', () => {
     expect(sent.fields.state).toBe('NY')
     expect(sent.fields.zip).toBe('10001')
     expect(sent.fields.country).toBe('United States')
-    expect(sent.fields.kidsAttending).toBe(2)
+    expect(sent.fields.kidsAttending).toBe('2')
     expect(sent.fields.hotelBlockInterest).toBe('Yes')
     expect(sent.fields.notes).toBe('Recently moved')
   })
