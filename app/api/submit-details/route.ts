@@ -15,6 +15,35 @@ const schema = z.object({
   notes: z.string().optional(),
 })
 
+// Discover the primary (first) field name of the Airtable table via the
+// Metadata API. Falls back to the AIRTABLE_PRIMARY_FIELD env var, then "Name".
+// Requires schema.bases:read scope on the personal access token.
+async function getAirtablePrimaryField(
+  apiKey: string,
+  baseId: string,
+  tableName: string,
+): Promise<string> {
+  if (process.env.AIRTABLE_PRIMARY_FIELD) return process.env.AIRTABLE_PRIMARY_FIELD
+
+  try {
+    const res = await fetch(
+      `https://api.airtable.com/v0/meta/bases/${encodeURIComponent(baseId)}/tables`,
+      { headers: { Authorization: `Bearer ${apiKey}` } },
+    )
+    if (res.ok) {
+      const data = (await res.json()) as {
+        tables: { id: string; name: string; fields: { name: string }[] }[]
+      }
+      const table = data.tables.find((t) => t.name === tableName || t.id === tableName)
+      if (table?.fields?.[0]?.name) return table.fields[0].name
+    }
+  } catch {
+    // fall through to default
+  }
+
+  return 'Name'
+}
+
 export async function POST(req: NextRequest) {
   let body: unknown
   try {
@@ -40,14 +69,14 @@ export async function POST(req: NextRequest) {
   // ── Airtable ──────────────────────────────────────────────────────
   // Primary storage — free tier handles thousands of RSVPs.
   // Set these env vars to enable:
-  //   AIRTABLE_API_KEY    — personal access token from airtable.com/account
+  //   AIRTABLE_API_KEY    — personal access token (needs data.records:write
+  //                          and schema.bases:read scopes)
   //   AIRTABLE_BASE_ID    — base ID from the URL (starts with "app…")
   //   AIRTABLE_TABLE_NAME — table name (default: "Submissions")
   //
-  // No custom field setup required — uses only Airtable's two default
-  // fields that exist in every new table:
-  //   Name  — primary text field  (stores full name)
-  //   Notes — long text field     (stores all other data as JSON)
+  // No custom field setup required. All submission data is stored as JSON
+  // in the table's primary field (auto-discovered via the Metadata API).
+  // Optional override: AIRTABLE_PRIMARY_FIELD=<your field name>
   //
   // Use GET /api/admin/export-rsvp to download a structured CSV.
   const airtableKey = process.env.AIRTABLE_API_KEY
@@ -58,6 +87,23 @@ export async function POST(req: NextRequest) {
 
   if (airtableKey && airtableBase) {
     try {
+      const primaryField = await getAirtablePrimaryField(airtableKey, airtableBase, airtableTable)
+
+      const payload = {
+        name: parsed.data.fullName,
+        email: parsed.data.email,
+        address1: parsed.data.address1,
+        address2: parsed.data.address2 ?? '',
+        city: parsed.data.city,
+        state: parsed.data.state,
+        zip: parsed.data.zip,
+        country: parsed.data.country,
+        kidsAttending: parsed.data.kidsAttending ?? 0,
+        hotelBlockInterest: parsed.data.hotelBlockInterest ? 'Yes' : 'No',
+        notes: parsed.data.notes ?? '',
+        submittedAt: submission.submittedAt,
+      }
+
       const res = await fetch(
         `https://api.airtable.com/v0/${encodeURIComponent(airtableBase)}/${encodeURIComponent(airtableTable)}`,
         {
@@ -66,23 +112,7 @@ export async function POST(req: NextRequest) {
             Authorization: `Bearer ${airtableKey}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            fields: {
-              'Name': parsed.data.fullName,
-              'Notes': JSON.stringify({
-                email: parsed.data.email,
-                address1: parsed.data.address1,
-                address2: parsed.data.address2 ?? '',
-                city: parsed.data.city,
-                state: parsed.data.state,
-                zip: parsed.data.zip,
-                country: parsed.data.country,
-                kidsAttending: parsed.data.kidsAttending ?? 0,
-                hotelBlockInterest: parsed.data.hotelBlockInterest ? 'Yes' : 'No',
-                notes: parsed.data.notes ?? '',
-              }),
-            },
-          }),
+          body: JSON.stringify({ fields: { [primaryField]: JSON.stringify(payload) } }),
         },
       )
       if (!res.ok) {
