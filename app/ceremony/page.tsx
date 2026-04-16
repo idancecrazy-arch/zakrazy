@@ -155,7 +155,7 @@ export default function CeremonyPage() {
               procession begins. Ushers will be on hand to assist.
             </p>
             <p className="font-crimson italic text-base text-muted-rose leading-relaxed">
-              Photography guidelines will be shared with your formal invitation.
+              Photography guidelines will be posted here closer to the wedding.
             </p>
           </div>
         </div>

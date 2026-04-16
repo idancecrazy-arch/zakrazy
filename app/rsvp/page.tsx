@@ -6,7 +6,7 @@ import CrossMotif from '@/components/CrossMotif'
 export const metadata: Metadata = {
   title: 'Confirm Your Details',
   description:
-    'Please share your mailing address and contact details. Formal invitations to follow.',
+    'Please share your mailing address and contact details.',
 }
 
 export default function RSVPPage() {
