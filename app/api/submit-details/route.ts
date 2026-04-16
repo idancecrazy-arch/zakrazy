@@ -77,7 +77,9 @@ export async function POST(req: NextRequest) {
               state: parsed.data.state,
               zip: parsed.data.zip,
               country: parsed.data.country,
-              kidsAttending: parsed.data.kidsAttending ?? 0,
+              kidsAttending: parsed.data.kidsAttending != null
+                ? String(parsed.data.kidsAttending)
+                : '',
               hotelBlockInterest: parsed.data.hotelBlockInterest ? 'Yes' : 'No',
               notes: parsed.data.notes ?? '',
             },
