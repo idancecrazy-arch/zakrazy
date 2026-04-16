@@ -6,12 +6,10 @@ import { NextRequest, NextResponse } from 'next/server'
 // Fetches all RSVP submissions from Airtable and returns them as a
 // downloadable CSV file.
 //
-// Required env vars (same as submit-details route):
-//   AIRTABLE_API_KEY, AIRTABLE_BASE_ID
+// Required env vars:
+//   AIRTABLE_API_KEY, AIRTABLE_BASE_ID, ADMIN_SECRET
 // Optional:
 //   AIRTABLE_TABLE_NAME  (default: "Submissions")
-//   ADMIN_SECRET         — if set, requests must include ?secret=<value>
-//                          to prevent public access
 
 // Field names match the Airtable table columns exactly (camelCase).
 // "Submitted At" comes from Airtable's createdTime record metadata.
@@ -53,13 +51,13 @@ function escapeCSV(value: unknown): string {
 }
 
 export async function GET(req: NextRequest) {
-  // Optional secret check
   const adminSecret = process.env.ADMIN_SECRET
-  if (adminSecret) {
-    const provided = req.nextUrl.searchParams.get('secret')
-    if (provided !== adminSecret) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  if (!adminSecret) {
+    return NextResponse.json({ error: 'Admin access not configured' }, { status: 503 })
+  }
+  const provided = req.nextUrl.searchParams.get('secret')
+  if (provided !== adminSecret) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const airtableKey = process.env.AIRTABLE_API_KEY

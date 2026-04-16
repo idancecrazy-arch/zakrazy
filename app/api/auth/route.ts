@@ -1,5 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+const attempts = new Map<string, { count: number; resetAt: number }>()
+const RATE_WINDOW_MS = 15 * 60 * 1000
+const MAX_ATTEMPTS = 10
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const entry = attempts.get(ip)
+  if (!entry || now > entry.resetAt) {
+    attempts.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS })
+    return false
+  }
+  entry.count++
+  return entry.count > MAX_ATTEMPTS
+}
+
 const PASSWORDS: Record<string, { type: 'text' | 'board'; message: string }> = {
   bunny:      { type: 'text',  message: 'meow!' },
   backgammon: { type: 'board', message: 'backgammon' },
@@ -9,6 +24,11 @@ const PASSWORDS: Record<string, { type: 'text' | 'board'; message: string }> = {
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  if (isRateLimited(ip)) {
+    return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 })
+  }
+
   let body: unknown
   try {
     body = await req.json()
