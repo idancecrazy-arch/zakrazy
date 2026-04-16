@@ -15,7 +15,7 @@ const schema = z.object({
   state: z.string().min(1, 'Please enter your state or province'),
   zip: z.string().min(3, 'Please enter your ZIP or postal code'),
   country: z.string().min(1, 'Please select your country'),
-  kidsAttending: z.coerce.number().int().min(0).optional(),
+  kidsAttending: z.number().int().min(0).optional().catch(undefined),
   hotelBlockInterest: z.boolean().optional(),
   notes: z.string().optional(),
 })
@@ -246,7 +246,7 @@ export default function DetailForm() {
         >
           <p className="font-crimson italic text-sm text-muted-rose/80">Children are warmly welcome.</p>
           <input
-            {...register('kidsAttending')}
+            {...register('kidsAttending', { valueAsNumber: true })}
             type="number"
             min="0"
             placeholder="0"
