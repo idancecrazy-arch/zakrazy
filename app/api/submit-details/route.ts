@@ -95,6 +95,26 @@ export async function POST(req: NextRequest) {
         scopes: ['https://www.googleapis.com/auth/spreadsheets'],
       })
       const sheets = google.sheets({ version: 'v4', auth })
+
+      // Write header row if A1 is empty (first submission or headers were deleted)
+      const HEADERS = [
+        'Timestamp', 'Full Name', 'Email', 'Street Address', 'Apt / Suite',
+        'City', 'State / Province', 'ZIP / Postal Code', 'Country',
+        'Kids Attending', 'Hotel Block Interest', 'Notes',
+      ]
+      const existing = await sheets.spreadsheets.values.get({
+        spreadsheetId: sheetId,
+        range: 'Sheet1!A1',
+      })
+      if (!existing.data.values?.length) {
+        await sheets.spreadsheets.values.update({
+          spreadsheetId: sheetId,
+          range: 'Sheet1!A1',
+          valueInputOption: 'RAW',
+          requestBody: { values: [HEADERS] },
+        })
+      }
+
       await sheets.spreadsheets.values.append({
         spreadsheetId: sheetId,
         range: 'Sheet1',

@@ -2,8 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
 // Hoist mock variables so they're available inside vi.mock() factories
-const { mockAppend, MockJWT } = vi.hoisted(() => ({
+const { mockAppend, mockGet, mockUpdate, MockJWT } = vi.hoisted(() => ({
   mockAppend: vi.fn().mockResolvedValue({}),
+  // Default: A1 already has content → headers not re-written
+  mockGet: vi.fn().mockResolvedValue({ data: { values: [['Timestamp']] } }),
+  mockUpdate: vi.fn().mockResolvedValue({}),
   // Must use a regular function (not arrow) so `new MockJWT(...)` works
   MockJWT: vi.fn(function MockJWT(this: Record<string, unknown>) {}),
 }))
@@ -12,7 +15,7 @@ vi.mock('googleapis', () => ({
   google: {
     auth: { JWT: MockJWT },
     sheets: vi.fn(() => ({
-      spreadsheets: { values: { append: mockAppend } },
+      spreadsheets: { values: { append: mockAppend, get: mockGet, update: mockUpdate } },
     })),
   },
 }))
@@ -58,6 +61,8 @@ describe('Google Sheets sync in /api/submit-details', () => {
 
   beforeEach(() => {
     mockAppend.mockClear()
+    mockGet.mockClear()
+    mockUpdate.mockClear()
     MockJWT.mockClear()
     warnSpy.mockClear()
     delete process.env.GOOGLE_SHEET_ID
@@ -126,5 +131,35 @@ describe('Google Sheets sync in /api/submit-details', () => {
 
     expect(res.status).toBe(201)
     expect(body.sheetsSync).toBe(false)
+  })
+
+  it('writes header row when A1 is empty (first-ever submission)', async () => {
+    Object.assign(process.env, SHEET_ENV)
+    mockGet.mockResolvedValueOnce({ data: {} }) // A1 empty
+
+    const { POST } = await import('./route')
+    await POST(makeRequest(validPayload))
+
+    expect(mockUpdate).toHaveBeenCalledOnce()
+    const updateCall = mockUpdate.mock.calls[0][0]
+    expect(updateCall.range).toBe('Sheet1!A1')
+    expect(updateCall.valueInputOption).toBe('RAW')
+    expect(updateCall.requestBody.values[0]).toEqual([
+      'Timestamp', 'Full Name', 'Email', 'Street Address', 'Apt / Suite',
+      'City', 'State / Province', 'ZIP / Postal Code', 'Country',
+      'Kids Attending', 'Hotel Block Interest', 'Notes',
+    ])
+    expect(mockAppend).toHaveBeenCalledOnce() // data row still appended
+  })
+
+  it('skips header row when A1 already has content', async () => {
+    Object.assign(process.env, SHEET_ENV)
+    // Default mockGet returns a populated A1 — no override needed
+
+    const { POST } = await import('./route')
+    await POST(makeRequest(validPayload))
+
+    expect(mockUpdate).not.toHaveBeenCalled()
+    expect(mockAppend).toHaveBeenCalledOnce()
   })
 })
