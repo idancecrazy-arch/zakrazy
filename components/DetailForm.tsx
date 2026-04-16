@@ -49,11 +49,11 @@ function Field({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">
+    <div className="flex flex-col gap-2">
+      <label className="font-work-sans text-xs sm:text-[13px] tracking-[0.12em] uppercase text-dark-taupe/85 font-medium">
         {label}
         {optional && (
-          <span className="ml-2 normal-case tracking-normal font-crimson italic text-[11px] text-muted-rose/70">
+          <span className="ml-2 normal-case tracking-normal font-crimson italic text-sm text-muted-rose">
             optional
           </span>
         )}
@@ -68,12 +68,15 @@ function Field({
 
 const inputClass = `
   w-full bg-ivory border border-gold-line/60
-  px-4 py-3
-  font-crimson text-base text-dark-taupe
-  placeholder:text-soft-gray/60
+  px-4 py-3.5 min-h-[48px]
+  font-crimson text-base sm:text-lg text-dark-taupe
+  placeholder:text-soft-gray
   focus:border-gold-line focus:ring-0
   transition-colors duration-200
 `
+
+const sectionHeadingClass =
+  'font-italiana text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50'
 
 export default function DetailForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -112,13 +115,13 @@ export default function DetailForm() {
           <h2 className="font-italiana text-4xl text-dark-taupe tracking-wide">
             Thank you, {submittedName}!
           </h2>
-          <p className="font-lora italic text-lg text-deep-ivory max-w-md leading-relaxed">
+          <p className="font-lora italic text-lg text-dark-taupe/85 max-w-md leading-relaxed">
             Your details have been saved. We&apos;ll be in touch soon with your
             save&#8209;the&#8209;date.
           </p>
         </div>
         <div className="w-16 h-px bg-pale-gold" />
-        <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">
+        <p className="font-work-sans text-xs tracking-[0.18em] uppercase text-dark-taupe/80 font-medium">
           September 12, 2026 · New York
         </p>
       </div>
@@ -133,9 +136,7 @@ export default function DetailForm() {
     >
       {/* Personal */}
       <div className="flex flex-col gap-6">
-        <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray border-b border-pale-gold/40 pb-3">
-          Contact Information
-        </p>
+        <h2 className={sectionHeadingClass}>Contact Information</h2>
 
         <Field label="Full Name" error={errors.fullName?.message}>
           <input
@@ -160,9 +161,7 @@ export default function DetailForm() {
 
       {/* Address */}
       <div className="flex flex-col gap-6">
-        <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray border-b border-pale-gold/40 pb-3">
-          Mailing Address
-        </p>
+        <h2 className={sectionHeadingClass}>Mailing Address</h2>
 
         <Field label="Street Address" error={errors.address1?.message}>
           <input
@@ -184,7 +183,7 @@ export default function DetailForm() {
           />
         </Field>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-4">
           <Field label="City" error={errors.city?.message}>
             <input
               {...register('city')}
@@ -206,7 +205,7 @@ export default function DetailForm() {
           </Field>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-4">
           <Field label="ZIP / Postal Code" error={errors.zip?.message}>
             <input
               {...register('zip')}
@@ -235,16 +234,14 @@ export default function DetailForm() {
 
       {/* A Couple of Questions */}
       <div className="flex flex-col gap-6">
-        <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray border-b border-pale-gold/40 pb-3">
-          A Couple of Questions
-        </p>
+        <h2 className={sectionHeadingClass}>A Couple of Questions</h2>
 
         <Field
           label="Will any young children be joining you? If so, how many?"
           error={errors.kidsAttending?.message}
           optional
         >
-          <p className="font-crimson italic text-sm text-muted-rose/80">Children are warmly welcome.</p>
+          <p className="font-crimson italic text-base text-muted-rose">Children are warmly welcome.</p>
           <input
             {...register('kidsAttending', {
               setValueAs: (v) => {
@@ -260,24 +257,24 @@ export default function DetailForm() {
           />
         </Field>
 
-        <div className="flex flex-col gap-2">
-          <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">
+        <div className="flex flex-col gap-3">
+          <p className="font-work-sans text-xs sm:text-[13px] tracking-[0.12em] uppercase text-dark-taupe/85 font-medium">
             Hotel block interest
-            <span className="ml-2 normal-case tracking-normal font-crimson italic text-[11px] text-muted-rose/70">
+            <span className="ml-2 normal-case tracking-normal font-crimson italic text-sm text-muted-rose">
               optional
             </span>
           </p>
-          <p className="font-crimson text-sm text-deep-ivory leading-relaxed">
+          <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
             We&apos;re looking into a hotel block nearby. Would you be interested?{' '}
-            <span className="italic text-muted-rose/80">(No commitment; we&apos;ll follow up with details.)</span>
+            <span className="italic text-muted-rose">(No commitment; we&apos;ll follow up with details.)</span>
           </p>
-          <label className="flex items-center gap-3 cursor-pointer mt-1">
+          <label className="flex items-center gap-3 cursor-pointer mt-1 min-h-[44px]">
             <input
               {...register('hotelBlockInterest')}
               type="checkbox"
-              className="w-4 h-4 border border-gold-line/60 accent-gold-line cursor-pointer"
+              className="w-5 h-5 border border-gold-line/60 accent-gold-line cursor-pointer"
             />
-            <span className="font-crimson text-base text-dark-taupe">
+            <span className="font-crimson text-base sm:text-lg text-dark-taupe">
               Yes, I&apos;m interested in hotel options
             </span>
           </label>
@@ -313,8 +310,9 @@ export default function DetailForm() {
           type="submit"
           disabled={status === 'loading'}
           className="
-            font-work-sans text-[11px] tracking-[0.25em] uppercase
-            px-10 py-4 border border-gold-line text-dark-taupe
+            w-full sm:w-auto
+            font-work-sans text-sm tracking-[0.18em] uppercase font-medium
+            px-10 py-4 min-h-[52px] border border-gold-line text-dark-taupe
             hover:bg-blush hover:border-shell-pink
             disabled:opacity-50 disabled:cursor-not-allowed
             transition-all duration-300
