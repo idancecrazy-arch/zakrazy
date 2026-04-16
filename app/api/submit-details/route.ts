@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { CONTACT_EMAIL } from '../../../lib/constants'
 
 const schema = z.object({
   fullName: z.string().min(2),
@@ -103,6 +104,41 @@ export async function POST(req: NextRequest) {
   // Set RESEND_API_KEY and NOTIFICATION_EMAIL env vars to enable.
   const resendKey = process.env.RESEND_API_KEY
   const notifyEmail = process.env.NOTIFICATION_EMAIL
+
+  // ── Backup email on Airtable failure ─────────────────────────────
+  // If Airtable write failed and Resend is configured, email the full
+  // submission to the couple so no record is lost.
+  if (airtableSync === false && resendKey) {
+    try {
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${resendKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: 'Wedding Website <noreply@resend.dev>',
+          to: CONTACT_EMAIL,
+          subject: `[BACKUP] RSVP submission — ${parsed.data.fullName} (Airtable sync failed)`,
+          text: [
+            `Name: ${parsed.data.fullName}`,
+            `Email: ${parsed.data.email}`,
+            `Address: ${parsed.data.address1}${parsed.data.address2 ? ', ' + parsed.data.address2 : ''}`,
+            `         ${parsed.data.city}, ${parsed.data.state} ${parsed.data.zip}`,
+            `         ${parsed.data.country}`,
+            parsed.data.kidsAttending != null ? `Kids attending: ${parsed.data.kidsAttending}` : '',
+            `Hotel block interest: ${parsed.data.hotelBlockInterest ? 'Yes' : 'No'}`,
+            parsed.data.notes ? `Notes: ${parsed.data.notes}` : '',
+            `Submitted: ${submission.submittedAt}`,
+          ]
+            .filter(Boolean)
+            .join('\n'),
+        }),
+      })
+    } catch (err) {
+      console.warn('Backup email failed:', err)
+    }
+  }
 
   if (resendKey && notifyEmail) {
     try {
