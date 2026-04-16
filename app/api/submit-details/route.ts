@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { google } from 'googleapis'
 
 const schema = z.object({
   fullName: z.string().min(2),
@@ -103,64 +102,6 @@ export async function POST(req: NextRequest) {
     console.warn(`Airtable sync disabled — missing env vars: ${missing.join(', ')}`)
   }
 
-  // ── Google Sheets ────────────────────────────────────────────────
-  // Alternative storage — configure instead of or alongside Airtable.
-  // Set these env vars to enable:
-  //   GOOGLE_SHEET_ID              — the spreadsheet ID from the URL
-  //   GOOGLE_SERVICE_ACCOUNT_EMAIL — service account client_email
-  //   GOOGLE_PRIVATE_KEY           — service account private_key (newlines as \n)
-  // The sheet must be shared (Editor) with the service account email.
-  const sheetId = process.env.GOOGLE_SHEET_ID
-  const saEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n')
-
-  let sheetsSync: boolean | null = null
-
-  if (!sheetId || !saEmail || !privateKey) {
-    const missing = [
-      !sheetId && 'GOOGLE_SHEET_ID',
-      !saEmail && 'GOOGLE_SERVICE_ACCOUNT_EMAIL',
-      !privateKey && 'GOOGLE_PRIVATE_KEY',
-    ].filter(Boolean)
-    console.warn(
-      `Google Sheets sync disabled — missing env vars: ${missing.join(', ')}`,
-    )
-  } else {
-    try {
-      const auth = new google.auth.JWT({
-        email: saEmail,
-        key: privateKey,
-        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-      })
-      const sheets = google.sheets({ version: 'v4', auth })
-      await sheets.spreadsheets.values.append({
-        spreadsheetId: sheetId,
-        range: 'Sheet1',
-        valueInputOption: 'USER_ENTERED',
-        requestBody: {
-          values: [[
-            submission.submittedAt,
-            parsed.data.fullName,
-            parsed.data.email,
-            parsed.data.address1,
-            parsed.data.address2 ?? '',
-            parsed.data.city,
-            parsed.data.state,
-            parsed.data.zip,
-            parsed.data.country,
-            parsed.data.kidsAttending ?? 0,
-            parsed.data.hotelBlockInterest ? 'Yes' : 'No',
-            parsed.data.notes ?? '',
-          ]],
-        },
-      })
-      sheetsSync = true
-    } catch (err) {
-      sheetsSync = false
-      console.error('Google Sheets write failed:', err)
-    }
-  }
-
   // ── Email notification via Resend ────────────────────────────────
   // Set RESEND_API_KEY and NOTIFICATION_EMAIL env vars to enable.
   const resendKey = process.env.RESEND_API_KEY
@@ -198,5 +139,5 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ success: true, airtableSync, sheetsSync }, { status: 201 })
+  return NextResponse.json({ success: true, airtableSync }, { status: 201 })
 }
