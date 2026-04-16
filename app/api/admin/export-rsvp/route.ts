@@ -13,9 +13,8 @@ import { NextRequest, NextResponse } from 'next/server'
 //   ADMIN_SECRET         — if set, requests must include ?secret=<value>
 //                          to prevent public access
 
-// "Submitted At" is sourced from Airtable's built-in createdTime, not a
-// table field — so it always exists regardless of how the table was set up.
-const FIELD_COLUMNS = [
+const CSV_COLUMNS = [
+  'Submitted At',
   'Full Name',
   'Email',
   'Address 1',
@@ -35,6 +34,19 @@ function escapeCSV(value: unknown): string {
     return `"${str.replace(/"/g, '""')}"`
   }
   return str
+}
+
+interface SubmissionFields {
+  email?: string
+  address1?: string
+  address2?: string
+  city?: string
+  state?: string
+  zip?: string
+  country?: string
+  kidsAttending?: number
+  hotelBlockInterest?: string
+  notes?: string
 }
 
 export async function GET(req: NextRequest) {
@@ -59,14 +71,13 @@ export async function GET(req: NextRequest) {
   }
 
   // Fetch all records from Airtable (handles pagination)
-  const records: { createdTime: string; fields: Record<string, unknown> }[] = []
+  const records: { createdTime: string; name: string; details: SubmissionFields }[] = []
   let offset: string | undefined
 
   do {
     const url = new URL(
       `https://api.airtable.com/v0/${encodeURIComponent(airtableBase)}/${encodeURIComponent(airtableTable)}`,
     )
-    // Sort by creation time (built-in on every record, no field needed)
     url.searchParams.set('sort[0][field]', 'Created')
     url.searchParams.set('sort[0][direction]', 'asc')
     if (offset) url.searchParams.set('offset', offset)
@@ -85,20 +96,43 @@ export async function GET(req: NextRequest) {
     }
 
     const data = (await res.json()) as {
-      records: { id: string; createdTime: string; fields: Record<string, unknown> }[]
+      records: { id: string; createdTime: string; fields: { Name?: string; Notes?: string } }[]
       offset?: string
     }
 
     for (const record of data.records) {
-      records.push({ createdTime: record.createdTime, fields: record.fields })
+      let details: SubmissionFields = {}
+      try {
+        details = JSON.parse(record.fields.Notes ?? '{}') as SubmissionFields
+      } catch {
+        // malformed Notes — keep empty details
+      }
+      records.push({
+        createdTime: record.createdTime,
+        name: record.fields.Name ?? '',
+        details,
+      })
     }
     offset = data.offset
   } while (offset)
 
-  // Build CSV — first column is Airtable's createdTime, rest are table fields
-  const header = ['Submitted At', ...FIELD_COLUMNS].map(escapeCSV).join(',')
-  const rows = records.map(({ createdTime, fields }) =>
-    [createdTime, ...FIELD_COLUMNS.map((col) => fields[col])].map(escapeCSV).join(','),
+  // Build CSV
+  const header = CSV_COLUMNS.map(escapeCSV).join(',')
+  const rows = records.map(({ createdTime, name, details }) =>
+    [
+      createdTime,
+      name,
+      details.email,
+      details.address1,
+      details.address2,
+      details.city,
+      details.state,
+      details.zip,
+      details.country,
+      details.kidsAttending,
+      details.hotelBlockInterest,
+      details.notes,
+    ].map(escapeCSV).join(','),
   )
   const csv = [header, ...rows].join('\r\n')
 
