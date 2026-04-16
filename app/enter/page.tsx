@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import BackgammonBoard from '@/components/BackgammonBoard'
 
 type Stage =
@@ -11,7 +11,6 @@ type Stage =
   | { name: 'error'; message: string }
 
 function EnterForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const rawFrom = searchParams.get('from') ?? '/'
   // Sanitize to prevent open redirect
@@ -23,9 +22,12 @@ function EnterForm() {
 
   useEffect(() => {
     if (stage.name !== 'success') return
-    const t = setTimeout(() => router.push(from), 3000)
+    // Use window.location to force a full request so the middleware sees the new auth cookie.
+    // router.push does a soft navigation that can use prefetched/cached payloads from before
+    // the cookie was set, causing the middleware to redirect back to /enter.
+    const t = setTimeout(() => { window.location.replace(from) }, 3000)
     return () => clearTimeout(t)
-  }, [stage, from, router])
+  }, [stage, from])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -56,7 +58,7 @@ function EnterForm() {
     }
   }
 
-  const handleContinue = () => router.push(from)
+  const handleContinue = () => { window.location.replace(from) }
 
   const showForm = stage.name === 'idle' || stage.name === 'loading' || stage.name === 'error'
 
