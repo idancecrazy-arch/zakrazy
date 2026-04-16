@@ -5,6 +5,7 @@ const AIRTABLE_ENV = {
   AIRTABLE_API_KEY: 'patTestKey123',
   AIRTABLE_BASE_ID: 'appTestBase456',
   AIRTABLE_TABLE_NAME: 'Submissions',
+  AIRTABLE_PRIMARY_FIELD: 'Title',
 }
 
 const validPayload = {
@@ -31,20 +32,24 @@ function makeRequest(body: unknown): NextRequest {
 
 describe('Airtable sync in /api/submit-details', () => {
   const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+  const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
 
   beforeEach(() => {
     warnSpy.mockClear()
+    logSpy.mockClear()
     delete process.env.AIRTABLE_API_KEY
     delete process.env.AIRTABLE_BASE_ID
     delete process.env.AIRTABLE_TABLE_NAME
+    delete process.env.AIRTABLE_PRIMARY_FIELD
   })
 
   afterEach(() => {
     warnSpy.mockClear()
+    logSpy.mockClear()
     vi.unstubAllGlobals()
   })
 
-  it('POSTs correct fields to Airtable when env vars are set', async () => {
+  it('POSTs correct data to Airtable when all env vars are set', async () => {
     Object.assign(process.env, AIRTABLE_ENV)
     const mockFetch = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ id: 'recTest' }), { status: 200 }),
@@ -58,32 +63,29 @@ describe('Airtable sync in /api/submit-details', () => {
     expect(res.status).toBe(201)
     expect(body.airtableSync).toBe(true)
 
-    // First call may be metadata API; find the records write call
-    const airtableWriteCall = mockFetch.mock.calls.find(
-      ([url]: [string]) =>
-        typeof url === 'string' &&
-        url.includes('airtable.com/v0') &&
-        !url.includes('/meta/'),
+    const airtableCall = mockFetch.mock.calls.find(
+      ([url]: [string]) => typeof url === 'string' && url.includes('airtable.com/v0'),
     )
-    expect(airtableWriteCall).toBeDefined()
+    expect(airtableCall).toBeDefined()
 
-    const [url, options] = airtableWriteCall as [string, RequestInit]
+    const [url, options] = airtableCall as [string, RequestInit]
     expect(url).toContain('appTestBase456')
     expect(url).toContain('Submissions')
     expect(options.method).toBe('POST')
 
-    // All data is stored as JSON in a single primary field
+    // All data stored as JSON in the configured primary field
     const sent = JSON.parse(options.body as string) as { fields: Record<string, string> }
-    const fieldValues = Object.values(sent.fields)
-    expect(fieldValues).toHaveLength(1)
-    const payload = JSON.parse(fieldValues[0]) as Record<string, unknown>
+    expect(sent.fields['Title']).toBeDefined()
+    const payload = JSON.parse(sent.fields['Title']) as Record<string, unknown>
     expect(payload['name']).toBe('Jane Smith')
     expect(payload['email']).toBe('jane@example.com')
     expect(payload['hotelBlockInterest']).toBe('Yes')
     expect(payload['kidsAttending']).toBe(2)
   })
 
-  it('returns airtableSync: null and warns when env vars are missing', async () => {
+  it('skips Airtable and warns when AIRTABLE_PRIMARY_FIELD is missing', async () => {
+    Object.assign(process.env, { ...AIRTABLE_ENV })
+    delete process.env.AIRTABLE_PRIMARY_FIELD
     vi.stubGlobal('fetch', vi.fn())
 
     const { POST } = await import('./route')
@@ -92,16 +94,27 @@ describe('Airtable sync in /api/submit-details', () => {
 
     expect(res.status).toBe(201)
     expect(body.airtableSync).toBeNull()
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('AIRTABLE_API_KEY'),
-    )
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('AIRTABLE_PRIMARY_FIELD'))
   })
 
-  it('returns airtableSync: false and still returns 201 when Airtable API errors', async () => {
+  it('returns airtableSync: null when Airtable env vars are absent', async () => {
+    vi.stubGlobal('fetch', vi.fn())
+
+    const { POST } = await import('./route')
+    const res = await POST(makeRequest(validPayload))
+    const body = await res.json()
+
+    expect(res.status).toBe(201)
+    expect(body.airtableSync).toBeNull()
+  })
+
+  it('returns airtableSync: false and warns (not errors) when Airtable API fails', async () => {
     Object.assign(process.env, AIRTABLE_ENV)
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue(new Response('Unauthorized', { status: 401 })),
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ error: { type: 'UNKNOWN_FIELD_NAME' } }), { status: 422 }),
+      ),
     )
 
     const { POST } = await import('./route')
@@ -110,5 +123,22 @@ describe('Airtable sync in /api/submit-details', () => {
 
     expect(res.status).toBe(201)
     expect(body.airtableSync).toBe(false)
+    // Must warn, not error
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Airtable write failed'),
+      expect.anything(),
+    )
+  })
+
+  it('always logs submission to console regardless of Airtable status', async () => {
+    vi.stubGlobal('fetch', vi.fn())
+
+    const { POST } = await import('./route')
+    await POST(makeRequest(validPayload))
+
+    expect(logSpy).toHaveBeenCalledWith(
+      'RSVP_SUBMISSION',
+      expect.stringContaining('jane@example.com'),
+    )
   })
 })

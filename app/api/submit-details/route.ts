@@ -15,35 +15,6 @@ const schema = z.object({
   notes: z.string().optional(),
 })
 
-// Discover the primary (first) field name of the Airtable table via the
-// Metadata API. Falls back to the AIRTABLE_PRIMARY_FIELD env var, then "Name".
-// Requires schema.bases:read scope on the personal access token.
-async function getAirtablePrimaryField(
-  apiKey: string,
-  baseId: string,
-  tableName: string,
-): Promise<string> {
-  if (process.env.AIRTABLE_PRIMARY_FIELD) return process.env.AIRTABLE_PRIMARY_FIELD
-
-  try {
-    const res = await fetch(
-      `https://api.airtable.com/v0/meta/bases/${encodeURIComponent(baseId)}/tables`,
-      { headers: { Authorization: `Bearer ${apiKey}` } },
-    )
-    if (res.ok) {
-      const data = (await res.json()) as {
-        tables: { id: string; name: string; fields: { name: string }[] }[]
-      }
-      const table = data.tables.find((t) => t.name === tableName || t.id === tableName)
-      if (table?.fields?.[0]?.name) return table.fields[0].name
-    }
-  } catch {
-    // fall through to default
-  }
-
-  return 'Name'
-}
-
 export async function POST(req: NextRequest) {
   let body: unknown
   try {
@@ -66,44 +37,46 @@ export async function POST(req: NextRequest) {
     ip: req.headers.get('x-forwarded-for') ?? 'unknown',
   }
 
-  // ── Airtable ──────────────────────────────────────────────────────
-  // Primary storage — free tier handles thousands of RSVPs.
-  // Set these env vars to enable:
-  //   AIRTABLE_API_KEY    — personal access token (needs data.records:write
-  //                          and schema.bases:read scopes)
-  //   AIRTABLE_BASE_ID    — base ID from the URL (starts with "app…")
-  //   AIRTABLE_TABLE_NAME — table name (default: "Submissions")
+  // ── Permanent record in Vercel logs ───────────────────────────────
+  // Every submission is logged here regardless of whether Airtable or
+  // email is configured. Vercel retains logs for 1 day on Hobby, longer
+  // on paid plans. Use /api/admin/export-rsvp to download a CSV from
+  // Airtable, or grep these logs as a fallback.
+  console.log('RSVP_SUBMISSION', JSON.stringify(submission))
+
+  // ── Airtable (optional) ───────────────────────────────────────────
+  // Set AIRTABLE_API_KEY + AIRTABLE_BASE_ID to enable.
+  // The token needs data.records:write scope.
   //
-  // No custom field setup required. All submission data is stored as JSON
-  // in the table's primary field (auto-discovered via the Metadata API).
-  // Optional override: AIRTABLE_PRIMARY_FIELD=<your field name>
+  // Also set AIRTABLE_PRIMARY_FIELD to the exact name of the primary
+  // (first) field in your Airtable table — e.g. "Name", "Title", etc.
+  // Without this the write will be skipped to avoid 422 errors.
   //
-  // Use GET /api/admin/export-rsvp to download a structured CSV.
+  // AIRTABLE_TABLE_NAME defaults to "Submissions".
   const airtableKey = process.env.AIRTABLE_API_KEY
   const airtableBase = process.env.AIRTABLE_BASE_ID
   const airtableTable = process.env.AIRTABLE_TABLE_NAME ?? 'Submissions'
+  const primaryField = process.env.AIRTABLE_PRIMARY_FIELD
 
   let airtableSync: boolean | null = null
 
-  if (airtableKey && airtableBase) {
+  if (airtableKey && airtableBase && primaryField) {
+    const payload = {
+      name: parsed.data.fullName,
+      email: parsed.data.email,
+      address1: parsed.data.address1,
+      address2: parsed.data.address2 ?? '',
+      city: parsed.data.city,
+      state: parsed.data.state,
+      zip: parsed.data.zip,
+      country: parsed.data.country,
+      kidsAttending: parsed.data.kidsAttending ?? 0,
+      hotelBlockInterest: parsed.data.hotelBlockInterest ? 'Yes' : 'No',
+      notes: parsed.data.notes ?? '',
+      submittedAt: submission.submittedAt,
+    }
+
     try {
-      const primaryField = await getAirtablePrimaryField(airtableKey, airtableBase, airtableTable)
-
-      const payload = {
-        name: parsed.data.fullName,
-        email: parsed.data.email,
-        address1: parsed.data.address1,
-        address2: parsed.data.address2 ?? '',
-        city: parsed.data.city,
-        state: parsed.data.state,
-        zip: parsed.data.zip,
-        country: parsed.data.country,
-        kidsAttending: parsed.data.kidsAttending ?? 0,
-        hotelBlockInterest: parsed.data.hotelBlockInterest ? 'Yes' : 'No',
-        notes: parsed.data.notes ?? '',
-        submittedAt: submission.submittedAt,
-      }
-
       const res = await fetch(
         `https://api.airtable.com/v0/${encodeURIComponent(airtableBase)}/${encodeURIComponent(airtableTable)}`,
         {
@@ -117,19 +90,23 @@ export async function POST(req: NextRequest) {
       )
       if (!res.ok) {
         const errText = await res.text()
-        throw new Error(`Airtable responded ${res.status}: ${errText}`)
+        console.warn('Airtable write failed (submission saved to logs):', errText)
+        airtableSync = false
+      } else {
+        airtableSync = true
       }
-      airtableSync = true
     } catch (err) {
+      console.warn('Airtable write failed (submission saved to logs):', err)
       airtableSync = false
-      console.error('Airtable write failed:', err)
     }
+  } else if (airtableKey && airtableBase && !primaryField) {
+    console.warn(
+      'Airtable sync skipped — set AIRTABLE_PRIMARY_FIELD to the name of ' +
+        'your table\'s primary field (e.g. "Name", "Title"). ' +
+        'Submission is saved to logs.',
+    )
   } else {
-    const missing = [
-      !airtableKey && 'AIRTABLE_API_KEY',
-      !airtableBase && 'AIRTABLE_BASE_ID',
-    ].filter(Boolean)
-    console.warn(`Airtable sync disabled — missing env vars: ${missing.join(', ')}`)
+    airtableSync = null
   }
 
   // ── Email notification via Resend ────────────────────────────────
@@ -165,7 +142,7 @@ export async function POST(req: NextRequest) {
         }),
       })
     } catch (err) {
-      console.error('Resend notification failed:', err)
+      console.warn('Resend notification failed:', err)
     }
   }
 
