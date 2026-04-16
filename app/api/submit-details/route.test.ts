@@ -73,7 +73,7 @@ describe('Google Sheets sync in /api/submit-details', () => {
 
     const call = mockAppend.mock.calls[0][0]
     expect(call.spreadsheetId).toBe('test-sheet-id')
-    expect(call.range).toBe('Sheet1')
+    expect(call.range).toBe('RSVP')
 
     const row: unknown[] = call.requestBody.values[0]
     // Index 0 is the ISO timestamp — just verify it looks like a date string

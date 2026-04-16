@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
       const sheets = google.sheets({ version: 'v4', auth })
       await sheets.spreadsheets.values.append({
         spreadsheetId: sheetId,
-        range: 'Sheet1',
+        range: 'RSVP',
         valueInputOption: 'USER_ENTERED',
         requestBody: {
           values: [[
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
         },
       })
     } catch (err) {
-      console.error('Google Sheets write failed:', err)
+      console.error('Google Sheets write failed:', err instanceof Error ? err.message : err)
     }
   }
 
