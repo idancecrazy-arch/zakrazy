@@ -9,91 +9,98 @@ export default function SwanMotif({
   size = 160,
   color = '#5A5044',
 }: SwanMotifProps) {
-  const h = Math.round(size * 220 / 380)
   return (
     <svg
-      viewBox="0 0 380 220"
+      viewBox="0 0 340 220"
       width={size}
-      height={h}
+      height={Math.round(size * 220 / 340)}
+      fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden="true"
     >
       {/* Head */}
-      <circle cx="52" cy="22" r="9" fill={color} />
+      <circle cx="50" cy="18" r="8" stroke={color} strokeWidth="1.6" fill="none" />
       {/* Eye */}
-      <circle cx="47" cy="17" r="2" fill="white" />
-      <circle cx="47" cy="17" r="1" fill={color} />
-      {/* Beak — banana-wedge pointing left */}
+      <circle cx="45" cy="13" r="1.5" fill={color} />
+      {/* Beak — small wedge pointing left */}
       <path
-        d="M 43 18 C 22 13 12 20 19 26 C 25 30 43 23 Z"
+        d="M 42 16 C 24 12 15 18 21 23 C 25 26 42 20 42 16 Z"
         fill={color}
       />
 
-      {/* Neck — filled lens S-curve, thick at base tapering to head */}
+      {/* Neck — outer breast curve (bold) */}
       <path
-        d="M 44 30 C 10 55 6 92 26 120 C 44 142 82 150 108 152
-           C 118 150 92 134 72 114 C 54 94 52 62 62 30 Z"
-        fill={color}
+        d="M 44 24 C 14 48 8 84 26 112 C 42 132 76 142 104 146"
+        stroke={color} strokeWidth="3.2" strokeLinecap="round"
+      />
+      {/* Neck — inner back curve (thin) */}
+      <path
+        d="M 60 22 C 50 44 50 74 58 98 C 66 116 88 128 114 134"
+        stroke={color} strokeWidth="1.0" strokeLinecap="round"
       />
 
-      {/* Body — 6 filled lens brushstroke paths forming the calligraphic body */}
+      {/* Body — 12 calligraphic pen-stroke paths, thin at top & bottom, boldest at center */}
 
-      {/* Stroke 1 — topmost, thinnest (~5px height) */}
-      <path
-        d="M 92 120 C 134 110 182 106 234 112 C 262 115 280 124 278 130
-           C 276 136 256 132 226 128 C 175 122 128 126 92 134 Z"
-        fill={color}
-      />
+      {/* Row 1  — hairline */}
+      <path d="M 96 120 C 132 115 172 113 224 117 C 250 119 266 124 264 130"
+        stroke={color} strokeWidth="0.8" strokeLinecap="round" />
 
-      {/* Stroke 2 — broader (~8px height) */}
-      <path
-        d="M 90 135 C 128 122 180 118 236 124 C 265 128 287 138 286 147
-           C 285 156 260 153 228 148 C 174 140 120 145 90 158 Z"
-        fill={color}
-      />
+      {/* Row 2 */}
+      <path d="M 92 129 C 130 123 174 120 230 125 C 258 128 276 135 274 142"
+        stroke={color} strokeWidth="1.2" strokeLinecap="round" />
 
-      {/* Stroke 3 — widest / boldest (~13px height, center of visual mass) */}
-      <path
-        d="M 88 150 C 122 136 176 132 234 138 C 265 143 292 154 291 165
-           C 290 176 264 174 229 168 C 172 160 115 166 88 180 Z"
-        fill={color}
-      />
+      {/* Row 3 */}
+      <path d="M 90 138 C 128 131 174 128 234 134 C 262 138 280 146 278 153"
+        stroke={color} strokeWidth="1.6" strokeLinecap="round" />
 
-      {/* Stroke 4 — tapering back down (~9px height) */}
-      <path
-        d="M 91 168 C 126 158 174 154 228 160 C 256 164 280 174 279 183
-           C 278 192 255 190 222 185 C 171 178 122 183 91 194 Z"
-        fill={color}
-      />
+      {/* Row 4 */}
+      <path d="M 88 147 C 126 139 172 136 234 142 C 263 146 282 155 280 163"
+        stroke={color} strokeWidth="2.0" strokeLinecap="round" />
 
-      {/* Stroke 5 — lower belly (~6px height) */}
-      <path
-        d="M 97 182 C 130 174 174 172 220 178 C 246 182 266 190 264 197
-           C 262 204 244 202 215 198 C 168 192 126 196 97 206 Z"
-        fill={color}
-      />
+      {/* Row 5 */}
+      <path d="M 88 156 C 124 147 170 144 232 150 C 262 154 282 164 280 172"
+        stroke={color} strokeWidth="2.3" strokeLinecap="round" />
 
-      {/* Stroke 6 — waterline, finest (~3px height) */}
-      <path
-        d="M 106 196 C 136 192 172 190 212 194 C 234 197 250 203 249 207
-           C 248 211 233 210 210 207 C 170 203 133 206 106 210 Z"
-        fill={color}
-      />
+      {/* Row 6 — boldest */}
+      <path d="M 88 165 C 122 155 168 152 230 158 C 260 162 282 173 280 181"
+        stroke={color} strokeWidth="2.5" strokeLinecap="round" />
 
-      {/* Tail — 3 stroked paths tapering from thick to whisper-thin */}
-      <path
-        d="M 282 120 C 318 148 348 178 352 220"
-        stroke={color} strokeWidth="3.5" strokeLinecap="round" fill="none"
-      />
-      <path
-        d="M 272 117 C 305 148 332 180 335 220"
-        stroke={color} strokeWidth="1.8" strokeLinecap="round" fill="none"
-      />
-      <path
-        d="M 261 114 C 291 146 316 178 318 220"
-        stroke={color} strokeWidth="0.8" strokeLinecap="round" fill="none"
-      />
+      {/* Row 7 — boldest */}
+      <path d="M 90 174 C 124 164 168 161 228 167 C 258 171 278 182 276 190"
+        stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+
+      {/* Row 8 */}
+      <path d="M 92 182 C 126 173 168 170 224 176 C 252 180 272 191 270 199"
+        stroke={color} strokeWidth="2.2" strokeLinecap="round" />
+
+      {/* Row 9 */}
+      <path d="M 96 190 C 128 182 168 180 218 185 C 246 189 264 199 262 207"
+        stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+
+      {/* Row 10 */}
+      <path d="M 102 197 C 132 190 168 188 210 193 C 236 197 252 206 250 213"
+        stroke={color} strokeWidth="1.4" strokeLinecap="round" />
+
+      {/* Row 11 */}
+      <path d="M 108 203 C 136 197 168 195 204 200 C 228 203 242 212 240 218"
+        stroke={color} strokeWidth="1.0" strokeLinecap="round" />
+
+      {/* Row 12 — hairline */}
+      <path d="M 116 208 C 142 203 168 202 198 206 C 218 209 230 216 228 220"
+        stroke={color} strokeWidth="0.7" strokeLinecap="round" />
+
+      {/* Tail — 5 long strokes fanning right, descending weight */}
+      <path d="M 272 122 C 298 140 318 164 324 200"
+        stroke={color} strokeWidth="2.8" strokeLinecap="round" />
+      <path d="M 268 120 C 292 140 310 166 314 200"
+        stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M 263 118 C 286 140 302 168 304 200"
+        stroke={color} strokeWidth="1.0" strokeLinecap="round" />
+      <path d="M 258 116 C 280 140 294 170 295 200"
+        stroke={color} strokeWidth="0.5" strokeLinecap="round" />
+      <path d="M 252 114 C 273 140 285 172 285 200"
+        stroke={color} strokeWidth="0.3" strokeLinecap="round" />
     </svg>
   )
 }
