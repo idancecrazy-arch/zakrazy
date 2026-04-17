@@ -4,7 +4,7 @@ import SwanMotif from '@/components/SwanMotif'
 import CrossMotif from '@/components/CrossMotif'
 import CountdownTimer from '@/components/CountdownTimer'
 import FeatherDivider from '@/components/FeatherDivider'
-import ChurchImage from '@/components/ChurchImage'
+import CloudMotif from '@/components/CloudMotif'
 import { COUPLE } from '@/lib/constants'
 
 export const metadata: Metadata = {
@@ -17,18 +17,35 @@ export default function HomePage() {
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-center text-center px-6 overflow-hidden">
 
-        {/* Celestial wisp background texture */}
-        <svg
-          className="absolute inset-0 w-full h-full opacity-[0.035] pointer-events-none"
-          viewBox="0 0 800 600"
-          preserveAspectRatio="xMidYMid slice"
-          aria-hidden="true"
-        >
-          <path d="M 0 200 C 200 100, 400 300, 800 150" stroke="#C3AF82" strokeWidth="80" fill="none" />
-          <path d="M 0 400 C 300 250, 500 450, 800 350" stroke="#C3AF82" strokeWidth="60" fill="none" />
-          <path d="M 0 550 C 250 480, 550 520, 800 480" stroke="#C3AF82" strokeWidth="40" fill="none" />
-          <path d="M 100 50 C 300 120, 600 20, 800 80" stroke="#C3AF82" strokeWidth="50" fill="none" />
-        </svg>
+        {/* Aetherial cloud backgrounds */}
+        <CloudMotif
+          className="absolute -top-4 -left-8 rotate-12"
+          fill="#FFE5CC"
+          opacity={0.06}
+          width={280}
+          height={112}
+        />
+        <CloudMotif
+          className="absolute top-1/4 -right-12 -rotate-6"
+          fill="#D4EED8"
+          opacity={0.07}
+          width={240}
+          height={96}
+        />
+        <CloudMotif
+          className="absolute bottom-1/4 -left-16 rotate-3"
+          fill="#F2DEDE"
+          opacity={0.06}
+          width={260}
+          height={104}
+        />
+        <CloudMotif
+          className="absolute -bottom-6 right-0 -rotate-12"
+          fill="#FFE5CC"
+          opacity={0.05}
+          width={220}
+          height={88}
+        />
 
         {/* Gold rule */}
         <div className="w-20 h-px bg-gold-line gold-rule mb-10" />
@@ -39,14 +56,19 @@ export default function HomePage() {
         </h1>
 
         {/* Date */}
-        <p className="font-italiana text-2xl sm:text-3xl text-dusty-lilac tracking-[0.2em] mb-4">
+        <p className="font-italiana text-2xl sm:text-3xl text-dusty-lilac tracking-[0.2em] mb-1">
           September 12, 2026
         </p>
 
+        {/* 龍鳳呈祥 — Dragon Phoenix Bring Fortune */}
+        <p className="font-chinese text-xl text-pale-gold/70 tracking-[0.3em] mb-4">
+          龍鳳呈祥
+        </p>
+
         {/* Swan + Cross motifs */}
-        <div className="mt-10 flex flex-col items-center gap-3">
-          <SwanMotif size={140} color="#C3AF82" />
-          <CrossMotif size={28} color="#D2C3A0" />
+        <div className="mt-8 flex flex-col items-center gap-3">
+          <SwanMotif size={140} color="#5A5044" />
+          <CrossMotif size={28} color="#EAD0B1" />
         </div>
 
         {/* Scroll cue */}
@@ -70,9 +92,9 @@ export default function HomePage() {
         </Link>
       </section>
 
-      {/* ── Feather divider ──────────────────────────────── */}
+      {/* ── Calligraphic divider ─────────────────────────── */}
       <div className="flex justify-center py-8 bg-ivory">
-        <FeatherDivider width={280} color="#D2C3A0" />
+        <FeatherDivider width={280} color="#EAD0B1" />
       </div>
 
       {/* ── Countdown ────────────────────────────────────── */}
@@ -107,7 +129,7 @@ export default function HomePage() {
 
       {/* ── Final swan ───────────────────────────────────── */}
       <section className="bg-ivory py-16 flex flex-col items-center gap-6 text-center px-6">
-        <SwanMotif size={100} color="#D2C3A0" />
+        <SwanMotif size={100} color="#5A5044" />
         <p className="font-lora italic text-base text-deep-ivory max-w-xs leading-relaxed">
           More details coming soon — we cannot wait to celebrate with you.
         </p>
