@@ -4,7 +4,50 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import RoseMotif from './RoseMotif'
+const GOOGLE_CAL_URL =
+  'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+  '&text=Christine+%26+Michael+Wedding' +
+  '&dates=20260912T160000%2F20260912T200000' +
+  '&ctz=America%2FNew_York' +
+  '&location=St.+Joseph%27s+Church%2C+371+Sixth+Avenue%2C+New+York+NY+10014' +
+  '&details=Save+the+Date+%E2%80%94+Christine+Liu+%26+Michael+Zakrajsek'
+
+const OUTLOOK_CAL_URL =
+  'https://outlook.live.com/calendar/0/deeplink/compose?subject=Christine+%26+Michael+Wedding' +
+  '&startdt=2026-09-12T16%3A00%3A00' +
+  '&enddt=2026-09-12T20%3A00%3A00' +
+  '&location=St.+Joseph%27s+Church%2C+New+York' +
+  '&body=Save+the+Date+%E2%80%94+Christine+Liu+%26+Michael+Zakrajsek'
+
+const ICS_CONTENT = [
+  'BEGIN:VCALENDAR',
+  'VERSION:2.0',
+  'CALSCALE:GREGORIAN',
+  'PRODID:-//Christine & Michael Wedding//EN',
+  'METHOD:PUBLISH',
+  'BEGIN:VEVENT',
+  'UID:christine-michael-wedding-20260912@zakrazy.vercel.app',
+  'SUMMARY:Christine & Michael Wedding',
+  'DTSTART;TZID=America/New_York:20260912T160000',
+  'DTEND;TZID=America/New_York:20260912T200000',
+  'DESCRIPTION:Save the Date — Christine Liu & Michael Zakrajsek',
+  "LOCATION:St. Joseph's Church\\, 371 Sixth Avenue\\, New York\\, NY 10014",
+  'STATUS:CONFIRMED',
+  'END:VEVENT',
+  'END:VCALENDAR',
+].join('\r\n')
+
+function downloadICS() {
+  const blob = new Blob([ICS_CONTENT], { type: 'text/calendar;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'christine-michael-wedding.ics'
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
 
 const schema = z.object({
   fullName: z.string().min(2, 'Please enter your full name'),
@@ -110,7 +153,6 @@ export default function DetailForm() {
   if (status === 'success') {
     return (
       <div className="flex flex-col items-center gap-8 text-center py-12 px-6">
-        <RoseMotif size={120} />
         <div className="flex flex-col gap-3">
           <h2 className="font-italiana text-4xl text-dark-taupe tracking-wide">
             Thank you, {submittedName}!
@@ -120,10 +162,38 @@ export default function DetailForm() {
             save&#8209;the&#8209;date.
           </p>
         </div>
-        <div className="w-16 h-px bg-pale-gold" />
         <p className="font-work-sans text-xs tracking-[0.18em] uppercase text-dark-taupe/80 font-medium">
           September 12, 2026 · New York
         </p>
+
+        {/* Calendar downloads */}
+        <div className="flex flex-col items-center gap-3 w-full max-w-xs">
+          <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">
+            Add to calendar
+          </p>
+          <a
+            href={GOOGLE_CAL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full font-work-sans text-[11px] tracking-[0.18em] uppercase px-6 py-3 border border-gold-line/50 text-dark-taupe hover:bg-blush transition-colors duration-200 text-center"
+          >
+            Google Calendar
+          </a>
+          <a
+            href={OUTLOOK_CAL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full font-work-sans text-[11px] tracking-[0.18em] uppercase px-6 py-3 border border-gold-line/50 text-dark-taupe hover:bg-blush transition-colors duration-200 text-center"
+          >
+            Outlook
+          </a>
+          <button
+            onClick={downloadICS}
+            className="w-full font-work-sans text-[11px] tracking-[0.18em] uppercase px-6 py-3 border border-gold-line/50 text-dark-taupe hover:bg-blush transition-colors duration-200"
+          >
+            Apple Calendar (iCal)
+          </button>
+        </div>
       </div>
     )
   }

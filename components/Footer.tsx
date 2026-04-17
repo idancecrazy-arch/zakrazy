@@ -1,13 +1,10 @@
 import Link from 'next/link'
-import BloomingRose from './BloomingRose'
 import { COUPLE, CONTACT_EMAIL } from '@/lib/constants'
 
 export default function Footer() {
   return (
     <footer className="bg-warm-cream border-t border-pale-gold/50 py-14">
       <div className="max-w-xl mx-auto px-6 flex flex-col items-center gap-6 text-center">
-
-        <BloomingRose size={160} />
 
         {/* Names and date */}
         <p className="font-italiana text-xl text-dark-taupe tracking-wide">

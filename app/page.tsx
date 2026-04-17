@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { Metadata } from 'next'
-import BloomingRose from '@/components/BloomingRose'
 import CrossMotif from '@/components/CrossMotif'
 import CtaBounce from '@/components/CtaBounce'
 import CountdownTimer from '@/components/CountdownTimer'
@@ -14,7 +13,7 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-start pt-40 text-center px-6 overflow-hidden">
+      <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-start pt-36 sm:pt-52 text-center px-6 overflow-hidden">
 
         {/* Celestial wisp background texture */}
         <svg
@@ -40,32 +39,32 @@ export default function HomePage() {
         </p>
 
         {/* Venue line */}
-        <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-soft-gray mb-14">
-          {VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}&ensp;·&ensp;{VENUE.city}
+        <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-soft-gray mb-2">
+          {VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}
+        </p>
+        <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-soft-gray mb-8 sm:mb-14">
+          {VENUE.city}
         </p>
 
         {/* Cross → CTA */}
-        <div className="flex flex-col items-center gap-8">
-          <div className="p-5 border border-gold-line/50 shadow-[0_0_0_6px_rgba(195,175,130,0.12)]">
-            <CrossMotif size={72} color="#D2C3A0" strokeWidth={5.5} />
-          </div>
+        <div className="flex flex-col items-center gap-6 sm:gap-8">
+          <CrossMotif size={72} color="#D2C3A0" strokeWidth={5.5} />
           <CtaBounce />
         </div>
       </section>
 
       {/* ── Countdown ────────────────────────────────────── */}
       <section className="bg-ivory py-20 px-6">
-        <div className="max-w-3xl mx-auto flex flex-col items-center gap-10 text-center">
+        <div className="max-w-3xl mx-auto flex flex-col items-center gap-6 text-center">
+          <CountdownTimer />
           <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray">
             Until the Celebration
           </p>
-          <CountdownTimer />
         </div>
       </section>
 
-      {/* ── Final rose ───────────────────────────────────── */}
+      {/* ── Final section ────────────────────────────────── */}
       <section className="bg-ivory py-16 flex flex-col items-center gap-6 text-center px-6">
-        <BloomingRose size={120} />
         <p className="font-lora italic text-base text-deep-ivory max-w-xs leading-relaxed">
           More details coming soon — we cannot wait to celebrate with you.
         </p>
