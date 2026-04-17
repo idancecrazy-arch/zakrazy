@@ -35,7 +35,7 @@ export default function HomePage() {
 
         {/* Date */}
         <p className="font-italiana text-2xl sm:text-3xl text-[#8C7DA0] tracking-[0.2em] mb-4">
-          September 12, 2026
+          September <span className="text-3xl sm:text-4xl">12, 2026</span>
         </p>
 
         {/* Venue line */}
