@@ -6,14 +6,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 const GOOGLE_CAL_URL =
   'https://calendar.google.com/calendar/render?action=TEMPLATE' +
-  '&text=Christine+%26+Michael+Wedding' +
+  '&text=Save+the+Date%3A+Christine+and+Michael+Wedding' +
   '&dates=20260912T140000%2F20260912T210000' +
   '&ctz=America%2FNew_York' +
   '&location=St.+Joseph%27s+Church%2C+371+Sixth+Avenue%2C+New+York+NY+10014' +
   '&details=Save+the+Date+%E2%80%94+Christine+Liu+%26+Michael+Zakrajsek'
 
 const OUTLOOK_CAL_URL =
-  'https://outlook.live.com/calendar/0/deeplink/compose?subject=Christine+%26+Michael+Wedding' +
+  'https://outlook.live.com/calendar/0/deeplink/compose?subject=Save+the+Date%3A+Christine+and+Michael+Wedding' +
   '&startdt=2026-09-12T14%3A00%3A00' +
   '&enddt=2026-09-12T21%3A00%3A00' +
   '&location=St.+Joseph%27s+Church%2C+New+York' +
@@ -27,7 +27,7 @@ const ICS_CONTENT = [
   'METHOD:PUBLISH',
   'BEGIN:VEVENT',
   'UID:christine-michael-wedding-20260912@zakrazy.vercel.app',
-  'SUMMARY:Christine & Michael Wedding',
+  'SUMMARY:Save the Date: Christine and Michael Wedding',
   'DTSTART;TZID=America/New_York:20260912T140000',
   'DTEND;TZID=America/New_York:20260912T210000',
   'DESCRIPTION:Save the Date — Christine Liu & Michael Zakrajsek',
