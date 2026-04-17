@@ -34,15 +34,15 @@ export default function HomePage() {
         </h1>
 
         {/* Date */}
-        <p className="font-italiana text-2xl sm:text-3xl text-dusty-lilac tracking-[0.2em] mb-4">
+        <p className="font-italiana text-2xl sm:text-3xl text-[#8B7AA0] tracking-[0.2em] mb-4">
           September 12, 2026
         </p>
 
         {/* Venue line */}
-        <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-soft-gray mb-2">
+        <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-[#8A8178] mb-2">
           {VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}
         </p>
-        <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-soft-gray mb-8 sm:mb-14">
+        <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-[#8A8178] mb-8 sm:mb-14">
           {VENUE.city}
         </p>
 
