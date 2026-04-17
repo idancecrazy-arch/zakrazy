@@ -45,7 +45,7 @@ export default function BloomingRose({ size = 200 }: Props) {
         muted
         playsInline
         preload="auto"
-        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block', mixBlendMode: 'screen' }}
       />
     </div>
   )

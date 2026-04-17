@@ -57,11 +57,11 @@ export default function HomePage() {
 
       {/* ── Countdown ────────────────────────────────────── */}
       <section className="bg-ivory py-20 px-6">
-        <div className="max-w-3xl mx-auto flex flex-col items-center gap-10 text-center">
+        <div className="max-w-3xl mx-auto flex flex-col items-center gap-6 text-center">
+          <CountdownTimer />
           <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray">
             Until the Celebration
           </p>
-          <CountdownTimer />
         </div>
       </section>
 
