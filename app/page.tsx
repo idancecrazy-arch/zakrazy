@@ -48,9 +48,7 @@ export default function HomePage() {
 
         {/* Cross → CTA */}
         <div className="flex flex-col items-center gap-6 sm:gap-8">
-          <div className="p-5 border border-gold-line/50 shadow-[0_0_0_6px_rgba(195,175,130,0.12)]">
-            <CrossMotif size={72} color="#D2C3A0" strokeWidth={5.5} />
-          </div>
+          <CrossMotif size={72} color="#D2C3A0" strokeWidth={5.5} />
           <CtaBounce />
         </div>
       </section>
