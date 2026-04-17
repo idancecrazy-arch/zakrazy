@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import SwanMotif from './SwanMotif'
+import RoseMotif from './RoseMotif'
 import { COUPLE, CONTACT_EMAIL } from '@/lib/constants'
 
 export default function Footer() {
@@ -10,8 +10,7 @@ export default function Footer() {
         {/* Gold rule */}
         <div className="w-24 h-px bg-gold-line gold-rule" />
 
-        {/* Swan */}
-        <SwanMotif size={64} color="#C3AF82" />
+        <RoseMotif size={64} />
 
         {/* Names and date */}
         <p className="font-italiana text-xl text-dark-taupe tracking-wide">
