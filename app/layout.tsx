@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
+import localFont from 'next/font/local'
 import {
-  Lovers_Quarrel,
   Cinzel_Decorative,
   Crimson_Pro,
   IM_Fell_English,
@@ -11,10 +11,11 @@ import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import { COUPLE, VENUE, SITE_URL } from '@/lib/constants'
 
-// Organic calligraphy script — main display headings (closest free match to Balzak/Ms Claudy)
-const loversQuarrel = Lovers_Quarrel({
-  weight: ['400'],
-  subsets: ['latin'],
+const balzak = localFont({
+  src: [
+    { path: '../public/Balzak.woff', weight: '400', style: 'normal' },
+    { path: '../public/Balzak.otf', weight: '400', style: 'normal' },
+  ],
   variable: '--font-italiana',
   display: 'swap',
 })
@@ -53,7 +54,7 @@ const cinzel = Cinzel({
 })
 
 const fontVars = [
-  loversQuarrel.variable,
+  balzak.variable,
   cinzelDecorative.variable,
   crimsonPro.variable,
   imFellEnglish.variable,
