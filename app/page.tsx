@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Metadata } from 'next'
-import RoseMotif from '@/components/RoseMotif'
+import BloomingRose from '@/components/BloomingRose'
 import CrossMotif from '@/components/CrossMotif'
 import CountdownTimer from '@/components/CountdownTimer'
 import FeatherDivider from '@/components/FeatherDivider'
@@ -29,9 +29,6 @@ export default function HomePage() {
           <path d="M 100 50 C 300 120, 600 20, 800 80" stroke="#C3AF82" strokeWidth="50" fill="none" />
         </svg>
 
-        {/* Gold rule */}
-        <div className="w-20 h-px bg-gold-line gold-rule mb-10" />
-
         {/* Main heading */}
         <h1 className="font-italiana text-6xl sm:text-7xl md:text-8xl text-dark-taupe tracking-wide leading-none mb-4">
           Save the Date
@@ -47,9 +44,9 @@ export default function HomePage() {
           {VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}&ensp;·&ensp;{VENUE.city}
         </p>
 
-        {/* Rose + Cross motifs */}
+        {/* Blooming rose + Cross motifs */}
         <div className="flex flex-col items-center gap-3">
-          <RoseMotif size={160} />
+          <BloomingRose size={200} />
           <CrossMotif size={28} color="#D2C3A0" />
         </div>
 
@@ -111,7 +108,7 @@ export default function HomePage() {
 
       {/* ── Final rose ───────────────────────────────────── */}
       <section className="bg-ivory py-16 flex flex-col items-center gap-6 text-center px-6">
-        <RoseMotif size={100} />
+        <BloomingRose size={120} />
         <p className="font-lora italic text-base text-deep-ivory max-w-xs leading-relaxed">
           More details coming soon — we cannot wait to celebrate with you.
         </p>
