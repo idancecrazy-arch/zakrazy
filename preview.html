@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Preview — Christine & Michael</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Ma+Shan+Zheng&family=Cinzel:wght@400;500&family=Crimson+Pro:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ivory:       #FFF8E1;
+    --warm-cream:  #FFE5CC;
+    --blush:       #F2DEDE;
+    --lilac:       #D4EED8;
+    --pale-gold:   #EAD0B1;
+    --gold-line:   #C8973F;
+    --dark-taupe:  #5A5044;
+    --deep-ivory:  #786E5F;
+  }
+
+  body {
+    background: var(--ivory);
+    color: var(--dark-taupe);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    min-height: 100vh;
+    background: var(--ivory);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cloud-bg { position: absolute; pointer-events: none; }
+  .cloud-tl { top: -1rem; left: -2rem; transform: rotate(12deg); }
+  .cloud-tr { top: 25%; right: -3rem; transform: rotate(-6deg); }
+  .cloud-bl { bottom: 25%; left: -4rem; transform: rotate(3deg); }
+  .cloud-br { bottom: -1.5rem; right: 0; transform: rotate(-12deg); }
+
+  .gold-rule {
+    width: 5rem; height: 1px;
+    background: var(--gold-line);
+    margin-bottom: 2.5rem;
+    transform-origin: center;
+    animation: drawLine 1.4s cubic-bezier(.25,.46,.45,.94) .3s both;
+  }
+  @keyframes drawLine { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+  h1 {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(3.5rem, 8vw, 6rem);
+    color: var(--dark-taupe);
+    line-height: 1;
+    margin-bottom: 1.2rem;
+    font-weight: 400;
+  }
+
+  .date {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    color: #B8D4BC;
+    letter-spacing: 0.2em;
+    margin-bottom: 0.4rem;
+  }
+
+  .chinese-flourish {
+    font-family: 'Ma Shan Zheng', cursive;
+    font-size: 1.2rem;
+    color: rgba(234, 208, 177, 0.75);
+    letter-spacing: 0.3em;
+    margin-bottom: 2rem;
+  }
+
+  .motifs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .scroll-cue {
+    position: absolute;
+    bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: bounce 1.5s ease-in-out infinite;
+  }
+  .scroll-cue-line { width: 1px; height: 2rem; background: rgba(234,208,177,0.6); }
+  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  /* ── Countdown section ── */
+  .countdown-section {
+    background: var(--ivory);
+    padding: 5rem 2rem;
+    text-align: center;
+  }
+  .section-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #C3BEB9;
+    margin-bottom: 2rem;
+  }
+  .countdown-box {
+    display: inline-block;
+    border: 1px solid var(--gold-line);
+    padding: 1.5rem 2.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .countdown-number {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    font-weight: 400;
+    color: var(--dark-taupe);
+  }
+  .countdown-unit {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #C3BEB9;
+    display: block;
+    margin-top: 0.25rem;
+  }
+  .invite-text {
+    font-family: 'Great Vibes', cursive;
+    font-size: 1.4rem;
+    color: var(--deep-ivory);
+    font-style: normal;
+    margin-bottom: 1.5rem;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .couple-names {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .partner-name {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    color: var(--dark-taupe);
+    font-weight: 400;
+  }
+  .ampersand {
+    font-family: 'Great Vibes', cursive;
+    font-size: 1.4rem;
+    color: var(--gold-line);
+  }
+
+  /* ── Color palette strip ── */
+  .palette-section {
+    background: var(--warm-cream);
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+  .palette-section h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #C3BEB9;
+    margin-bottom: 1.5rem;
+  }
+  .swatches {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .swatch-block {
+    width: 60px;
+    height: 60px;
+    border-radius: 2px;
+    border: 1px solid rgba(90,80,68,0.12);
+  }
+  .swatch-label {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    color: var(--deep-ivory);
+    text-transform: uppercase;
+  }
+
+  /* ── Divider section ── */
+  .divider-section {
+    background: var(--ivory);
+    padding: 2rem 2rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* ── Typography showcase ── */
+  .type-section {
+    background: var(--ivory);
+    padding: 3rem 2rem 4rem;
+    text-align: center;
+    border-top: 1px solid rgba(234,208,177,0.4);
+  }
+  .type-section h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #C3BEB9;
+    margin-bottom: 2rem;
+  }
+  .type-specimen {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  .type-row {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    justify-content: center;
+  }
+  .type-meta {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #C3BEB9;
+    min-width: 130px;
+    text-align: right;
+  }
+  .great-vibes-hero { font-family: 'Great Vibes', cursive; font-size: 3rem; color: var(--dark-taupe); }
+  .great-vibes-body { font-family: 'Great Vibes', cursive; font-size: 1.4rem; color: var(--deep-ivory); }
+  .ma-shan { font-family: 'Ma Shan Zheng', cursive; font-size: 1.8rem; color: var(--dark-taupe); }
+  .cinzel-label { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--dark-taupe); }
+  .crimson-body { font-family: 'Crimson Pro', serif; font-size: 17px; color: var(--dark-taupe); }
+</style>
+</head>
+<body>
+
+<!-- ── Hero ─────────────────────── -->
+<section class="hero">
+
+  <!-- Cloud backgrounds -->
+  <svg class="cloud-bg cloud-tl" viewBox="0 0 200 80" width="280" height="112" aria-hidden="true" style="opacity:0.06">
+    <path d="M 20 70 C 20 55 30 45 42 45 C 42 35 50 28 60 28 C 60 18 70 12 82 14 C 90 8 100 6 108 12 C 116 6 128 8 134 14 C 146 12 156 18 156 28 C 168 28 178 35 178 45 C 190 45 200 55 200 70 Z" fill="#FFE5CC"/>
+    <path d="M 20 70 C 15 74 10 78 18 80 C 26 82 30 77 26 73" fill="#FFE5CC"/>
+    <path d="M 200 70 C 205 74 210 78 202 80 C 194 82 190 77 194 73" fill="#FFE5CC"/>
+  </svg>
+  <svg class="cloud-bg cloud-tr" viewBox="0 0 200 80" width="240" height="96" aria-hidden="true" style="opacity:0.07">
+    <path d="M 20 70 C 20 55 30 45 42 45 C 42 35 50 28 60 28 C 60 18 70 12 82 14 C 90 8 100 6 108 12 C 116 6 128 8 134 14 C 146 12 156 18 156 28 C 168 28 178 35 178 45 C 190 45 200 55 200 70 Z" fill="#D4EED8"/>
+    <path d="M 20 70 C 15 74 10 78 18 80 C 26 82 30 77 26 73" fill="#D4EED8"/>
+    <path d="M 200 70 C 205 74 210 78 202 80 C 194 82 190 77 194 73" fill="#D4EED8"/>
+  </svg>
+  <svg class="cloud-bg cloud-bl" viewBox="0 0 200 80" width="260" height="104" aria-hidden="true" style="opacity:0.06">
+    <path d="M 20 70 C 20 55 30 45 42 45 C 42 35 50 28 60 28 C 60 18 70 12 82 14 C 90 8 100 6 108 12 C 116 6 128 8 134 14 C 146 12 156 18 156 28 C 168 28 178 35 178 45 C 190 45 200 55 200 70 Z" fill="#F2DEDE"/>
+    <path d="M 20 70 C 15 74 10 78 18 80 C 26 82 30 77 26 73" fill="#F2DEDE"/>
+    <path d="M 200 70 C 205 74 210 78 202 80 C 194 82 190 77 194 73" fill="#F2DEDE"/>
+  </svg>
+
+  <div class="gold-rule"></div>
+
+  <h1>Save the Date</h1>
+
+  <p class="date">September 12, 2026</p>
+  <p class="chinese-flourish">龍鳳呈祥</p>
+
+  <div class="motifs">
+    <!-- Swan Motif — brushstroke body -->
+    <svg viewBox="0 0 380 220" width="140" height="81" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="52" cy="22" r="9" fill="#5A5044"/>
+      <circle cx="47" cy="17" r="2" fill="white"/>
+      <circle cx="47" cy="17" r="1" fill="#5A5044"/>
+      <path d="M 43 18 C 22 13 12 20 19 26 C 25 30 43 23 Z" fill="#5A5044"/>
+      <path d="M 44 30 C 10 55 6 92 26 120 C 44 142 82 150 108 152 C 118 150 92 134 72 114 C 54 94 52 62 62 30 Z" fill="#5A5044"/>
+      <path d="M 92 120 C 134 110 182 106 234 112 C 262 115 280 124 278 130 C 276 136 256 132 226 128 C 175 122 128 126 92 134 Z" fill="#5A5044"/>
+      <path d="M 90 135 C 128 122 180 118 236 124 C 265 128 287 138 286 147 C 285 156 260 153 228 148 C 174 140 120 145 90 158 Z" fill="#5A5044"/>
+      <path d="M 88 150 C 122 136 176 132 234 138 C 265 143 292 154 291 165 C 290 176 264 174 229 168 C 172 160 115 166 88 180 Z" fill="#5A5044"/>
+      <path d="M 91 168 C 126 158 174 154 228 160 C 256 164 280 174 279 183 C 278 192 255 190 222 185 C 171 178 122 183 91 194 Z" fill="#5A5044"/>
+      <path d="M 97 182 C 130 174 174 172 220 178 C 246 182 266 190 264 197 C 262 204 244 202 215 198 C 168 192 126 196 97 206 Z" fill="#5A5044"/>
+      <path d="M 106 196 C 136 192 172 190 212 194 C 234 197 250 203 249 207 C 248 211 233 210 210 207 C 170 203 133 206 106 210 Z" fill="#5A5044"/>
+      <path d="M 282 120 C 318 148 348 178 352 220" stroke="#5A5044" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <path d="M 272 117 C 305 148 332 180 335 220" stroke="#5A5044" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+      <path d="M 261 114 C 291 146 316 178 318 220" stroke="#5A5044" stroke-width="0.8" stroke-linecap="round" fill="none"/>
+    </svg>
+
+    <!-- Cross Motif -->
+    <svg viewBox="0 0 40 60" width="28" height="42" aria-hidden="true">
+      <line x1="20" y1="6" x2="20" y2="54" stroke="#EAD0B1" stroke-width="2.8" stroke-linecap="round"/>
+      <line x1="6" y1="20" x2="34" y2="20" stroke="#EAD0B1" stroke-width="2.8" stroke-linecap="round"/>
+      <line x1="20" y1="6" x2="20" y2="10" stroke="#EAD0B1" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="17" y1="6" x2="23" y2="6" stroke="#EAD0B1" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="17" y1="54" x2="23" y2="54" stroke="#EAD0B1" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="6" y1="17" x2="6" y2="23" stroke="#EAD0B1" stroke-width="1.8" stroke-linecap="round"/>
+      <line x1="34" y1="17" x2="34" y2="23" stroke="#EAD0B1" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div class="scroll-cue"><div class="scroll-cue-line"></div></div>
+</section>
+
+<!-- ── Countdown ────────────────── -->
+<section class="countdown-section">
+  <p class="section-label">Until the Celebration</p>
+  <div class="countdown-box">
+    <div class="countdown-number">148</div>
+    <span class="countdown-unit">Days</span>
+  </div>
+  <p class="invite-text">We joyfully invite you to celebrate with us</p>
+  <div class="couple-names">
+    <span class="partner-name">Christine Liu</span>
+    <span class="ampersand">&amp;</span>
+    <span class="partner-name">Michael Zakrajsek</span>
+  </div>
+  <div style="width:4rem;height:1px;background:var(--pale-gold);margin:2rem auto 0;"></div>
+</section>
+
+<!-- ── Calligraphic divider ─────── -->
+<div class="divider-section">
+  <svg viewBox="0 0 320 24" width="320" height="24" aria-hidden="true">
+    <path d="M 160 6 L 165 12 L 160 18 L 155 12 Z" fill="#EAD0B1"/>
+    <line x1="146" y1="12" x2="8"   y2="12" stroke="#EAD0B1" stroke-width="0.4" stroke-linecap="round"/>
+    <line x1="146" y1="12" x2="75"  y2="12" stroke="#EAD0B1" stroke-width="0.9" stroke-linecap="round"/>
+    <line x1="146" y1="12" x2="111" y2="12" stroke="#EAD0B1" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="174" y1="12" x2="312" y2="12" stroke="#EAD0B1" stroke-width="0.4" stroke-linecap="round"/>
+    <line x1="174" y1="12" x2="245" y2="12" stroke="#EAD0B1" stroke-width="0.9" stroke-linecap="round"/>
+    <line x1="174" y1="12" x2="209" y2="12" stroke="#EAD0B1" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+</div>
+
+<!-- ── Color palette ─────────────── -->
+<section class="palette-section">
+  <h3>Color Palette</h3>
+  <div class="swatches">
+    <div class="swatch"><div class="swatch-block" style="background:#FFF8E1"></div><span class="swatch-label">Antique Creme</span></div>
+    <div class="swatch"><div class="swatch-block" style="background:#FFE5CC"></div><span class="swatch-label">Pastel Peach</span></div>
+    <div class="swatch"><div class="swatch-block" style="background:#EAD0B1"></div><span class="swatch-label">Champagne Gold</span></div>
+    <div class="swatch"><div class="swatch-block" style="background:#D4EED8"></div><span class="swatch-label">Pastel Sage</span></div>
+    <div class="swatch"><div class="swatch-block" style="background:#F2DEDE"></div><span class="swatch-label">Rose Cloud</span></div>
+    <div class="swatch"><div class="swatch-block" style="background:#FFDAB9"></div><span class="swatch-label">Pastel Apricot</span></div>
+    <div class="swatch"><div class="swatch-block" style="background:#5A5044;border-color:transparent"></div><span class="swatch-label">Dark Taupe</span></div>
+  </div>
+</section>
+
+<!-- ── Typography ───────────────── -->
+<section class="type-section">
+  <h3>Typography System</h3>
+  <div class="type-specimen">
+    <div class="type-row">
+      <span class="type-meta">Hero heading</span>
+      <span class="great-vibes-hero">Save the Date</span>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">Chinese brush</span>
+      <span class="ma-shan">龍鳳呈祥</span>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">Script prose</span>
+      <span class="great-vibes-body">We joyfully invite you to celebrate with us</span>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">Labels / nav</span>
+      <span class="cinzel-label">Confirm Your Details</span>
+    </div>
+    <div class="type-row">
+      <span class="type-meta">Body copy</span>
+      <span class="crimson-body">More details coming soon — we cannot wait to celebrate with you.</span>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
