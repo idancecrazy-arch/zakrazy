@@ -44,10 +44,10 @@ export default function HomePage() {
           {VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}&ensp;·&ensp;{VENUE.city}
         </p>
 
-        {/* Blooming rose + Cross motifs */}
-        <div className="flex flex-col items-center gap-3">
-          <BloomingRose size={200} />
-          <CrossMotif size={28} color="#D2C3A0" />
+        {/* Cross + Blooming rose */}
+        <div className="flex flex-col items-center gap-6">
+          <CrossMotif size={72} color="#D2C3A0" strokeWidth={5.5} />
+          <BloomingRose size={280} />
         </div>
 
         {/* Scroll cue */}
