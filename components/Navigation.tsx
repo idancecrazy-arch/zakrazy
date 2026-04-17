@@ -39,15 +39,16 @@ export default function Navigation() {
           ${scrolled || menuOpen ? 'bg-ivory shadow-sm' : 'bg-transparent'}
         `}
       >
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
           {/* Names / logo */}
           <Link
             href="/"
-            className="font-italiana text-xl text-dark-taupe tracking-wide hover:text-dusty-lilac transition-colors duration-300"
+            className="font-italiana text-dark-taupe tracking-wide hover:text-dusty-lilac transition-colors duration-300"
           >
-            <span className="flex flex-col leading-tight text-left">
-              <span>{COUPLE.partner1.first}</span>
-              <span className="text-gold-line font-crimson italic text-sm">&amp; {COUPLE.partner2.first}</span>
+            <span className="flex flex-col items-start leading-snug">
+              <span className="text-2xl">{COUPLE.partner1.first} {COUPLE.partner1.last}</span>
+              <span className="text-gold-line text-sm self-center">&amp;</span>
+              <span className="text-2xl">{COUPLE.partner2.first} {COUPLE.partner2.last}</span>
             </span>
           </Link>
 

@@ -19,14 +19,15 @@ export default function BloomingRose({ size = 200 }: Props) {
     v.currentTime = 0
   }
 
+  // No top fade so the rose bloom is never clipped; gentle bottom + side fades only
   const maskStyle = {
     WebkitMaskImage: [
-      'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)',
-      'linear-gradient(to right,  transparent 0%, black 18%, black 82%, transparent 100%)',
+      'linear-gradient(to bottom, black 0%, black 72%, transparent 100%)',
+      'linear-gradient(to right,  transparent 0%, black 14%, black 86%, transparent 100%)',
     ].join(', '),
     maskImage: [
-      'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)',
-      'linear-gradient(to right,  transparent 0%, black 18%, black 82%, transparent 100%)',
+      'linear-gradient(to bottom, black 0%, black 72%, transparent 100%)',
+      'linear-gradient(to right,  transparent 0%, black 14%, black 86%, transparent 100%)',
     ].join(', '),
     WebkitMaskComposite: 'destination-in' as const,
     maskComposite: 'intersect' as const,

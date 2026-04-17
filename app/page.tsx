@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { Metadata } from 'next'
-import BloomingRose from '@/components/BloomingRose'
 import CrossMotif from '@/components/CrossMotif'
 import CtaBounce from '@/components/CtaBounce'
 import CountdownTimer from '@/components/CountdownTimer'
@@ -40,8 +39,11 @@ export default function HomePage() {
         </p>
 
         {/* Venue line */}
-        <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-soft-gray mb-14">
-          {VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}&ensp;·&ensp;{VENUE.city}
+        <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-soft-gray mb-2">
+          {VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}
+        </p>
+        <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-soft-gray mb-14">
+          {VENUE.city}
         </p>
 
         {/* Cross → CTA */}
@@ -63,9 +65,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Final rose ───────────────────────────────────── */}
+      {/* ── Final section ────────────────────────────────── */}
       <section className="bg-ivory py-16 flex flex-col items-center gap-6 text-center px-6">
-        <BloomingRose size={120} />
         <p className="font-lora italic text-base text-deep-ivory max-w-xs leading-relaxed">
           More details coming soon — we cannot wait to celebrate with you.
         </p>
