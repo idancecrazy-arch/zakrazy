@@ -39,7 +39,7 @@ export default function Navigation() {
           ${scrolled || menuOpen ? 'bg-ivory shadow-sm' : 'bg-transparent'}
         `}
       >
-        <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           {/* Names / logo */}
           <Link
             href="/"

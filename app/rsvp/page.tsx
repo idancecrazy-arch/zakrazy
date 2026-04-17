@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function RSVPPage() {
   return (
-    <div className="min-h-screen bg-ivory pt-28 sm:pt-32 pb-24 px-5 sm:px-6">
+    <div className="min-h-screen bg-ivory pt-36 sm:pt-40 pb-24 px-5 sm:px-6">
       <div className="max-w-2xl mx-auto">
 
         {/* Header */}

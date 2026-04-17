@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function OurStoryPage() {
   return (
-    <div className="min-h-screen bg-ivory pt-16 flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-ivory pt-36 flex flex-col items-center justify-center">
       <div className="max-w-xl mx-auto px-6 py-32 flex flex-col items-center gap-10 text-center">
         <h1 className="font-italiana text-5xl sm:text-6xl text-dark-taupe tracking-wide">
           Our Story

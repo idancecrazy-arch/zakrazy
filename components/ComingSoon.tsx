@@ -7,7 +7,7 @@ interface ComingSoonProps {
 
 export default function ComingSoon({ title, subtitle }: ComingSoonProps) {
   return (
-    <div className="min-h-screen bg-ivory flex items-center justify-center px-6 pt-16">
+    <div className="min-h-screen bg-ivory flex items-center justify-center px-6 pt-36">
       <div className="flex flex-col items-center text-center gap-8 max-w-md">
 
         <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray">
