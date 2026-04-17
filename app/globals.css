@@ -1,34 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── New Palette — Chinese-Western Fusion ── */
-  --color-ivory:          #FFF8E1;   /* Antique Creme — primary bg */
-  --color-warm-cream:     #FFE5CC;   /* Pastel Peach — secondary bg */
-  --color-blush:          #F2DEDE;   /* Rose Cloud */
-  --color-shell-pink:     #FFDAB9;   /* Pastel Apricot */
-  --color-lilac:          #D4EED8;   /* Pastel Sage */
-  --color-dusty-lilac:    #B8D4BC;   /* Deepened sage — active states */
-  --color-pale-gold:      #EAD0B1;   /* Champagne Gold */
-  --color-gold-line:      #C8973F;   /* Warm gold — rules & lines */
-  --color-soft-gray:      #C3BEB9;
-  --color-dark-taupe:     #5A5044;
-  --color-deep-ivory:     #786E5F;
-  --color-muted-rose:     #C3A59E;
-
-  /* Full named palette (for new components) */
-  --color-champagne-gold: #EAD0B1;
-  --color-pastel-peach:   #FFE5CC;
-  --color-pastel-sage:    #D4EED8;
-  --color-rose-cloud:     #F2DEDE;
-  --color-pastel-apricot: #FFDAB9;
-  --color-antique-creme:  #FFF8E1;
+  /* ── Celestial Plié Color Palette ── */
+  --color-ivory:        #FAF5EB;
+  --color-warm-cream:   #F5EEE1;
+  --color-blush:        #EBD2C8;
+  --color-shell-pink:   #E4C3BC;
+  --color-lilac:        #C8B9D2;
+  --color-dusty-lilac:  #B4A5C3;
+  --color-pale-gold:    #D2C3A0;
+  --color-gold-line:    #C3AF82;
+  --color-soft-gray:    #C3BEB9;
+  --color-dark-taupe:   #5A5044;
+  --color-deep-ivory:   #786E5F;
+  --color-muted-rose:   #C3A59E;
 }
 
 /* ── Typography utilities ── */
 @layer utilities {
-  /* .font-italiana now renders Great Vibes fountain pen script */
   .font-italiana {
-    font-family: var(--font-fountain-pen), 'Palatino Linotype', cursive;
+    font-family: var(--font-italiana), 'Garamond', 'Palatino Linotype', serif;
   }
   .font-poiret {
     font-family: var(--font-poiret-one), 'Palatino Linotype', serif;
@@ -36,19 +27,11 @@
   .font-crimson {
     font-family: var(--font-crimson-pro), Georgia, serif;
   }
-  /* .font-lora now also renders fountain pen script */
   .font-lora {
-    font-family: var(--font-fountain-pen), 'Palatino Linotype', cursive;
+    font-family: var(--font-lora), 'Book Antiqua', Georgia, serif;
   }
   .font-work-sans {
     font-family: var(--font-work-sans), 'Palatino Linotype', serif;
-  }
-  /* New utilities */
-  .font-chinese {
-    font-family: var(--font-chinese-brush), 'STKaiti', 'KaiTi', cursive;
-  }
-  .font-script {
-    font-family: var(--font-fountain-pen), 'Palatino Linotype', cursive;
   }
 }
 
@@ -58,7 +41,7 @@ html {
 }
 
 body {
-  background-color: #FFF8E1;
+  background-color: #FAF5EB;
   color: #5A5044;
   font-family: var(--font-crimson-pro), Georgia, serif;
   font-size: 17px;

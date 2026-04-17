@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import {
-  Ma_Shan_Zheng,
-  Great_Vibes,
+  Cormorant_Garamond,
   Cinzel_Decorative,
   Crimson_Pro,
+  IM_Fell_English,
   Cinzel,
 } from 'next/font/google'
 import './globals.css'
@@ -11,19 +11,12 @@ import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import { COUPLE, VENUE, SITE_URL } from '@/lib/constants'
 
-// Traditional Chinese brush calligraphy — heroes and 龍鳳呈祥 flourishes
-const maShanZheng = Ma_Shan_Zheng({
-  weight: ['400'],
+// Extreme thick/thin contrast — classical calligraphic cut for headings
+const cormorantGaramond = Cormorant_Garamond({
+  weight: ['300', '400', '600'],
+  style: ['normal', 'italic'],
   subsets: ['latin'],
-  variable: '--font-chinese-brush',
-  display: 'swap',
-})
-
-// Connective fountain pen script — main English headings and prose
-const greatVibes = Great_Vibes({
-  weight: ['400'],
-  subsets: ['latin'],
-  variable: '--font-fountain-pen',
+  variable: '--font-italiana',
   display: 'swap',
 })
 
@@ -43,6 +36,15 @@ const crimsonPro = Crimson_Pro({
   display: 'swap',
 })
 
+// Genuine old-press ink character for italic prose
+const imFellEnglish = IM_Fell_English({
+  weight: ['400'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+  variable: '--font-lora',
+  display: 'swap',
+})
+
 // Classical Roman small caps for buttons and labels
 const cinzel = Cinzel({
   weight: ['400', '500', '600'],
@@ -52,10 +54,10 @@ const cinzel = Cinzel({
 })
 
 const fontVars = [
-  maShanZheng.variable,
-  greatVibes.variable,
+  cormorantGaramond.variable,
   cinzelDecorative.variable,
   crimsonPro.variable,
+  imFellEnglish.variable,
   cinzel.variable,
 ].join(' ')
 
