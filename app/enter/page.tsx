@@ -79,8 +79,6 @@ function EnterForm() {
       {/* Password form */}
       {showForm && (
         <div className="relative z-10 flex flex-col items-center gap-8 w-full max-w-sm">
-          <div className="w-20 h-px bg-gold-line gold-rule" />
-
           <h1 className="font-italiana text-5xl sm:text-6xl text-dark-taupe tracking-wide text-center leading-tight">
             Christine &amp; Michael
           </h1>
@@ -88,8 +86,6 @@ function EnterForm() {
           <p className="font-lora italic text-base text-deep-ivory text-center">
             Enter the password to continue
           </p>
-
-          <div className="w-16 h-px bg-pale-gold/60" />
 
           <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
             <input
@@ -135,20 +131,15 @@ function EnterForm() {
             </button>
           </form>
 
-          <div className="w-16 h-px bg-pale-gold/40" />
         </div>
       )}
 
       {/* Success: text response */}
       {stage.name === 'success' && stage.type === 'text' && (
         <div className="relative z-10 flex flex-col items-center gap-10 text-center">
-          <div className="w-20 h-px bg-gold-line gold-rule" />
-
           <p className="font-italiana text-7xl sm:text-8xl md:text-9xl text-dark-taupe tracking-wide">
             {stage.message}
           </p>
-
-          <div className="w-16 h-px bg-pale-gold/60" />
 
           <button
             onClick={handleContinue}
@@ -171,11 +162,7 @@ function EnterForm() {
       {/* Success: backgammon board */}
       {stage.name === 'success' && stage.type === 'board' && (
         <div className="relative z-10 flex flex-col items-center gap-8 text-center w-full max-w-xl">
-          <div className="w-20 h-px bg-gold-line gold-rule" />
-
           <BackgammonBoard />
-
-          <div className="w-16 h-px bg-pale-gold/60" />
 
           <button
             onClick={handleContinue}

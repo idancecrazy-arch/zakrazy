@@ -1,6 +1,4 @@
 import Link from 'next/link'
-import RoseMotif from './RoseMotif'
-import FeatherDivider from './FeatherDivider'
 
 interface ComingSoonProps {
   title: string
@@ -20,13 +18,9 @@ export default function ComingSoon({ title, subtitle }: ComingSoonProps) {
           {title}
         </h1>
 
-        <FeatherDivider width={200} color="#D2C3A0" />
-
         <p className="font-lora italic text-xl text-deep-ivory leading-relaxed">
           Details coming soon — we can&apos;t wait to share more with you.
         </p>
-
-        <RoseMotif size={120} />
 
         <Link
           href="/"

@@ -13,7 +13,7 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-start pt-40 text-center px-6 overflow-hidden">
+      <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-start pt-28 sm:pt-40 text-center px-6 overflow-hidden">
 
         {/* Celestial wisp background texture */}
         <svg
@@ -42,12 +42,12 @@ export default function HomePage() {
         <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-soft-gray mb-2">
           {VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}
         </p>
-        <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-soft-gray mb-14">
+        <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-soft-gray mb-8 sm:mb-14">
           {VENUE.city}
         </p>
 
         {/* Cross → CTA */}
-        <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center gap-6 sm:gap-8">
           <div className="p-5 border border-gold-line/50 shadow-[0_0_0_6px_rgba(195,175,130,0.12)]">
             <CrossMotif size={72} color="#D2C3A0" strokeWidth={5.5} />
           </div>

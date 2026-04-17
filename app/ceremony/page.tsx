@@ -1,9 +1,7 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import CrossMotif from '@/components/CrossMotif'
-import FeatherDivider from '@/components/FeatherDivider'
 import ArchMotif from '@/components/ArchMotif'
-import RoseMotif from '@/components/RoseMotif'
 import ChurchImage from '@/components/ChurchImage'
 import { VENUE } from '@/lib/constants'
 
@@ -26,7 +24,6 @@ export default function CeremonyPage() {
           <h1 className="font-italiana text-5xl sm:text-6xl text-dark-taupe tracking-wide leading-tight">
             Ceremony Details
           </h1>
-          <FeatherDivider width={240} color="#D2C3A0" />
         </div>
 
         {/* Church name + cross */}
@@ -75,7 +72,7 @@ export default function CeremonyPage() {
           </p>
         </div>
 
-        <FeatherDivider width={200} color="#D2C3A0" className="mx-auto mb-14" />
+        <div className="mb-14" />
 
         {/* Details grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-pale-gold/30 border border-pale-gold/30 mb-14">
@@ -130,7 +127,7 @@ export default function CeremonyPage() {
           </p>
         </div>
 
-        <FeatherDivider width={200} color="#D2C3A0" className="mx-auto mb-14" />
+        <div className="mb-14" />
 
         {/* What to Expect */}
         <div className="flex flex-col gap-6 mb-16">
@@ -161,7 +158,6 @@ export default function CeremonyPage() {
         </div>
 
         <div className="flex flex-col items-center gap-6 mt-10">
-          <RoseMotif size={100} />
           <p className="font-lora italic text-base text-deep-ivory text-center">
             September 12, 2026 · St. Joseph&apos;s Church · New York
           </p>

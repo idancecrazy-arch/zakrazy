@@ -4,8 +4,6 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import RoseMotif from './RoseMotif'
-
 const GOOGLE_CAL_URL =
   'https://calendar.google.com/calendar/render?action=TEMPLATE' +
   '&text=Christine+%26+Michael+Wedding' +
@@ -155,7 +153,6 @@ export default function DetailForm() {
   if (status === 'success') {
     return (
       <div className="flex flex-col items-center gap-8 text-center py-12 px-6">
-        <RoseMotif size={120} />
         <div className="flex flex-col gap-3">
           <h2 className="font-italiana text-4xl text-dark-taupe tracking-wide">
             Thank you, {submittedName}!
@@ -165,7 +162,6 @@ export default function DetailForm() {
             save&#8209;the&#8209;date.
           </p>
         </div>
-        <div className="w-16 h-px bg-pale-gold" />
         <p className="font-work-sans text-xs tracking-[0.18em] uppercase text-dark-taupe/80 font-medium">
           September 12, 2026 · New York
         </p>
