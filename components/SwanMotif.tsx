@@ -11,85 +11,95 @@ export default function SwanMotif({
 }: SwanMotifProps) {
   return (
     <svg
-      viewBox="0 0 200 140"
+      viewBox="0 0 260 172"
       width={size}
-      height={size * 0.7}
+      height={Math.round(size * 172 / 260)}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden="true"
     >
-      {/* Left swan — neck curves from top-left down to centre, body sweeps left */}
+      {/* Head */}
+      <ellipse
+        cx="54" cy="18" rx="11" ry="12"
+        stroke={color} strokeWidth="2.2" fill="none"
+      />
+      {/* Eye */}
+      <circle cx="50" cy="14" r="1.8" fill={color} />
+      {/* Beak — filled tapered shape pointing left */}
       <path
-        d="M 100 115 C 55 115 20 78 42 48 C 53 33 71 32 78 18"
+        d="M 43 13 C 22 10 13 17 20 22 C 26 25 43 20 43 15 Z"
+        fill={color}
+      />
+      {/* Outer neck — the defining bold S-curve (chest/breast side) */}
+      <path
+        d="M 44 28 C 16 52 14 86 32 112 C 46 130 68 140 92 144"
+        stroke={color}
+        strokeWidth="5.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* Inner neck — back-of-neck edge, thinner */}
+      <path
+        d="M 62 24 C 52 46 54 74 62 100 C 68 118 88 130 114 136"
+        stroke={color}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* Upper back arch — the swan's back ridge (dominant stroke) */}
+      <path
+        d="M 96 92 C 130 76 172 74 204 92 C 220 102 226 124 218 142"
+        stroke={color}
+        strokeWidth="6"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* Mid-body sweep */}
+      <path
+        d="M 102 126 C 134 110 174 106 208 116 C 226 122 234 146 224 162"
+        stroke={color}
+        strokeWidth="5"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* Lower body */}
+      <path
+        d="M 106 148 C 138 140 174 138 204 150 C 218 156 224 168 216 172"
+        stroke={color}
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* Neck-to-body joining stroke */}
+      <path
+        d="M 92 140 C 108 138 130 136 156 140 C 176 144 192 156 188 166"
+        stroke={color}
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* Tail feather 1 — longest, boldest */}
+      <path
+        d="M 214 86 C 228 114 238 146 240 172"
+        stroke={color}
+        strokeWidth="4.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* Tail feather 2 */}
+      <path
+        d="M 206 84 C 218 114 226 148 226 172"
+        stroke={color}
+        strokeWidth="2.8"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* Tail feather 3 — finest */}
+      <path
+        d="M 197 82 C 206 112 212 148 212 170"
         stroke={color}
         strokeWidth="1.4"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Right swan — mirror */}
-      <path
-        d="M 100 115 C 145 115 180 78 158 48 C 147 33 129 32 122 18"
-        stroke={color}
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Left swan body */}
-      <path
-        d="M 42 48 C 28 58 18 78 32 96 C 46 112 72 116 100 115"
-        stroke={color}
-        strokeWidth="1.1"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Right swan body (mirrored) */}
-      <path
-        d="M 158 48 C 172 58 182 78 168 96 C 154 112 128 116 100 115"
-        stroke={color}
-        strokeWidth="1.1"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Left swan head */}
-      <ellipse
-        cx="78"
-        cy="14"
-        rx="5"
-        ry="6"
-        stroke={color}
-        strokeWidth="1"
-        fill="none"
-      />
-      {/* Left beak */}
-      <path
-        d="M 73 13 L 67 11"
-        stroke={color}
-        strokeWidth="1"
-        strokeLinecap="round"
-      />
-      {/* Right swan head */}
-      <ellipse
-        cx="122"
-        cy="14"
-        rx="5"
-        ry="6"
-        stroke={color}
-        strokeWidth="1"
-        fill="none"
-      />
-      {/* Right beak */}
-      <path
-        d="M 127 13 L 133 11"
-        stroke={color}
-        strokeWidth="1"
-        strokeLinecap="round"
-      />
-      {/* Tail flourish at the point where bodies meet */}
-      <path
-        d="M 100 115 C 96 124 100 130 100 130 C 100 130 104 124 100 115"
-        stroke={color}
-        strokeWidth="1"
         strokeLinecap="round"
         fill="none"
       />

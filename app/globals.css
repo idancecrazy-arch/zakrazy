@@ -19,19 +19,19 @@
 /* ── Typography utilities ── */
 @layer utilities {
   .font-italiana {
-    font-family: var(--font-italiana), Georgia, serif;
+    font-family: var(--font-italiana), 'Garamond', 'Palatino Linotype', serif;
   }
   .font-poiret {
-    font-family: var(--font-poiret-one), 'Trebuchet MS', sans-serif;
+    font-family: var(--font-poiret-one), 'Palatino Linotype', serif;
   }
   .font-crimson {
     font-family: var(--font-crimson-pro), Georgia, serif;
   }
   .font-lora {
-    font-family: var(--font-lora), Georgia, serif;
+    font-family: var(--font-lora), 'Book Antiqua', Georgia, serif;
   }
   .font-work-sans {
-    font-family: var(--font-work-sans), Arial, sans-serif;
+    font-family: var(--font-work-sans), 'Palatino Linotype', serif;
   }
 }
 
