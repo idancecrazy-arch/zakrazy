@@ -21,11 +21,11 @@ export default function BloomingRose({ size = 200 }: Props) {
 
   const maskStyle = {
     WebkitMaskImage: [
-      'linear-gradient(to bottom, transparent 0%, black 38%, black 80%, transparent 100%)',
+      'linear-gradient(to bottom, transparent 0%, black 55%, black 82%, transparent 100%)',
       'linear-gradient(to right,  transparent 0%, black 10%, black 90%, transparent 100%)',
     ].join(', '),
     maskImage: [
-      'linear-gradient(to bottom, transparent 0%, black 38%, black 80%, transparent 100%)',
+      'linear-gradient(to bottom, transparent 0%, black 55%, black 82%, transparent 100%)',
       'linear-gradient(to right,  transparent 0%, black 10%, black 90%, transparent 100%)',
     ].join(', '),
     WebkitMaskComposite: 'destination-in' as const,
