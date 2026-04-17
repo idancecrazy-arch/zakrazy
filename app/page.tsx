@@ -13,7 +13,7 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-start pt-36 sm:pt-52 text-center px-6 overflow-hidden">
+      <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-start pt-52 sm:pt-52 text-center px-6 overflow-hidden">
 
         {/* Celestial wisp background texture */}
         <svg
