@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import RoseMotif from './RoseMotif'
+import BloomingRose from './BloomingRose'
 import { COUPLE, CONTACT_EMAIL } from '@/lib/constants'
 
 export default function Footer() {
@@ -7,10 +7,7 @@ export default function Footer() {
     <footer className="bg-warm-cream border-t border-pale-gold/50 py-14">
       <div className="max-w-xl mx-auto px-6 flex flex-col items-center gap-6 text-center">
 
-        {/* Gold rule */}
-        <div className="w-24 h-px bg-gold-line gold-rule" />
-
-        <RoseMotif size={64} />
+        <BloomingRose size={160} />
 
         {/* Names and date */}
         <p className="font-italiana text-xl text-dark-taupe tracking-wide">
@@ -31,8 +28,6 @@ export default function Footer() {
           </Link>
         )}
 
-        {/* Gold rule */}
-        <div className="w-16 h-px bg-pale-gold/60" />
       </div>
     </footer>
   )

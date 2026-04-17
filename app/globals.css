@@ -61,6 +61,16 @@ body {
   animation: drawLine 1.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s both;
 }
 
+/* ── Subtle CTA bounce ── */
+@keyframes subtleBounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
+}
+
+.animate-subtle-bounce {
+  animation: subtleBounce 1.2s ease-in-out infinite;
+}
+
 /* ── Input resets ── */
 input:focus, textarea:focus, select:focus {
   outline: none;

@@ -19,7 +19,7 @@ export default function CtaBounce() {
         px-10 py-5 bg-gold-line text-ivory
         hover:bg-dark-taupe hover:-translate-y-0.5 hover:shadow-md
         transition-all duration-300
-        ${bouncing ? 'animate-bounce' : ''}
+        ${bouncing ? 'animate-subtle-bounce' : ''}
       `}
     >
       Confirm Your Details

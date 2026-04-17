@@ -4,8 +4,7 @@ import BloomingRose from '@/components/BloomingRose'
 import CrossMotif from '@/components/CrossMotif'
 import CtaBounce from '@/components/CtaBounce'
 import CountdownTimer from '@/components/CountdownTimer'
-import FeatherDivider from '@/components/FeatherDivider'
-import { COUPLE, VENUE } from '@/lib/constants'
+import { VENUE } from '@/lib/constants'
 
 export const metadata: Metadata = {
   title: 'Save the Date',
@@ -15,7 +14,7 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-center text-center px-6 overflow-hidden">
+      <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-start pt-40 text-center px-6 overflow-hidden">
 
         {/* Celestial wisp background texture */}
         <svg
@@ -31,65 +30,36 @@ export default function HomePage() {
         </svg>
 
         {/* Main heading */}
-        <h1 className="font-italiana text-6xl sm:text-7xl md:text-8xl text-dark-taupe tracking-wide leading-none mb-4">
+        <h1 className="font-italiana text-6xl sm:text-7xl md:text-8xl text-dark-taupe tracking-wide leading-none mb-6">
           Save the Date
         </h1>
 
         {/* Date */}
-        <p className="font-italiana text-2xl sm:text-3xl text-dusty-lilac tracking-[0.2em] mb-2">
+        <p className="font-italiana text-2xl sm:text-3xl text-dusty-lilac tracking-[0.2em] mb-4">
           September 12, 2026
         </p>
 
         {/* Venue line */}
-        <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-soft-gray mb-10">
+        <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-soft-gray mb-14">
           {VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}&ensp;·&ensp;{VENUE.city}
         </p>
 
-        {/* Cross → CTA → Blooming rose */}
+        {/* Cross → CTA */}
         <div className="flex flex-col items-center gap-8">
-          <CrossMotif size={72} color="#D2C3A0" strokeWidth={5.5} />
+          <div className="p-5 border border-gold-line/50 shadow-[0_0_0_6px_rgba(195,175,130,0.12)]">
+            <CrossMotif size={72} color="#D2C3A0" strokeWidth={5.5} />
+          </div>
           <CtaBounce />
-          <BloomingRose size={280} />
-        </div>
-
-        {/* Scroll cue */}
-        <div className="absolute bottom-10 flex flex-col items-center gap-2 animate-bounce">
-          <div className="w-px h-8 bg-pale-gold/60" />
         </div>
       </section>
 
-      {/* ── Feather divider ──────────────────────────────── */}
-      <div className="flex justify-center py-8 bg-ivory">
-        <FeatherDivider width={280} color="#D2C3A0" />
-      </div>
-
       {/* ── Countdown ────────────────────────────────────── */}
-      <section className="bg-ivory py-16 px-6">
+      <section className="bg-ivory py-20 px-6">
         <div className="max-w-3xl mx-auto flex flex-col items-center gap-10 text-center">
           <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray">
             Until the Celebration
           </p>
-
           <CountdownTimer />
-
-          {/* Invitation line */}
-          <p className="font-lora italic text-xl text-deep-ivory max-w-md leading-relaxed">
-            We joyfully invite you to celebrate with us
-          </p>
-
-          {/* Names */}
-          <div className="flex flex-col items-center gap-1">
-            <p className="font-italiana text-3xl sm:text-4xl text-dark-taupe tracking-wide">
-              {COUPLE.partner1.first} {COUPLE.partner1.last}
-            </p>
-            <p className="font-lora italic text-gold-line text-xl">&amp;</p>
-            <p className="font-italiana text-3xl sm:text-4xl text-dark-taupe tracking-wide">
-              {COUPLE.partner2.first} {COUPLE.partner2.last}
-            </p>
-          </div>
-
-          {/* Gold rule */}
-          <div className="w-16 h-px bg-pale-gold" />
         </div>
       </section>
 
