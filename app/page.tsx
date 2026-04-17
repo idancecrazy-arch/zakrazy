@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Metadata } from 'next'
 import BloomingRose from '@/components/BloomingRose'
 import CrossMotif from '@/components/CrossMotif'
+import CtaBounce from '@/components/CtaBounce'
 import CountdownTimer from '@/components/CountdownTimer'
 import FeatherDivider from '@/components/FeatherDivider'
 import { COUPLE, VENUE } from '@/lib/constants'
@@ -44,31 +45,17 @@ export default function HomePage() {
           {VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}&ensp;·&ensp;{VENUE.city}
         </p>
 
-        {/* Blooming rose + Cross motifs */}
-        <div className="flex flex-col items-center gap-3">
-          <BloomingRose size={200} />
-          <CrossMotif size={28} color="#D2C3A0" />
+        {/* Cross → CTA → Blooming rose */}
+        <div className="flex flex-col items-center gap-8">
+          <CrossMotif size={72} color="#D2C3A0" strokeWidth={5.5} />
+          <CtaBounce />
+          <BloomingRose size={280} />
         </div>
 
         {/* Scroll cue */}
         <div className="absolute bottom-10 flex flex-col items-center gap-2 animate-bounce">
           <div className="w-px h-8 bg-pale-gold/60" />
         </div>
-      </section>
-
-      {/* ── CTA ──────────────────────────────────────────── */}
-      <section className="bg-ivory py-10 flex justify-center px-6">
-        <Link
-          href="/rsvp"
-          className="
-            font-work-sans text-[12px] tracking-[0.25em] uppercase
-            px-10 py-5 bg-gold-line text-ivory
-            hover:bg-dark-taupe hover:-translate-y-0.5 hover:shadow-md
-            transition-all duration-300
-          "
-        >
-          Confirm Your Details
-        </Link>
       </section>
 
       {/* ── Feather divider ──────────────────────────────── */}
