@@ -3,7 +3,7 @@ import Link from 'next/link'
 import CrossMotif from '@/components/CrossMotif'
 import FeatherDivider from '@/components/FeatherDivider'
 import ArchMotif from '@/components/ArchMotif'
-import SwanMotif from '@/components/SwanMotif'
+import RoseMotif from '@/components/RoseMotif'
 import ChurchImage from '@/components/ChurchImage'
 import { VENUE } from '@/lib/constants'
 
@@ -160,9 +160,8 @@ export default function CeremonyPage() {
           </div>
         </div>
 
-        {/* Swan close */}
         <div className="flex flex-col items-center gap-6 mt-10">
-          <SwanMotif size={100} color="#D2C3A0" />
+          <RoseMotif size={100} />
           <p className="font-lora italic text-base text-deep-ivory text-center">
             September 12, 2026 · St. Joseph&apos;s Church · New York
           </p>

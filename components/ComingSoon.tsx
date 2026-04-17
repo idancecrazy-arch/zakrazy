@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import SwanMotif from './SwanMotif'
+import RoseMotif from './RoseMotif'
 import FeatherDivider from './FeatherDivider'
 
 interface ComingSoonProps {
@@ -26,7 +26,7 @@ export default function ComingSoon({ title, subtitle }: ComingSoonProps) {
           Details coming soon — we can&apos;t wait to share more with you.
         </p>
 
-        <SwanMotif size={120} color="#D2C3A0" />
+        <RoseMotif size={120} />
 
         <Link
           href="/"

@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import SwanMotif from '@/components/SwanMotif'
+import RoseMotif from '@/components/RoseMotif'
 import FeatherDivider from '@/components/FeatherDivider'
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ export default function OurStoryPage() {
           Coming soon — more to share before the big day.
         </p>
         <div className="w-16 h-px bg-pale-gold" />
-        <SwanMotif size={100} color="#D2C3A0" />
+        <RoseMotif size={100} />
         <p className="font-work-sans text-[9px] tracking-[0.3em] uppercase text-soft-gray">
           September 12, 2026
         </p>

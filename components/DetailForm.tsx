@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import SwanMotif from './SwanMotif'
+import RoseMotif from './RoseMotif'
 
 const schema = z.object({
   fullName: z.string().min(2, 'Please enter your full name'),
@@ -110,7 +110,7 @@ export default function DetailForm() {
   if (status === 'success') {
     return (
       <div className="flex flex-col items-center gap-8 text-center py-12 px-6">
-        <SwanMotif size={120} color="#C3AF82" />
+        <RoseMotif size={120} />
         <div className="flex flex-col gap-3">
           <h2 className="font-italiana text-4xl text-dark-taupe tracking-wide">
             Thank you, {submittedName}!

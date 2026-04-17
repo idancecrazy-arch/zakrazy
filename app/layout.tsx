@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import {
-  Cormorant_Garamond,
+  Lovers_Quarrel,
   Cinzel_Decorative,
   Crimson_Pro,
   IM_Fell_English,
@@ -11,10 +11,9 @@ import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import { COUPLE, VENUE, SITE_URL } from '@/lib/constants'
 
-// Extreme thick/thin contrast — classical calligraphic cut for headings
-const cormorantGaramond = Cormorant_Garamond({
-  weight: ['300', '400', '600'],
-  style: ['normal', 'italic'],
+// Organic calligraphy script — main display headings (closest free match to Balzak/Ms Claudy)
+const loversQuarrel = Lovers_Quarrel({
+  weight: ['400'],
   subsets: ['latin'],
   variable: '--font-italiana',
   display: 'swap',
@@ -54,7 +53,7 @@ const cinzel = Cinzel({
 })
 
 const fontVars = [
-  cormorantGaramond.variable,
+  loversQuarrel.variable,
   cinzelDecorative.variable,
   crimsonPro.variable,
   imFellEnglish.variable,

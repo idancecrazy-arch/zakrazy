@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Metadata } from 'next'
-import SwanMotif from '@/components/SwanMotif'
+import RoseMotif from '@/components/RoseMotif'
 import CrossMotif from '@/components/CrossMotif'
 import CountdownTimer from '@/components/CountdownTimer'
 import FeatherDivider from '@/components/FeatherDivider'
@@ -47,9 +47,9 @@ export default function HomePage() {
           {VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}&ensp;·&ensp;{VENUE.city}
         </p>
 
-        {/* Swan + Cross motifs */}
+        {/* Rose + Cross motifs */}
         <div className="flex flex-col items-center gap-3">
-          <SwanMotif size={160} color="#5A5044" />
+          <RoseMotif size={160} />
           <CrossMotif size={28} color="#D2C3A0" />
         </div>
 
@@ -109,9 +109,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Final swan ───────────────────────────────────── */}
+      {/* ── Final rose ───────────────────────────────────── */}
       <section className="bg-ivory py-16 flex flex-col items-center gap-6 text-center px-6">
-        <SwanMotif size={100} color="#C3AF82" />
+        <RoseMotif size={100} />
         <p className="font-lora italic text-base text-deep-ivory max-w-xs leading-relaxed">
           More details coming soon — we cannot wait to celebrate with you.
         </p>
