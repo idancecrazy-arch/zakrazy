@@ -45,7 +45,10 @@ export default function Navigation() {
             href="/"
             className="font-italiana text-xl text-dark-taupe tracking-wide hover:text-dusty-lilac transition-colors duration-300"
           >
-            {COUPLE.partner1.first} <span className="text-gold-line font-crimson italic text-base">+</span> {COUPLE.partner2.first}
+            <span className="flex flex-col leading-tight text-left">
+              <span>{COUPLE.partner1.first}</span>
+              <span className="text-gold-line font-crimson italic text-sm">&amp; {COUPLE.partner2.first}</span>
+            </span>
           </Link>
 
           {/* Desktop nav */}

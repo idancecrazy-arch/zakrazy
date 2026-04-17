@@ -20,8 +20,16 @@ export default function BloomingRose({ size = 200 }: Props) {
   }
 
   const maskStyle = {
-    WebkitMaskImage: 'radial-gradient(ellipse 72% 78% at 50% 52%, black 25%, rgba(0,0,0,0.6) 48%, transparent 70%)',
-    maskImage: 'radial-gradient(ellipse 72% 78% at 50% 52%, black 25%, rgba(0,0,0,0.6) 48%, transparent 70%)',
+    WebkitMaskImage: [
+      'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)',
+      'linear-gradient(to right,  transparent 0%, black 18%, black 82%, transparent 100%)',
+    ].join(', '),
+    maskImage: [
+      'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)',
+      'linear-gradient(to right,  transparent 0%, black 18%, black 82%, transparent 100%)',
+    ].join(', '),
+    WebkitMaskComposite: 'destination-in' as const,
+    maskComposite: 'intersect' as const,
   }
 
   return (
