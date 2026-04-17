@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import {
-  Pinyon_Script,
+  Lovers_Quarrel,
   Cinzel_Decorative,
   Crimson_Pro,
   IM_Fell_English,
@@ -11,8 +11,8 @@ import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import { COUPLE, VENUE, SITE_URL } from '@/lib/constants'
 
-// Calligraphic fountain-pen script — main display headings
-const pinyonScript = Pinyon_Script({
+// Organic calligraphy script — main display headings (closest free match to Balzak/Ms Claudy)
+const loversQuarrel = Lovers_Quarrel({
   weight: ['400'],
   subsets: ['latin'],
   variable: '--font-italiana',
@@ -53,7 +53,7 @@ const cinzel = Cinzel({
 })
 
 const fontVars = [
-  pinyonScript.variable,
+  loversQuarrel.variable,
   cinzelDecorative.variable,
   crimsonPro.variable,
   imFellEnglish.variable,
