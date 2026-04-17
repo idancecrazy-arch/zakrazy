@@ -158,8 +158,7 @@ export default function DetailForm() {
             Thank you, {submittedName}!
           </h2>
           <p className="font-lora italic text-lg text-dark-taupe/85 max-w-md leading-relaxed">
-            Your details have been saved. We&apos;ll be in touch soon with your
-            save&#8209;the&#8209;date.
+            Your details have been saved. A formal invitation will follow closer to the date.
           </p>
         </div>
         <p className="font-work-sans text-xs tracking-[0.18em] uppercase text-dark-taupe/80 font-medium">

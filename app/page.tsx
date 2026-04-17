@@ -13,7 +13,7 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-start pt-36 sm:pt-52 text-center px-6 overflow-hidden">
+      <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-start pt-52 sm:pt-52 text-center px-6 overflow-hidden">
 
         {/* Celestial wisp background texture */}
         <svg
@@ -35,7 +35,7 @@ export default function HomePage() {
 
         {/* Date */}
         <p className="font-italiana text-2xl sm:text-3xl text-[#8C7DA0] tracking-[0.2em] mb-4">
-          September 12, 2026
+          September <span className="text-3xl sm:text-4xl">12, 2026</span>
         </p>
 
         {/* Venue line */}
