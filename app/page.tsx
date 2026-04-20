@@ -3,7 +3,7 @@ import { Metadata } from 'next'
 import CrossMotif from '@/components/CrossMotif'
 import CtaBounce from '@/components/CtaBounce'
 import CountdownTimer from '@/components/CountdownTimer'
-import { VENUE } from '@/lib/constants'
+import { VENUE, RECEPTION_VENUE } from '@/lib/constants'
 
 export const metadata: Metadata = {
   title: 'Save the Date',
@@ -38,13 +38,20 @@ export default function HomePage() {
           September <span className="text-3xl sm:text-4xl">12, 2026</span>
         </p>
 
-        {/* Venue line */}
-        <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-[#8C8782] mb-2">
-          {VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}
-        </p>
-        <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-[#8C8782] mb-8 sm:mb-14">
-          {VENUE.city}
-        </p>
+        {/* Venue lines */}
+        <div className="flex flex-col items-center gap-1 mb-8 sm:mb-14">
+          <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-[#8C8782]">
+            <span className="text-[#C3AF82]">Ceremony</span>
+            &ensp;·&ensp;{VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}
+          </p>
+          <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-[#8C8782]">
+            <span className="text-[#C3AF82]">Reception</span>
+            &ensp;·&ensp;{RECEPTION_VENUE.shortName}&ensp;·&ensp;{RECEPTION_VENUE.neighborhood}
+          </p>
+          <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-[#8C8782] mt-1">
+            {VENUE.city}
+          </p>
+        </div>
 
         {/* Cross → CTA */}
         <div className="flex flex-col items-center gap-6 sm:gap-8">
@@ -66,7 +73,7 @@ export default function HomePage() {
       {/* ── Final section ────────────────────────────────── */}
       <section className="bg-ivory py-16 flex flex-col items-center gap-6 text-center px-6">
         <p className="font-lora italic text-base text-deep-ivory max-w-xs leading-relaxed">
-          More details coming soon — we cannot wait to celebrate with you.
+          Formal invitation to follow — we cannot wait to celebrate with you.
         </p>
         <Link
           href="/rsvp"

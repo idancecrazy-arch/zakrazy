@@ -20,6 +20,17 @@ export const VENUE = {
     'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3023.2!2d-74.0021!3d40.7331!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c2598a4ae37769%3A0x8b60d4a9d58cdd4a!2sSt.%20Joseph&#39;s%20Church!5e0!3m2!1sen!2sus!4v1',
 }
 
+export const RECEPTION_VENUE = {
+  name: 'Golden Unicorn Restaurant',
+  shortName: 'Golden Unicorn',
+  address: '18 East Broadway',
+  city: 'New York',
+  state: 'NY',
+  zip: '10002',
+  neighborhood: 'Chinatown',
+  googleMapsUrl: 'https://maps.google.com/?q=18+East+Broadway+New+York+NY+10002',
+}
+
 export const CONTACT_EMAIL = 'christineandmichaelzak@gmail.com'
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://zakrazy.vercel.app'
