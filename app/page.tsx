@@ -49,7 +49,7 @@ export default function HomePage() {
             &ensp;·&ensp;{RECEPTION_VENUE.shortName}&ensp;·&ensp;{RECEPTION_VENUE.neighborhood}
           </p>
           <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-[#8C8782] mt-1">
-            {VENUE.city}
+            {VENUE.city}, {VENUE.city}
           </p>
         </div>
 
