@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 const KEY = 'planner-state'
 
 function getKvCredentials(): { url: string; token: string } | null {
-  // Standard Vercel KV env vars (default / first store)
+  // Standard Vercel KV REST API vars (default / first store)
   const url   = process.env.KV_REST_API_URL
   const token = process.env.KV_REST_API_TOKEN
   if (url && token) return { url, token }
@@ -13,7 +13,20 @@ function getKvCredentials(): { url: string; token: string } | null {
   const pToken = process.env.REDIS_CORDOVAN_KETTLE_KV_REST_API_TOKEN
   if (pUrl && pToken) return { url: pUrl, token: pToken }
 
-  // Log which KV/Redis env vars ARE present so we can identify the right name
+  // REDIS_URL: Upstash binary format rediss://default:TOKEN@HOST:PORT
+  // Derive the REST API endpoint from it — same host, HTTPS, password = token
+  const redisUrl = process.env.REDIS_URL
+  if (redisUrl) {
+    try {
+      const parsed = new URL(redisUrl)
+      const derivedToken = parsed.password
+      const derivedHost  = parsed.hostname
+      if (derivedToken && derivedHost) {
+        return { url: `https://${derivedHost}`, token: derivedToken }
+      }
+    } catch { /* malformed URL */ }
+  }
+
   const present = Object.keys(process.env).filter(
     k => k.includes('KV') || k.includes('REDIS') || k.includes('UPSTASH')
   )
