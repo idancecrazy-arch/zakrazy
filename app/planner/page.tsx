@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Reorder, useDragControls } from 'framer-motion'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -216,6 +217,38 @@ const genId = () => `x${Date.now()}-${++_seq}`
 function parseCost(cost: string): number {
   const digits = cost.replace(/[$,]/g, '').match(/^\d+/)
   return digits ? parseInt(digits[0]) : 0
+}
+
+const MONTH_IDX: Record<string, number> = {
+  jan: 0, january: 0, feb: 1, february: 1, mar: 2, march: 2,
+  apr: 3, april: 3, may: 4, jun: 5, june: 5, jul: 6, july: 6,
+  aug: 7, august: 7, sep: 8, september: 8, oct: 9, october: 9,
+  nov: 10, november: 10, dec: 11, december: 11,
+}
+
+function parseDateLabel(label: string): Date | null {
+  if (!label) return null
+  const m = label.toLowerCase().match(/([a-z]+)\s+(\d+)/)
+  if (!m) return null
+  const mo = MONTH_IDX[m[1]]
+  if (mo === undefined) return null
+  const day = parseInt(m[2])
+  const yr = label.match(/(\d{4})/)
+  return new Date(yr ? parseInt(yr[1]) : 2026, mo, day)
+}
+
+function findClosestDeadlineId(dueLabel: string, deadlines: Deadline[]): string | null {
+  const t = parseDateLabel(dueLabel)
+  if (!t) return null
+  let best: string | null = null
+  let minDiff = Infinity
+  for (const dl of deadlines) {
+    const d = parseDateLabel(dl.date)
+    if (!d) continue
+    const diff = Math.abs(t.getTime() - d.getTime())
+    if (diff < minDiff) { minDiff = diff; best = dl.id }
+  }
+  return best
 }
 
 function formatDollars(n: number): string {
@@ -449,6 +482,133 @@ function TaskRow({
   )
 }
 
+// ── DeadlineItem (draggable) ───────────────────────────────────────────────────
+
+function DeadlineItem({
+  dl, isEditing, associatedTasks, onUpdate, onDelete, onBulletUpdate, onBulletRemove, onBulletAdd,
+}: {
+  dl: Deadline
+  isEditing: boolean
+  associatedTasks: Task[]
+  onUpdate: (id: string, changes: Partial<Deadline>) => void
+  onDelete: (id: string) => void
+  onBulletUpdate: (dlId: string, i: number, val: string) => void
+  onBulletRemove: (dlId: string, i: number) => void
+  onBulletAdd: (dlId: string) => void
+}) {
+  const controls = useDragControls()
+  const s = urgencyStyles[dl.urgency]
+
+  return (
+    <Reorder.Item value={dl} dragListener={false} dragControls={controls} as="div" className="relative">
+      <div className={`absolute -left-7 top-2 w-3 h-3 rounded-full ${s.dot} ring-2 ring-ivory`} />
+
+      <div className={`relative border rounded-lg p-4 ${s.card}`}>
+        {/* Drag handle */}
+        <div
+          onPointerDown={e => controls.start(e)}
+          className="absolute top-3 right-3 cursor-grab active:cursor-grabbing text-soft-gray/30 hover:text-soft-gray/70 transition-colors touch-none select-none z-10"
+          title="Drag to reorder"
+        >
+          <svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor" aria-hidden="true">
+            <circle cx="3" cy="2.5" r="1.2"/><circle cx="7" cy="2.5" r="1.2"/>
+            <circle cx="3" cy="7"   r="1.2"/><circle cx="7" cy="7"   r="1.2"/>
+            <circle cx="3" cy="11.5" r="1.2"/><circle cx="7" cy="11.5" r="1.2"/>
+          </svg>
+        </div>
+
+        {isEditing ? (
+          <div className="space-y-2 pr-6">
+            <div className="flex flex-wrap gap-2 items-center">
+              <input
+                value={dl.date}
+                onChange={e => onUpdate(dl.id, { date: e.target.value })}
+                placeholder="Date (e.g. May 5, 2026)"
+                className={`${smallInputCls} flex-1 min-w-[130px]`}
+              />
+              <input
+                value={dl.label}
+                onChange={e => onUpdate(dl.id, { label: e.target.value })}
+                placeholder="Label (e.g. CRITICAL)"
+                className={`${smallInputCls} flex-1 min-w-[100px]`}
+              />
+              <select
+                value={dl.urgency}
+                onChange={e => onUpdate(dl.id, { urgency: e.target.value as DeadlineUrgency })}
+                className={selectCls}
+              >
+                <option value="wedding">Wedding</option>
+                <option value="critical">Critical</option>
+                <option value="soon">Soon</option>
+                <option value="upcoming">Upcoming</option>
+              </select>
+              <button onClick={() => onDelete(dl.id)} className={deleteBtnCls} title="Delete deadline">×</button>
+            </div>
+            <input
+              value={dl.title}
+              onChange={e => onUpdate(dl.id, { title: e.target.value })}
+              placeholder="Milestone title"
+              className={inputCls}
+            />
+            <div className="space-y-1.5 mt-1">
+              {dl.bullets.map((b, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input
+                    value={b}
+                    onChange={e => onBulletUpdate(dl.id, i, e.target.value)}
+                    placeholder="Bullet point"
+                    className={`${inputCls} flex-1`}
+                  />
+                  <button onClick={() => onBulletRemove(dl.id, i)} className={deleteBtnCls} title="Remove bullet">×</button>
+                </div>
+              ))}
+              <button onClick={() => onBulletAdd(dl.id)} className={addRowBtnCls}>+ add bullet</button>
+            </div>
+          </div>
+        ) : (
+          <div className="pr-5">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 mb-2">
+              <span className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">{dl.date}</span>
+              <span className={`font-work-sans text-[10px] tracking-[0.2em] uppercase ${s.label}`}>{dl.label}</span>
+            </div>
+            <h3 className="font-crimson font-semibold text-lg text-dark-taupe mb-2 leading-snug">{dl.title}</h3>
+            <ul className="space-y-1">
+              {dl.bullets.map((b, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-gold-line mt-1 flex-shrink-0 text-xs">·</span>
+                  <span className="font-crimson text-sm text-deep-ivory leading-snug">{b}</span>
+                </li>
+              ))}
+            </ul>
+            {associatedTasks.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-soft-gray/20">
+                <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray mb-2">Tasks</p>
+                <div className="space-y-1.5">
+                  {associatedTasks.map(t => (
+                    <div key={t.id} className="flex items-center gap-2">
+                      <span className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${
+                        t.status === 'done'        ? 'bg-gold-line'     :
+                        t.status === 'in-progress' ? 'bg-dusty-lilac'   :
+                                                     'bg-soft-gray/50'
+                      }`} />
+                      <span className={`font-crimson text-xs text-deep-ivory flex-1 leading-snug ${t.status === 'done' ? 'line-through opacity-50' : ''}`}>
+                        {t.title}
+                      </span>
+                      {t.assignee && (
+                        <span className="font-work-sans text-[9px] text-soft-gray flex-shrink-0">→ {t.assignee}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </Reorder.Item>
+  )
+}
+
 // ── Edit mode toggle button ────────────────────────────────────────────────────
 
 function EditToggle({ isEditing, onToggle }: { isEditing: boolean; onToggle: () => void }) {
@@ -571,6 +731,14 @@ export default function PlannerDashboard() {
     return acc
   }, {})
 
+  const deadlineTaskMap: Record<string, Task[]> = {}
+  for (const dl of deadlines) deadlineTaskMap[dl.id] = []
+  for (const t of tasks) {
+    if (!t.dueLabel) continue
+    const dlId = findClosestDeadlineId(t.dueLabel, deadlines)
+    if (dlId) (deadlineTaskMap[dlId] ??= []).push(t)
+  }
+
   const filteredTasks = activeCategory === 'All' ? tasks : tasks.filter(t => t.category === activeCategory)
 
   const vendorCats = [...new Set(vendors.map(v => v.category))]
@@ -674,91 +842,27 @@ export default function PlannerDashboard() {
             <div className="relative">
               <div className="absolute left-3 top-0 bottom-0 w-px bg-soft-gray/30" />
 
-              <div className="flex flex-col gap-5 pl-10">
-                {deadlines.map((dl) => {
-                  const s = urgencyStyles[dl.urgency]
-                  return (
-                    <div key={dl.id} className="relative">
-                      <div className={`absolute -left-7 top-2 w-3 h-3 rounded-full ${s.dot} ring-2 ring-ivory`} />
-
-                      <div className={`border rounded-lg p-4 ${s.card}`}>
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            {/* Row 1: date · label · urgency · delete */}
-                            <div className="flex flex-wrap gap-2 items-center">
-                              <input
-                                value={dl.date}
-                                onChange={e => updateDeadline(dl.id, { date: e.target.value })}
-                                placeholder="Date (e.g. May 5, 2026)"
-                                className={`${smallInputCls} flex-1 min-w-[130px]`}
-                              />
-                              <input
-                                value={dl.label}
-                                onChange={e => updateDeadline(dl.id, { label: e.target.value })}
-                                placeholder="Label (e.g. CRITICAL)"
-                                className={`${smallInputCls} flex-1 min-w-[100px]`}
-                              />
-                              <select
-                                value={dl.urgency}
-                                onChange={e => updateDeadline(dl.id, { urgency: e.target.value as DeadlineUrgency })}
-                                className={selectCls}
-                              >
-                                <option value="wedding">Wedding</option>
-                                <option value="critical">Critical</option>
-                                <option value="soon">Soon</option>
-                                <option value="upcoming">Upcoming</option>
-                              </select>
-                              <button onClick={() => deleteDeadline(dl.id)} className={deleteBtnCls} title="Delete deadline">×</button>
-                            </div>
-                            {/* Row 2: title */}
-                            <input
-                              value={dl.title}
-                              onChange={e => updateDeadline(dl.id, { title: e.target.value })}
-                              placeholder="Milestone title"
-                              className={inputCls}
-                            />
-                            {/* Bullets */}
-                            <div className="space-y-1.5 mt-1">
-                              {dl.bullets.map((b, i) => (
-                                <div key={i} className="flex items-center gap-2">
-                                  <input
-                                    value={b}
-                                    onChange={e => updateBullet(dl.id, i, e.target.value)}
-                                    placeholder="Bullet point"
-                                    className={`${inputCls} flex-1`}
-                                  />
-                                  <button onClick={() => removeBullet(dl.id, i)} className={deleteBtnCls} title="Remove bullet">×</button>
-                                </div>
-                              ))}
-                              <button onClick={() => addBullet(dl.id)} className={addRowBtnCls}>
-                                + add bullet
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 mb-2">
-                              <span className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">{dl.date}</span>
-                              <span className={`font-work-sans text-[10px] tracking-[0.2em] uppercase ${s.label}`}>{dl.label}</span>
-                            </div>
-                            <h3 className="font-crimson font-semibold text-lg text-dark-taupe mb-2 leading-snug">
-                              {dl.title}
-                            </h3>
-                            <ul className="space-y-1">
-                              {dl.bullets.map((b, i) => (
-                                <li key={i} className="flex items-start gap-2">
-                                  <span className="text-gold-line mt-1 flex-shrink-0 text-xs">·</span>
-                                  <span className="font-crimson text-sm text-deep-ivory leading-snug">{b}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
+              <Reorder.Group
+                axis="y"
+                values={deadlines}
+                onReorder={setDeadlines}
+                as="div"
+                className="flex flex-col gap-5 pl-10"
+              >
+                {deadlines.map(dl => (
+                  <DeadlineItem
+                    key={dl.id}
+                    dl={dl}
+                    isEditing={isEditing}
+                    associatedTasks={deadlineTaskMap[dl.id] ?? []}
+                    onUpdate={updateDeadline}
+                    onDelete={deleteDeadline}
+                    onBulletUpdate={updateBullet}
+                    onBulletRemove={removeBullet}
+                    onBulletAdd={addBullet}
+                  />
+                ))}
+              </Reorder.Group>
             </div>
 
             {isEditing && (
@@ -1157,7 +1261,7 @@ export default function PlannerDashboard() {
                       </datalist>
                       <button onClick={() => deleteVendor(v.id)} className={deleteBtnCls} title="Delete vendor">×</button>
                     </div>
-                    {/* Row 2: service · budget */}
+                    {/* Row 2: service */}
                     <div className="flex flex-wrap gap-2">
                       <div className="flex-1 min-w-[180px]">
                         <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Service</label>
@@ -1165,15 +1269,6 @@ export default function PlannerDashboard() {
                           value={v.service}
                           onChange={e => updateVendor(v.id, { service: e.target.value })}
                           placeholder="Service description"
-                          className={inputCls}
-                        />
-                      </div>
-                      <div className="w-32">
-                        <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Budget</label>
-                        <input
-                          value={v.budget}
-                          onChange={e => updateVendor(v.id, { budget: e.target.value })}
-                          placeholder="$0"
                           className={inputCls}
                         />
                       </div>
@@ -1260,10 +1355,6 @@ export default function PlannerDashboard() {
                               )}
                             </div>
                             <div className="flex flex-wrap gap-x-5 gap-y-2 text-right shrink-0">
-                              <div>
-                                <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray">Budget</p>
-                                <p className="font-crimson text-sm text-dark-taupe">{v.budget || '–'}</p>
-                              </div>
                               {(v.contact || v.phone || v.email) && (
                                 <div>
                                   <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray">Contact</p>
