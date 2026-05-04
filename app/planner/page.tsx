@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Reorder, useDragControls } from 'framer-motion'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -642,6 +642,88 @@ export default function PlannerDashboard() {
   const [addingCategory, setAddingCategory] = useState(false)
   const [newCatValue, setNewCatValue] = useState('')
 
+  // ── Persistence ─────────────────────────────────────────────────────────────
+
+  const [initialized, setInitialized]       = useState(false)
+  const [saveStatus, setSaveStatus]         = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const dirtyRef     = useRef(false)
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastSaveIdRef = useRef('')
+
+  // Dirty-marking setters — use these in user-initiated handlers so the
+  // auto-save effect knows a real change happened (vs. a poll update).
+  const setDeadlinesD  = (v: Parameters<typeof setDeadlines>[0])  => { dirtyRef.current = true; setDeadlines(v)  }
+  const setTasksD      = (v: Parameters<typeof setTasks>[0])      => { dirtyRef.current = true; setTasks(v)      }
+  const setBudgetD     = (v: Parameters<typeof setBudgetItems>[0]) => { dirtyRef.current = true; setBudgetItems(v) }
+  const setVendorsD    = (v: Parameters<typeof setVendors>[0])    => { dirtyRef.current = true; setVendors(v)    }
+  const setScenariosD  = (v: Parameters<typeof setScenarios>[0])  => { dirtyRef.current = true; setScenarios(v)  }
+  const setCategoriesD = (v: Parameters<typeof setCategories>[0]) => { dirtyRef.current = true; setCategories(v) }
+
+  // Load saved state once on mount
+  useEffect(() => {
+    fetch('/api/planner-state')
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(({ data }) => {
+        if (!data) return
+        if (data.deadlines)   setDeadlines(data.deadlines)
+        if (data.tasks)       setTasks(data.tasks)
+        if (data.budgetItems) setBudgetItems(data.budgetItems)
+        if (data.vendors)     setVendors(data.vendors)
+        if (data.scenarios)   setScenarios(data.scenarios)
+        if (data.categories)  setCategories(data.categories)
+        if (data._id)         lastSaveIdRef.current = data._id
+      })
+      .catch(() => {})
+      .finally(() => setInitialized(true))
+  }, [])
+
+  // Debounced auto-save whenever user-initiated state changes occur
+  useEffect(() => {
+    if (!initialized || !dirtyRef.current) return
+    setSaveStatus('saving')
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    saveTimerRef.current = setTimeout(async () => {
+      const saveId = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
+      lastSaveIdRef.current = saveId
+      try {
+        await fetch('/api/planner-state', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deadlines, tasks, budgetItems, vendors, scenarios, categories, _id: saveId }),
+        })
+        setSaveStatus('saved')
+        setTimeout(() => setSaveStatus('idle'), 2000)
+      } catch {
+        setSaveStatus('error')
+      }
+    }, 400)
+  }, [initialized, deadlines, tasks, budgetItems, vendors, scenarios, categories])
+
+  // Poll every 8 s for changes made by other users
+  useEffect(() => {
+    if (!initialized) return
+    const id = setInterval(async () => {
+      if (saveTimerRef.current) return // our own save is pending — skip
+      try {
+        const res = await fetch('/api/planner-state')
+        if (!res.ok) return
+        const { data } = await res.json()
+        if (!data?._id || data._id === lastSaveIdRef.current) return
+        // Someone else saved — apply without marking dirty
+        if (data.deadlines)   setDeadlines(data.deadlines)
+        if (data.tasks)       setTasks(data.tasks)
+        if (data.budgetItems) setBudgetItems(data.budgetItems)
+        if (data.vendors)     setVendors(data.vendors)
+        if (data.scenarios)   setScenarios(data.scenarios)
+        if (data.categories)  setCategories(data.categories)
+        lastSaveIdRef.current = data._id
+      } catch { /* silent */ }
+    }, 8000)
+    return () => clearInterval(id)
+  }, [initialized])
+
+  // ── Navigation ──────────────────────────────────────────────────────────────
+
   const setSection = (s: typeof activeSection) => {
     setActiveSection(s)
     setIsEditing(false)
@@ -651,22 +733,22 @@ export default function PlannerDashboard() {
 
   const updateTask = (id: string, changes: Partial<Task>) => {
     if (changes.category && !categories.includes(changes.category)) {
-      setCategories(prev => [...prev, changes.category!])
+      setCategoriesD(prev => [...prev, changes.category!])
     }
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, ...changes } : t))
+    setTasksD(prev => prev.map(t => t.id === id ? { ...t, ...changes } : t))
   }
 
-  const deleteTask = (id: string) => setTasks(prev => prev.filter(t => t.id !== id))
+  const deleteTask = (id: string) => setTasksD(prev => prev.filter(t => t.id !== id))
 
   const addTask = () => {
     const cat = activeCategory !== 'All' ? activeCategory : (categories[0] ?? 'Other')
-    setTasks(prev => [...prev, { id: genId(), title: 'New task', category: cat, status: 'pending', assignee: '', dueLabel: '', notes: '' }])
+    setTasksD(prev => [...prev, { id: genId(), title: 'New task', category: cat, status: 'pending', assignee: '', dueLabel: '', notes: '' }])
   }
 
   const commitNewCategory = () => {
     const trimmed = newCatValue.trim()
     if (trimmed && !categories.includes(trimmed)) {
-      setCategories(prev => [...prev, trimmed])
+      setCategoriesD(prev => [...prev, trimmed])
     }
     setNewCatValue('')
     setAddingCategory(false)
@@ -675,12 +757,12 @@ export default function PlannerDashboard() {
   // ── Deadline handlers ───────────────────────────────────────────────────────
 
   const updateDeadline = (id: string, changes: Partial<Deadline>) =>
-    setDeadlines(prev => prev.map(d => d.id === id ? { ...d, ...changes } : d))
+    setDeadlinesD(prev => prev.map(d => d.id === id ? { ...d, ...changes } : d))
 
-  const deleteDeadline = (id: string) => setDeadlines(prev => prev.filter(d => d.id !== id))
+  const deleteDeadline = (id: string) => setDeadlinesD(prev => prev.filter(d => d.id !== id))
 
   const addDeadline = () =>
-    setDeadlines(prev => [...prev, { id: genId(), date: '', label: '', title: 'New milestone', bullets: [], urgency: 'upcoming' }])
+    setDeadlinesD(prev => [...prev, { id: genId(), date: '', label: '', title: 'New milestone', bullets: [], urgency: 'upcoming' }])
 
   const updateBullet = (dlId: string, i: number, val: string) =>
     updateDeadline(dlId, { bullets: deadlines.find(d => d.id === dlId)!.bullets.map((b, j) => j === i ? val : b) })
@@ -694,32 +776,32 @@ export default function PlannerDashboard() {
   // ── Budget handlers ─────────────────────────────────────────────────────────
 
   const updateBudgetItem = (id: string, changes: Partial<BudgetItem>) =>
-    setBudgetItems(prev => prev.map(b => b.id === id ? { ...b, ...changes } : b))
+    setBudgetD(prev => prev.map(b => b.id === id ? { ...b, ...changes } : b))
 
-  const deleteBudgetItem = (id: string) => setBudgetItems(prev => prev.filter(b => b.id !== id))
+  const deleteBudgetItem = (id: string) => setBudgetD(prev => prev.filter(b => b.id !== id))
 
   const addBudgetItem = (status: 'paid' | 'pending') =>
-    setBudgetItems(prev => [...prev, { id: genId(), item: 'New item', cost: '$0', status }])
+    setBudgetD(prev => [...prev, { id: genId(), item: 'New item', cost: '$0', status }])
 
   // ── Vendor handlers ─────────────────────────────────────────────────────────
 
   const updateVendor = (id: string, changes: Partial<Vendor>) =>
-    setVendors(prev => prev.map(v => v.id === id ? { ...v, ...changes } : v))
+    setVendorsD(prev => prev.map(v => v.id === id ? { ...v, ...changes } : v))
 
-  const deleteVendor = (id: string) => setVendors(prev => prev.filter(v => v.id !== id))
+  const deleteVendor = (id: string) => setVendorsD(prev => prev.filter(v => v.id !== id))
 
   const addVendor = () =>
-    setVendors(prev => [...prev, { id: genId(), vendor: 'New Vendor', service: '', contact: '', phone: '', email: '', website: '', notes: '', budget: '', category: 'Other', status: 'pending' }])
+    setVendorsD(prev => [...prev, { id: genId(), vendor: 'New Vendor', service: '', contact: '', phone: '', email: '', website: '', notes: '', budget: '', category: 'Other', status: 'pending' }])
 
   // ── Scenario handlers ───────────────────────────────────────────────────────
 
   const updateScenario = (id: string, changes: Partial<ReceptionScenario>) =>
-    setScenarios(prev => prev.map(s => s.id === id ? { ...s, ...changes } : s))
+    setScenariosD(prev => prev.map(s => s.id === id ? { ...s, ...changes } : s))
 
-  const deleteScenario = (id: string) => setScenarios(prev => prev.filter(s => s.id !== id))
+  const deleteScenario = (id: string) => setScenariosD(prev => prev.filter(s => s.id !== id))
 
   const addScenario = () =>
-    setScenarios(prev => [...prev, { id: genId(), label: `Scenario ${String.fromCharCode(65 + prev.length)}`, guests: 100, seatsPerTable: 8, costPerTable: 1600 }])
+    setScenariosD(prev => [...prev, { id: genId(), label: `Scenario ${String.fromCharCode(65 + prev.length)}`, guests: 100, seatsPerTable: 8, costPerTable: 1600 }])
 
   // ── Derived values ──────────────────────────────────────────────────────────
 
@@ -785,6 +867,15 @@ export default function PlannerDashboard() {
             <span className="hidden sm:block font-work-sans text-[9px] tracking-[0.3em] uppercase text-soft-gray">
               Wedding Coordination
             </span>
+            {saveStatus === 'saving' && (
+              <span className="font-work-sans text-[9px] text-soft-gray/60 hidden sm:inline">saving…</span>
+            )}
+            {saveStatus === 'saved' && (
+              <span className="font-work-sans text-[9px] text-gold-line/70 hidden sm:inline">saved</span>
+            )}
+            {saveStatus === 'error' && (
+              <span className="font-work-sans text-[9px] text-muted-rose hidden sm:inline">save failed</span>
+            )}
           </div>
 
           <nav className="flex items-center gap-0.5 overflow-x-auto">
@@ -845,7 +936,7 @@ export default function PlannerDashboard() {
               <Reorder.Group
                 axis="y"
                 values={deadlines}
-                onReorder={setDeadlines}
+                onReorder={setDeadlinesD}
                 as="div"
                 className="flex flex-col gap-5 pl-10"
               >
