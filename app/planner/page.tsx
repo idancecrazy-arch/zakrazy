@@ -1157,7 +1157,7 @@ export default function PlannerDashboard() {
                       </datalist>
                       <button onClick={() => deleteVendor(v.id)} className={deleteBtnCls} title="Delete vendor">×</button>
                     </div>
-                    {/* Row 2: service · budget */}
+                    {/* Row 2: service */}
                     <div className="flex flex-wrap gap-2">
                       <div className="flex-1 min-w-[180px]">
                         <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Service</label>
@@ -1165,15 +1165,6 @@ export default function PlannerDashboard() {
                           value={v.service}
                           onChange={e => updateVendor(v.id, { service: e.target.value })}
                           placeholder="Service description"
-                          className={inputCls}
-                        />
-                      </div>
-                      <div className="w-32">
-                        <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Budget</label>
-                        <input
-                          value={v.budget}
-                          onChange={e => updateVendor(v.id, { budget: e.target.value })}
-                          placeholder="$0"
                           className={inputCls}
                         />
                       </div>
@@ -1260,10 +1251,6 @@ export default function PlannerDashboard() {
                               )}
                             </div>
                             <div className="flex flex-wrap gap-x-5 gap-y-2 text-right shrink-0">
-                              <div>
-                                <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray">Budget</p>
-                                <p className="font-crimson text-sm text-dark-taupe">{v.budget || '–'}</p>
-                              </div>
                               {(v.contact || v.phone || v.email) && (
                                 <div>
                                   <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray">Contact</p>
