@@ -219,6 +219,38 @@ function parseCost(cost: string): number {
   return digits ? parseInt(digits[0]) : 0
 }
 
+const MONTH_IDX: Record<string, number> = {
+  jan: 0, january: 0, feb: 1, february: 1, mar: 2, march: 2,
+  apr: 3, april: 3, may: 4, jun: 5, june: 5, jul: 6, july: 6,
+  aug: 7, august: 7, sep: 8, september: 8, oct: 9, october: 9,
+  nov: 10, november: 10, dec: 11, december: 11,
+}
+
+function parseDateLabel(label: string): Date | null {
+  if (!label) return null
+  const m = label.toLowerCase().match(/([a-z]+)\s+(\d+)/)
+  if (!m) return null
+  const mo = MONTH_IDX[m[1]]
+  if (mo === undefined) return null
+  const day = parseInt(m[2])
+  const yr = label.match(/(\d{4})/)
+  return new Date(yr ? parseInt(yr[1]) : 2026, mo, day)
+}
+
+function findClosestDeadlineId(dueLabel: string, deadlines: Deadline[]): string | null {
+  const t = parseDateLabel(dueLabel)
+  if (!t) return null
+  let best: string | null = null
+  let minDiff = Infinity
+  for (const dl of deadlines) {
+    const d = parseDateLabel(dl.date)
+    if (!d) continue
+    const diff = Math.abs(t.getTime() - d.getTime())
+    if (diff < minDiff) { minDiff = diff; best = dl.id }
+  }
+  return best
+}
+
 function formatDollars(n: number): string {
   return '$' + n.toLocaleString()
 }
@@ -453,10 +485,11 @@ function TaskRow({
 // ── DeadlineItem (draggable) ───────────────────────────────────────────────────
 
 function DeadlineItem({
-  dl, isEditing, onUpdate, onDelete, onBulletUpdate, onBulletRemove, onBulletAdd,
+  dl, isEditing, associatedTasks, onUpdate, onDelete, onBulletUpdate, onBulletRemove, onBulletAdd,
 }: {
   dl: Deadline
   isEditing: boolean
+  associatedTasks: Task[]
   onUpdate: (id: string, changes: Partial<Deadline>) => void
   onDelete: (id: string) => void
   onBulletUpdate: (dlId: string, i: number, val: string) => void
@@ -547,6 +580,28 @@ function DeadlineItem({
                 </li>
               ))}
             </ul>
+            {associatedTasks.length > 0 && (
+              <div className="mt-3 pt-3 border-t border-soft-gray/20">
+                <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray mb-2">Tasks</p>
+                <div className="space-y-1.5">
+                  {associatedTasks.map(t => (
+                    <div key={t.id} className="flex items-center gap-2">
+                      <span className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${
+                        t.status === 'done'        ? 'bg-gold-line'     :
+                        t.status === 'in-progress' ? 'bg-dusty-lilac'   :
+                                                     'bg-soft-gray/50'
+                      }`} />
+                      <span className={`font-crimson text-xs text-deep-ivory flex-1 leading-snug ${t.status === 'done' ? 'line-through opacity-50' : ''}`}>
+                        {t.title}
+                      </span>
+                      {t.assignee && (
+                        <span className="font-work-sans text-[9px] text-soft-gray flex-shrink-0">→ {t.assignee}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -676,6 +731,14 @@ export default function PlannerDashboard() {
     return acc
   }, {})
 
+  const deadlineTaskMap: Record<string, Task[]> = {}
+  for (const dl of deadlines) deadlineTaskMap[dl.id] = []
+  for (const t of tasks) {
+    if (!t.dueLabel) continue
+    const dlId = findClosestDeadlineId(t.dueLabel, deadlines)
+    if (dlId) (deadlineTaskMap[dlId] ??= []).push(t)
+  }
+
   const filteredTasks = activeCategory === 'All' ? tasks : tasks.filter(t => t.category === activeCategory)
 
   const vendorCats = [...new Set(vendors.map(v => v.category))]
@@ -791,6 +854,7 @@ export default function PlannerDashboard() {
                     key={dl.id}
                     dl={dl}
                     isEditing={isEditing}
+                    associatedTasks={deadlineTaskMap[dl.id] ?? []}
                     onUpdate={updateDeadline}
                     onDelete={deleteDeadline}
                     onBulletUpdate={updateBullet}
