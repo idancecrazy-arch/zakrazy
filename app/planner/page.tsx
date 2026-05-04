@@ -646,6 +646,7 @@ export default function PlannerDashboard() {
 
   const [initialized, setInitialized]       = useState(false)
   const [saveStatus, setSaveStatus]         = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [kvMissing, setKvMissing]           = useState(false)
   const dirtyRef     = useRef(false)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const lastSaveIdRef = useRef('')
@@ -662,8 +663,10 @@ export default function PlannerDashboard() {
   // Load saved state once on mount
   useEffect(() => {
     fetch('/api/planner-state')
-      .then(r => r.ok ? r.json() : Promise.reject())
-      .then(({ data }) => {
+      .then(r => r.json())
+      .then((json) => {
+        if (json.kvMissing) { setKvMissing(true); return }
+        const { data } = json
         if (!data) return
         if (data.deadlines)   setDeadlines(data.deadlines)
         if (data.tasks)       setTasks(data.tasks)
@@ -686,11 +689,13 @@ export default function PlannerDashboard() {
       const saveId = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
       lastSaveIdRef.current = saveId
       try {
-        await fetch('/api/planner-state', {
+        const res = await fetch('/api/planner-state', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ deadlines, tasks, budgetItems, vendors, scenarios, categories, _id: saveId }),
         })
+        const json = await res.json()
+        if (json.kvMissing) { setKvMissing(true); setSaveStatus('error'); return }
         setSaveStatus('saved')
         setTimeout(() => setSaveStatus('idle'), 2000)
       } catch {
@@ -857,6 +862,13 @@ export default function PlannerDashboard() {
 
   return (
     <div className="min-h-screen bg-ivory">
+      {kvMissing && (
+        <div className="bg-muted-rose/20 border-b border-muted-rose/40 px-4 py-2 text-center">
+          <span className="font-work-sans text-[10px] tracking-[0.15em] uppercase text-muted-rose">
+            Storage not configured — edits will not persist. Add <code className="font-mono normal-case tracking-normal">KV_REST_API_URL</code> &amp; <code className="font-mono normal-case tracking-normal">KV_REST_API_TOKEN</code> in Vercel project settings.
+          </span>
+        </div>
+      )}
       {/* ── Top bar ─────────────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-10 bg-ivory border-b border-soft-gray/30 px-4 sm:px-8">
         <div className="max-w-5xl mx-auto h-14 flex items-center justify-between gap-4">
