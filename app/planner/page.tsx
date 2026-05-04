@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Reorder, useDragControls } from 'framer-motion'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -449,6 +450,110 @@ function TaskRow({
   )
 }
 
+// ── DeadlineItem (draggable) ───────────────────────────────────────────────────
+
+function DeadlineItem({
+  dl, isEditing, onUpdate, onDelete, onBulletUpdate, onBulletRemove, onBulletAdd,
+}: {
+  dl: Deadline
+  isEditing: boolean
+  onUpdate: (id: string, changes: Partial<Deadline>) => void
+  onDelete: (id: string) => void
+  onBulletUpdate: (dlId: string, i: number, val: string) => void
+  onBulletRemove: (dlId: string, i: number) => void
+  onBulletAdd: (dlId: string) => void
+}) {
+  const controls = useDragControls()
+  const s = urgencyStyles[dl.urgency]
+
+  return (
+    <Reorder.Item value={dl} dragListener={false} dragControls={controls} as="div" className="relative">
+      <div className={`absolute -left-7 top-2 w-3 h-3 rounded-full ${s.dot} ring-2 ring-ivory`} />
+
+      <div className={`relative border rounded-lg p-4 ${s.card}`}>
+        {/* Drag handle */}
+        <div
+          onPointerDown={e => controls.start(e)}
+          className="absolute top-3 right-3 cursor-grab active:cursor-grabbing text-soft-gray/30 hover:text-soft-gray/70 transition-colors touch-none select-none z-10"
+          title="Drag to reorder"
+        >
+          <svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor" aria-hidden="true">
+            <circle cx="3" cy="2.5" r="1.2"/><circle cx="7" cy="2.5" r="1.2"/>
+            <circle cx="3" cy="7"   r="1.2"/><circle cx="7" cy="7"   r="1.2"/>
+            <circle cx="3" cy="11.5" r="1.2"/><circle cx="7" cy="11.5" r="1.2"/>
+          </svg>
+        </div>
+
+        {isEditing ? (
+          <div className="space-y-2 pr-6">
+            <div className="flex flex-wrap gap-2 items-center">
+              <input
+                value={dl.date}
+                onChange={e => onUpdate(dl.id, { date: e.target.value })}
+                placeholder="Date (e.g. May 5, 2026)"
+                className={`${smallInputCls} flex-1 min-w-[130px]`}
+              />
+              <input
+                value={dl.label}
+                onChange={e => onUpdate(dl.id, { label: e.target.value })}
+                placeholder="Label (e.g. CRITICAL)"
+                className={`${smallInputCls} flex-1 min-w-[100px]`}
+              />
+              <select
+                value={dl.urgency}
+                onChange={e => onUpdate(dl.id, { urgency: e.target.value as DeadlineUrgency })}
+                className={selectCls}
+              >
+                <option value="wedding">Wedding</option>
+                <option value="critical">Critical</option>
+                <option value="soon">Soon</option>
+                <option value="upcoming">Upcoming</option>
+              </select>
+              <button onClick={() => onDelete(dl.id)} className={deleteBtnCls} title="Delete deadline">×</button>
+            </div>
+            <input
+              value={dl.title}
+              onChange={e => onUpdate(dl.id, { title: e.target.value })}
+              placeholder="Milestone title"
+              className={inputCls}
+            />
+            <div className="space-y-1.5 mt-1">
+              {dl.bullets.map((b, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input
+                    value={b}
+                    onChange={e => onBulletUpdate(dl.id, i, e.target.value)}
+                    placeholder="Bullet point"
+                    className={`${inputCls} flex-1`}
+                  />
+                  <button onClick={() => onBulletRemove(dl.id, i)} className={deleteBtnCls} title="Remove bullet">×</button>
+                </div>
+              ))}
+              <button onClick={() => onBulletAdd(dl.id)} className={addRowBtnCls}>+ add bullet</button>
+            </div>
+          </div>
+        ) : (
+          <div className="pr-5">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 mb-2">
+              <span className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">{dl.date}</span>
+              <span className={`font-work-sans text-[10px] tracking-[0.2em] uppercase ${s.label}`}>{dl.label}</span>
+            </div>
+            <h3 className="font-crimson font-semibold text-lg text-dark-taupe mb-2 leading-snug">{dl.title}</h3>
+            <ul className="space-y-1">
+              {dl.bullets.map((b, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="text-gold-line mt-1 flex-shrink-0 text-xs">·</span>
+                  <span className="font-crimson text-sm text-deep-ivory leading-snug">{b}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </Reorder.Item>
+  )
+}
+
 // ── Edit mode toggle button ────────────────────────────────────────────────────
 
 function EditToggle({ isEditing, onToggle }: { isEditing: boolean; onToggle: () => void }) {
@@ -674,91 +779,26 @@ export default function PlannerDashboard() {
             <div className="relative">
               <div className="absolute left-3 top-0 bottom-0 w-px bg-soft-gray/30" />
 
-              <div className="flex flex-col gap-5 pl-10">
-                {deadlines.map((dl) => {
-                  const s = urgencyStyles[dl.urgency]
-                  return (
-                    <div key={dl.id} className="relative">
-                      <div className={`absolute -left-7 top-2 w-3 h-3 rounded-full ${s.dot} ring-2 ring-ivory`} />
-
-                      <div className={`border rounded-lg p-4 ${s.card}`}>
-                        {isEditing ? (
-                          <div className="space-y-2">
-                            {/* Row 1: date · label · urgency · delete */}
-                            <div className="flex flex-wrap gap-2 items-center">
-                              <input
-                                value={dl.date}
-                                onChange={e => updateDeadline(dl.id, { date: e.target.value })}
-                                placeholder="Date (e.g. May 5, 2026)"
-                                className={`${smallInputCls} flex-1 min-w-[130px]`}
-                              />
-                              <input
-                                value={dl.label}
-                                onChange={e => updateDeadline(dl.id, { label: e.target.value })}
-                                placeholder="Label (e.g. CRITICAL)"
-                                className={`${smallInputCls} flex-1 min-w-[100px]`}
-                              />
-                              <select
-                                value={dl.urgency}
-                                onChange={e => updateDeadline(dl.id, { urgency: e.target.value as DeadlineUrgency })}
-                                className={selectCls}
-                              >
-                                <option value="wedding">Wedding</option>
-                                <option value="critical">Critical</option>
-                                <option value="soon">Soon</option>
-                                <option value="upcoming">Upcoming</option>
-                              </select>
-                              <button onClick={() => deleteDeadline(dl.id)} className={deleteBtnCls} title="Delete deadline">×</button>
-                            </div>
-                            {/* Row 2: title */}
-                            <input
-                              value={dl.title}
-                              onChange={e => updateDeadline(dl.id, { title: e.target.value })}
-                              placeholder="Milestone title"
-                              className={inputCls}
-                            />
-                            {/* Bullets */}
-                            <div className="space-y-1.5 mt-1">
-                              {dl.bullets.map((b, i) => (
-                                <div key={i} className="flex items-center gap-2">
-                                  <input
-                                    value={b}
-                                    onChange={e => updateBullet(dl.id, i, e.target.value)}
-                                    placeholder="Bullet point"
-                                    className={`${inputCls} flex-1`}
-                                  />
-                                  <button onClick={() => removeBullet(dl.id, i)} className={deleteBtnCls} title="Remove bullet">×</button>
-                                </div>
-                              ))}
-                              <button onClick={() => addBullet(dl.id)} className={addRowBtnCls}>
-                                + add bullet
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <>
-                            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 mb-2">
-                              <span className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">{dl.date}</span>
-                              <span className={`font-work-sans text-[10px] tracking-[0.2em] uppercase ${s.label}`}>{dl.label}</span>
-                            </div>
-                            <h3 className="font-crimson font-semibold text-lg text-dark-taupe mb-2 leading-snug">
-                              {dl.title}
-                            </h3>
-                            <ul className="space-y-1">
-                              {dl.bullets.map((b, i) => (
-                                <li key={i} className="flex items-start gap-2">
-                                  <span className="text-gold-line mt-1 flex-shrink-0 text-xs">·</span>
-                                  <span className="font-crimson text-sm text-deep-ivory leading-snug">{b}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
+              <Reorder.Group
+                axis="y"
+                values={deadlines}
+                onReorder={setDeadlines}
+                as="div"
+                className="flex flex-col gap-5 pl-10"
+              >
+                {deadlines.map(dl => (
+                  <DeadlineItem
+                    key={dl.id}
+                    dl={dl}
+                    isEditing={isEditing}
+                    onUpdate={updateDeadline}
+                    onDelete={deleteDeadline}
+                    onBulletUpdate={updateBullet}
+                    onBulletRemove={removeBullet}
+                    onBulletAdd={addBullet}
+                  />
+                ))}
+              </Reorder.Group>
             </div>
 
             {isEditing && (
