@@ -6,6 +6,8 @@ import { Reorder, useDragControls } from 'framer-motion'
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type TaskStatus = 'done' | 'in-progress' | 'pending'
+type DeadlineUrgency = 'wedding' | 'critical' | 'soon' | 'upcoming'
+type VendorStatus = 'confirmed' | 'deposit-paid' | 'pending' | 'in-discussion'
 
 type Task = {
   id: string
@@ -17,14 +19,12 @@ type Task = {
   notes: string
 }
 
-type DeadlineUrgency = 'wedding' | 'critical' | 'soon' | 'upcoming'
-
 type Deadline = {
   id: string
   date: string
   label: string
   title: string
-  bullets: string[]
+  bullets: { id: string; text: string }[]
   urgency: DeadlineUrgency
 }
 
@@ -32,446 +32,516 @@ type BudgetItem = {
   id: string
   item: string
   cost: string
-  status: 'paid' | 'pending'
+  paid: boolean
+}
+
+type GuestScenario = {
+  id: string
+  numGuests: number
+  costPerTable: number
+  seatsPerTable: number
 }
 
 type Vendor = {
   id: string
   vendor: string
   service: string
+  category: string
   contact: string
   phone: string
   email: string
-  website: string
-  notes: string
   budget: string
-  category: string
-  status: 'confirmed' | 'deposit-paid' | 'pending' | 'in-discussion'
+  status: VendorStatus
+  notes: string
 }
 
-type ReceptionScenario = {
-  id: string
-  label: string
-  guests: number
-  seatsPerTable: number
-  costPerTable: number
-}
+// ── Utilities ──────────────────────────────────────────────────────────────────
 
-// ── Seed data ──────────────────────────────────────────────────────────────────
+let _seq = 0
+const uid = () => `${Date.now()}-${++_seq}`
+
+// ── Initial Data ───────────────────────────────────────────────────────────────
 
 const INITIAL_DEADLINES: Deadline[] = [
   {
-    id: 'd1',
-    date: 'May 5, 2026',
-    label: 'TOMORROW',
+    id: 'd1', date: 'May 5, 2026', label: 'TOMORROW', urgency: 'critical',
     title: 'Wedding Planner Call',
     bullets: [
-      'Discuss small decoration coordination',
-      'Day-of table setup & guest check-in logistics',
-      'Confirm: decoration setup and day-of coordination',
-      'Status update: guest count (100–120), vendor confirmations, timeline review',
+      { id: 'b1', text: 'Discuss small decoration coordination' },
+      { id: 'b2', text: 'Day-of table setup & guest check-in logistics' },
+      { id: 'b3', text: 'Confirm: decoration setup and day-of coordination' },
+      { id: 'b4', text: 'Status update: guest count (100–120), vendor confirmations, timeline review' },
     ],
-    urgency: 'critical',
   },
   {
-    id: 'd2',
-    date: 'June 12, 2026',
-    label: '⏰ CRITICAL',
+    id: 'd2', date: 'June 12, 2026', label: '⏰ CRITICAL', urgency: 'critical',
     title: 'Send RSVPs & Confirm Golden Unicorn',
     bullets: [
-      'Send formal invitations to all guests',
-      'RSVP deadline: ~July 15 (6 weeks before wedding)',
-      'Confirm final menu selection with Golden Unicorn',
-      'Confirm final guest count accommodation',
-      'Discuss any dietary restrictions',
+      { id: 'b5', text: 'Send formal invitations to all guests' },
+      { id: 'b6', text: 'RSVP deadline: ~July 15 (6 weeks before wedding)' },
+      { id: 'b7', text: 'Confirm final menu selection with Golden Unicorn' },
+      { id: 'b8', text: 'Confirm final guest count accommodation' },
+      { id: 'b9', text: 'Discuss any dietary restrictions' },
     ],
-    urgency: 'critical',
   },
   {
-    id: 'd3',
-    date: 'August 15, 2026',
-    label: '⏰ CRITICAL',
+    id: 'd3', date: 'August 15, 2026', label: '⏰ CRITICAL', urgency: 'soon',
     title: 'Get Items Printed',
     bullets: [
-      'Table number frames',
-      'Ceremony programs',
-      'Place cards / seating cards',
-      'Guest list for check-in table',
-      'Menu cards (optional)',
-      'Allow 2–3 weeks for printing and delivery',
+      { id: 'b10', text: 'Table number frames' },
+      { id: 'b11', text: 'Ceremony programs' },
+      { id: 'b12', text: 'Place cards / seating cards' },
+      { id: 'b13', text: 'Guest list for check-in table' },
+      { id: 'b14', text: 'Menu cards (optional)' },
+      { id: 'b15', text: 'Allow 2–3 weeks for printing and delivery' },
     ],
-    urgency: 'soon',
   },
   {
-    id: 'd4',
-    date: 'August 22, 2026',
-    label: '⏰ CRITICAL',
+    id: 'd4', date: 'August 22, 2026', label: '⏰ CRITICAL', urgency: 'soon',
     title: 'Finalize Table Arrangements & Seating Chart',
     bullets: [
-      'Complete final table layout and seating assignments',
-      'Coordinate with reception venue on setup preferences',
-      'Finalize any last-minute guest changes',
-      'Create table numbers and place cards',
+      { id: 'b16', text: 'Complete final table layout and seating assignments' },
+      { id: 'b17', text: 'Coordinate with reception venue on setup preferences' },
+      { id: 'b18', text: 'Finalize any last-minute guest changes' },
+      { id: 'b19', text: 'Create table numbers and place cards' },
     ],
-    urgency: 'soon',
   },
   {
-    id: 'd5',
-    date: 'September 10, 2026',
-    label: '⏰ CRITICAL',
+    id: 'd5', date: 'September 10, 2026', label: '⏰ CRITICAL', urgency: 'upcoming',
     title: 'Prepare All Ceremony Flowers (2 Days Before)',
     bullets: [
-      'Make bridal bouquet',
-      'Prepare flower girl rose basket',
-      'Any altar or ceremony arch arrangements',
-      'Ensure flower freshness',
+      { id: 'b20', text: 'Make bridal bouquet' },
+      { id: 'b21', text: 'Prepare flower girl rose basket' },
+      { id: 'b22', text: 'Any altar or ceremony arch arrangements' },
+      { id: 'b23', text: 'Ensure flower freshness' },
     ],
-    urgency: 'upcoming',
   },
   {
-    id: 'd6',
-    date: 'September 12, 2026',
-    label: '🎊 WEDDING DAY',
+    id: 'd6', date: 'September 12, 2026', label: '🎊 WEDDING DAY', urgency: 'wedding',
     title: "Christine & Michael's Wedding",
     bullets: [
-      "Ceremony: 2:00 PM at St. Joseph's Church, Greenwich Village",
-      'Reception setup: arrive 4:00 PM at Golden Unicorn',
-      'Reception: 5:00 PM – 10:00 PM at Golden Unicorn',
+      { id: 'b24', text: "Ceremony: 2:00 PM at St. Joseph's Church, Greenwich Village" },
+      { id: 'b25', text: 'Reception setup: arrive 4:00 PM at Golden Unicorn' },
+      { id: 'b26', text: 'Reception: 5:00 PM – 10:00 PM at Golden Unicorn' },
     ],
-    urgency: 'wedding',
   },
 ]
 
 const INITIAL_TASKS: Task[] = [
-  { id: 't1',  title: 'Make bridal bouquet',                                      category: 'DIY',            status: 'pending',     assignee: '',                    dueLabel: 'Sep 10', notes: '' },
-  { id: 't2',  title: 'Prepare flower girl basket with roses',                    category: 'DIY',            status: 'pending',     assignee: '',                    dueLabel: 'Sep 10', notes: '' },
-  { id: 't3',  title: 'Source vases for floral arrangements',                     category: 'DIY',            status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't4',  title: 'Confirm final details with Jin Krista (music)',             category: 'Vendors',        status: 'pending',     assignee: '',                    dueLabel: 'Jun 12', notes: '' },
-  { id: 't5',  title: 'Finalize photographer booking (6 hrs or 8 hrs?)',           category: 'Vendors',        status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't6',  title: 'Confirm DJ details and music preferences',                 category: 'Vendors',        status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't7',  title: 'Coordinate with florist for ceremony arch & centerpieces', category: 'Vendors',        status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't8',  title: 'Confirm lion dancers logistics and timing',                category: 'Vendors',        status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't9',  title: 'Finalize guest count (100 or 120 guests?)',                category: 'Guests',         status: 'in-progress', assignee: '',                    dueLabel: 'Jun 12', notes: '' },
-  { id: 't10', title: 'Send out formal invitations',                              category: 'Guests',         status: 'pending',     assignee: '',                    dueLabel: 'Jun 12', notes: '' },
-  { id: 't11', title: 'Collect RSVPs',                                            category: 'Guests',         status: 'pending',     assignee: '',                    dueLabel: 'Jul 15', notes: '' },
-  { id: 't12', title: 'Finalize ceremony music selections with Jin Krista',       category: 'Ceremony',       status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't13', title: "Coordinate with St. Joseph's Church on timing",            category: 'Ceremony',       status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't14', title: 'Plan processional and recessional order',                  category: 'Ceremony',       status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't15', title: 'Confirm final menu with Golden Unicorn',                   category: 'Reception',      status: 'pending',     assignee: '',                    dueLabel: 'Jun 12', notes: '' },
-  { id: 't16', title: 'Plan table layout and seating chart',                      category: 'Reception',      status: 'pending',     assignee: '',                    dueLabel: 'Aug 22', notes: '' },
-  { id: 't17', title: 'Arrange transportation if needed',                         category: 'Reception',      status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't18', title: 'Source materials for bridal bouquet',                      category: 'Design & Style', status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't19', title: 'Source roses for flower girl basket',                      category: 'Design & Style', status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't20', title: 'Plan bridesmaid attire (ivory/blush/lilac)',               category: 'Design & Style', status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't21', title: 'Finalize groomsmen attire',                                category: 'Design & Style', status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't22', title: 'Order table number frames',                                category: 'Printing',       status: 'pending',     assignee: '',                    dueLabel: 'Aug 15', notes: '' },
-  { id: 't23', title: 'Order ceremony programs',                                  category: 'Printing',       status: 'pending',     assignee: '',                    dueLabel: 'Aug 15', notes: '' },
-  { id: 't24', title: 'Order seating cards / place cards',                        category: 'Printing',       status: 'pending',     assignee: '',                    dueLabel: 'Aug 15', notes: '' },
-  { id: 't25', title: 'Order guest list for check-in table',                      category: 'Printing',       status: 'pending',     assignee: '',                    dueLabel: 'Aug 15', notes: '' },
-  { id: 't26', title: 'Order menu cards (optional)',                              category: 'Printing',       status: 'pending',     assignee: '',                    dueLabel: 'Aug 15', notes: '' },
-  { id: 't27', title: 'Complete marriage prep class',                             category: 'Other',          status: 'in-progress', assignee: 'Christine & Michael', dueLabel: 'Sep 12', notes: '' },
-  { id: 't28', title: 'Wedding dress final fittings',                             category: 'Other',          status: 'pending',     assignee: 'Christine',           dueLabel: '',       notes: '' },
-  { id: 't29', title: 'Plan rehearsal dinner details',                            category: 'Other',          status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
-  { id: 't30', title: 'Arrange wedding day timeline and schedule',                category: 'Other',          status: 'pending',     assignee: '',                    dueLabel: '',       notes: '' },
+  { id: 't1',  category: 'DIY',            status: 'pending',     assignee: '',                   dueLabel: 'Sep 10', notes: '', title: 'Make bridal bouquet' },
+  { id: 't2',  category: 'DIY',            status: 'pending',     assignee: '',                   dueLabel: 'Sep 10', notes: '', title: 'Prepare flower girl basket with roses' },
+  { id: 't3',  category: 'DIY',            status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Source vases for floral arrangements' },
+  { id: 't4',  category: 'Vendors',        status: 'pending',     assignee: '',                   dueLabel: 'Jun 12', notes: '', title: 'Confirm final details with Jin Krista (music)' },
+  { id: 't5',  category: 'Vendors',        status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Finalize photographer booking (6 hrs or 8 hrs?)' },
+  { id: 't6',  category: 'Vendors',        status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Confirm DJ details and music preferences' },
+  { id: 't7',  category: 'Vendors',        status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Coordinate with florist for ceremony arch & centerpieces' },
+  { id: 't8',  category: 'Vendors',        status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Confirm lion dancers logistics and timing' },
+  { id: 't9',  category: 'Guests',         status: 'in-progress', assignee: '',                   dueLabel: 'Jun 12', notes: '', title: 'Finalize guest count (100 or 120 guests?)' },
+  { id: 't10', category: 'Guests',         status: 'pending',     assignee: '',                   dueLabel: 'Jun 12', notes: '', title: 'Send out formal invitations' },
+  { id: 't11', category: 'Guests',         status: 'pending',     assignee: '',                   dueLabel: 'Jul 15', notes: '', title: 'Collect RSVPs' },
+  { id: 't12', category: 'Ceremony',       status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Finalize ceremony music selections with Jin Krista' },
+  { id: 't13', category: 'Ceremony',       status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: "Coordinate with St. Joseph's Church on timing" },
+  { id: 't14', category: 'Ceremony',       status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Plan processional and recessional order' },
+  { id: 't15', category: 'Reception',      status: 'pending',     assignee: '',                   dueLabel: 'Jun 12', notes: '', title: 'Confirm final menu with Golden Unicorn' },
+  { id: 't16', category: 'Reception',      status: 'pending',     assignee: '',                   dueLabel: 'Aug 22', notes: '', title: 'Plan table layout and seating chart' },
+  { id: 't17', category: 'Reception',      status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Arrange transportation if needed' },
+  { id: 't18', category: 'Design & Style', status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Source materials for bridal bouquet' },
+  { id: 't19', category: 'Design & Style', status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Source roses for flower girl basket' },
+  { id: 't20', category: 'Design & Style', status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Plan bridesmaid attire (ivory/blush/lilac)' },
+  { id: 't21', category: 'Design & Style', status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Finalize groomsmen attire' },
+  { id: 't22', category: 'Printing',       status: 'pending',     assignee: '',                   dueLabel: 'Aug 15', notes: '', title: 'Order table number frames' },
+  { id: 't23', category: 'Printing',       status: 'pending',     assignee: '',                   dueLabel: 'Aug 15', notes: '', title: 'Order ceremony programs' },
+  { id: 't24', category: 'Printing',       status: 'pending',     assignee: '',                   dueLabel: 'Aug 15', notes: '', title: 'Order seating cards / place cards' },
+  { id: 't25', category: 'Printing',       status: 'pending',     assignee: '',                   dueLabel: 'Aug 15', notes: '', title: 'Order guest list for check-in table' },
+  { id: 't26', category: 'Printing',       status: 'pending',     assignee: '',                   dueLabel: 'Aug 15', notes: '', title: 'Order menu cards (optional)' },
+  { id: 't27', category: 'Other',          status: 'in-progress', assignee: 'Christine & Michael', dueLabel: 'Sep 12', notes: '', title: 'Complete marriage prep class' },
+  { id: 't28', category: 'Other',          status: 'pending',     assignee: 'Christine',          dueLabel: '',       notes: '', title: 'Wedding dress final fittings' },
+  { id: 't29', category: 'Other',          status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Plan rehearsal dinner details' },
+  { id: 't30', category: 'Other',          status: 'pending',     assignee: '',                   dueLabel: '',       notes: '', title: 'Arrange wedding day timeline and schedule' },
 ]
 
 const INITIAL_BUDGET_ITEMS: BudgetItem[] = [
-  { id: 'b1',  item: 'Marriage class',               cost: '$195',            status: 'paid'    },
-  { id: 'b2',  item: 'Wedding dress',                cost: '$3,380',          status: 'paid'    },
-  { id: 'b3',  item: 'Website',                      cost: '$100',            status: 'paid'    },
-  { id: 'b4',  item: 'Church ceremony fee',          cost: '$2,500',          status: 'paid'    },
-  { id: 'b5',  item: 'Reception deposit',            cost: '$500',            status: 'paid'    },
-  { id: 'b6',  item: 'Save the Date',                cost: '$0',              status: 'paid'    },
-  { id: 'b7',  item: 'Marriage prep class',          cost: '$200',            status: 'pending' },
-  { id: 'b8',  item: 'Reception (remaining balance)',cost: '$20,300–$23,500', status: 'pending' },
-  { id: 'b9',  item: 'Photography (6 hrs)',          cost: '$3,000',          status: 'pending' },
-  { id: 'b10', item: 'DJ',                           cost: '$3,000',          status: 'pending' },
-  { id: 'b11', item: 'Florals',                      cost: '$3,000',          status: 'pending' },
-  { id: 'b12', item: 'Lion dancers',                 cost: '$1,000',          status: 'pending' },
-  { id: 'b13', item: 'Ceremony music – Jin Krista',  cost: '$2,000',          status: 'pending' },
+  { id: 'bi1',  item: 'Marriage class',               cost: '$195',            paid: true },
+  { id: 'bi2',  item: 'Wedding dress',                cost: '$3,380',          paid: true },
+  { id: 'bi3',  item: 'Website',                      cost: '$100',            paid: true },
+  { id: 'bi4',  item: 'Church ceremony fee',          cost: '$2,500',          paid: true },
+  { id: 'bi5',  item: 'Reception deposit',            cost: '$500',            paid: true },
+  { id: 'bi6',  item: 'Save the Date',                cost: '$0',              paid: true },
+  { id: 'bi7',  item: 'Marriage prep class',          cost: '$200',            paid: false },
+  { id: 'bi8',  item: 'Reception (remaining balance)',cost: '$20,300–$23,500', paid: false },
+  { id: 'bi9',  item: 'Photography (6 hrs)',          cost: '$3,000',          paid: false },
+  { id: 'bi10', item: 'DJ',                           cost: '$3,000',          paid: false },
+  { id: 'bi11', item: 'Florals',                      cost: '$3,000',          paid: false },
+  { id: 'bi12', item: 'Lion dancers',                 cost: '$1,000',          paid: false },
+  { id: 'bi13', item: 'Ceremony music – Jin Krista',  cost: '$2,000',          paid: false },
+]
+
+const INITIAL_SCENARIOS: GuestScenario[] = [
+  { id: 'gs1', numGuests: 100, costPerTable: 1600, seatsPerTable: 8 },
+  { id: 'gs2', numGuests: 120, costPerTable: 1600, seatsPerTable: 8 },
 ]
 
 const INITIAL_VENDORS: Vendor[] = [
-  { id: 'v1', vendor: 'Jin Krista',          service: 'Ceremony Music',          contact: '', phone: '', email: '', website: '', notes: '', budget: '$2,000',           category: 'Music',         status: 'confirmed'     },
-  { id: 'v2', vendor: 'Golden Unicorn',      service: 'Reception Venue',         contact: '', phone: '', email: '', website: '', notes: '', budget: '$20,800–$24,000',  category: 'Venue',         status: 'deposit-paid'  },
-  { id: 'v3', vendor: 'Photographer',        service: 'Photography (6–8 hrs)',   contact: '', phone: '', email: '', website: '', notes: '', budget: '$3,000–$4,000',    category: 'Photography',   status: 'pending'       },
-  { id: 'v4', vendor: 'DJ',                  service: 'Reception Entertainment', contact: '', phone: '', email: '', website: '', notes: '', budget: '$3,000',           category: 'Entertainment', status: 'pending'       },
-  { id: 'v5', vendor: 'Florist',             service: 'Florals & Arrangements',  contact: '', phone: '', email: '', website: '', notes: '', budget: '$3,000',           category: 'Florals',       status: 'pending'       },
-  { id: 'v6', vendor: 'Lion Dancers',        service: 'Cultural Entertainment',  contact: '', phone: '', email: '', website: '', notes: '', budget: '$1,000',           category: 'Entertainment', status: 'pending'       },
-  { id: 'v7', vendor: "St. Joseph's Church", service: 'Ceremony Venue',          contact: '', phone: '', email: '', website: '', notes: '', budget: '$2,500 (paid)',     category: 'Venue',         status: 'confirmed'     },
-  { id: 'v8', vendor: 'Wedding Planner',     service: 'Overall Coordination',    contact: '', phone: '', email: '', website: '', notes: '', budget: 'TBD',             category: 'Coordination',  status: 'in-discussion' },
+  { id: 'v1', vendor: 'Jin Krista',          service: 'Ceremony Music',         category: 'Music',         contact: 'TBD', phone: '', email: '', budget: '$2,000',           status: 'confirmed',     notes: '' },
+  { id: 'v2', vendor: 'Golden Unicorn',      service: 'Reception Venue',        category: 'Venue',         contact: 'TBD', phone: '', email: '', budget: '$20,800–$24,000',  status: 'deposit-paid',  notes: '' },
+  { id: 'v3', vendor: 'Photographer',        service: 'Photography (6–8 hrs)',  category: 'Photography',   contact: 'TBD', phone: '', email: '', budget: '$3,000–$4,000',    status: 'pending',       notes: '' },
+  { id: 'v4', vendor: 'DJ',                  service: 'Reception Entertainment',category: 'Music',         contact: 'TBD', phone: '', email: '', budget: '$3,000',           status: 'pending',       notes: '' },
+  { id: 'v5', vendor: 'Florist',             service: 'Florals & Arrangements', category: 'Florals',       contact: 'TBD', phone: '', email: '', budget: '$3,000',           status: 'pending',       notes: '' },
+  { id: 'v6', vendor: 'Lion Dancers',        service: 'Cultural Entertainment', category: 'Entertainment', contact: 'TBD', phone: '', email: '', budget: '$1,000',           status: 'pending',       notes: '' },
+  { id: 'v7', vendor: "St. Joseph's Church", service: 'Ceremony Venue',         category: 'Venue',         contact: 'TBD', phone: '', email: '', budget: '$2,500 (paid)',    status: 'confirmed',     notes: '' },
+  { id: 'v8', vendor: 'Wedding Planner',     service: 'Overall Coordination',   category: 'Planning',      contact: 'TBD', phone: '', email: '', budget: 'TBD',             status: 'in-discussion', notes: '' },
 ]
 
-const INITIAL_SCENARIOS: ReceptionScenario[] = [
-  { id: 's1', label: 'Scenario A', guests: 100, seatsPerTable: 8, costPerTable: 1600 },
-  { id: 's2', label: 'Scenario B', guests: 120, seatsPerTable: 8, costPerTable: 1600 },
-]
+// ── Shared: Inline editable text ───────────────────────────────────────────────
 
-const INITIAL_CATEGORIES = ['DIY', 'Vendors', 'Guests', 'Ceremony', 'Reception', 'Design & Style', 'Printing', 'Other']
-
-// ── Helpers ────────────────────────────────────────────────────────────────────
-
-let _seq = 0
-const genId = () => `x${Date.now()}-${++_seq}`
-
-function parseCost(cost: string): number {
-  const digits = cost.replace(/[$,]/g, '').match(/^\d+/)
-  return digits ? parseInt(digits[0]) : 0
-}
-
-const MONTH_IDX: Record<string, number> = {
-  jan: 0, january: 0, feb: 1, february: 1, mar: 2, march: 2,
-  apr: 3, april: 3, may: 4, jun: 5, june: 5, jul: 6, july: 6,
-  aug: 7, august: 7, sep: 8, september: 8, oct: 9, october: 9,
-  nov: 10, november: 10, dec: 11, december: 11,
-}
-
-function parseDateLabel(label: string): Date | null {
-  if (!label) return null
-  const m = label.toLowerCase().match(/([a-z]+)\s+(\d+)/)
-  if (!m) return null
-  const mo = MONTH_IDX[m[1]]
-  if (mo === undefined) return null
-  const day = parseInt(m[2])
-  const yr = label.match(/(\d{4})/)
-  return new Date(yr ? parseInt(yr[1]) : 2026, mo, day)
-}
-
-function findClosestDeadlineId(dueLabel: string, deadlines: Deadline[]): string | null {
-  const t = parseDateLabel(dueLabel)
-  if (!t) return null
-  let best: string | null = null
-  let minDiff = Infinity
-  for (const dl of deadlines) {
-    const d = parseDateLabel(dl.date)
-    if (!d) continue
-    const diff = Math.abs(t.getTime() - d.getTime())
-    if (diff < minDiff) { minDiff = diff; best = dl.id }
-  }
-  return best
-}
-
-function formatDollars(n: number): string {
-  return '$' + n.toLocaleString()
-}
-
-// ── Style maps ─────────────────────────────────────────────────────────────────
-
-const urgencyStyles: Record<DeadlineUrgency, { dot: string; card: string; label: string }> = {
-  wedding:  { dot: 'bg-lilac',      card: 'border-lilac bg-lilac/10',           label: 'text-dusty-lilac font-semibold' },
-  critical: { dot: 'bg-muted-rose', card: 'border-muted-rose bg-muted-rose/10', label: 'text-muted-rose font-semibold'  },
-  soon:     { dot: 'bg-gold-line',  card: 'border-gold-line bg-pale-gold/20',   label: 'text-deep-ivory'                },
-  upcoming: { dot: 'bg-pale-gold',  card: 'border-pale-gold bg-ivory',          label: 'text-soft-gray'                 },
-}
-
-const statusStyles: Record<TaskStatus, { pill: string; label: string }> = {
-  done:          { pill: 'bg-gold-line/20 text-deep-ivory border border-gold-line/40',  label: 'Done'        },
-  'in-progress': { pill: 'bg-lilac/20 text-dusty-lilac border border-lilac/40',         label: 'In Progress' },
-  pending:       { pill: 'bg-soft-gray/20 text-soft-gray border border-soft-gray/40',   label: 'Pending'     },
-}
-
-const vendorStatusStyles: Record<Vendor['status'], string> = {
-  'confirmed':     'bg-gold-line/20 text-deep-ivory border border-gold-line/40',
-  'deposit-paid':  'bg-pale-gold/30 text-deep-ivory border border-pale-gold/60',
-  'pending':       'bg-soft-gray/20 text-soft-gray border border-soft-gray/40',
-  'in-discussion': 'bg-lilac/20 text-dusty-lilac border border-lilac/40',
-}
-
-const vendorStatusLabel: Record<Vendor['status'], string> = {
-  'confirmed':     'Confirmed',
-  'deposit-paid':  'Deposit Paid',
-  'pending':       'Pending',
-  'in-discussion': 'In Discussion',
-}
-
-const nextStatus: Record<TaskStatus, TaskStatus> = {
-  pending:      'in-progress',
-  'in-progress': 'done',
-  done:         'pending',
-}
-
-// ── Shared input/button style strings ─────────────────────────────────────────
-
-const inputCls = [
-  'bg-ivory/80 border border-soft-gray/40 rounded px-2.5 py-1.5',
-  'text-sm font-crimson text-dark-taupe',
-  'focus:outline-none focus:border-gold-line',
-  'w-full min-h-[36px]',
-].join(' ')
-
-const smallInputCls = [
-  'bg-ivory/80 border border-soft-gray/40 rounded px-2 py-1',
-  'text-xs font-crimson text-dark-taupe',
-  'focus:outline-none focus:border-gold-line',
-  'min-h-[32px]',
-].join(' ')
-
-const selectCls = [
-  'bg-ivory/80 border border-soft-gray/40 rounded px-2 py-1',
-  'text-xs font-crimson text-dark-taupe',
-  'focus:outline-none focus:border-gold-line',
-  'min-h-[32px]',
-].join(' ')
-
-const deleteBtnCls = [
-  'flex-shrink-0 w-8 h-8 flex items-center justify-center rounded',
-  'text-soft-gray hover:text-muted-rose hover:bg-muted-rose/10',
-  'transition-colors text-xl leading-none',
-].join(' ')
-
-const addRowBtnCls = [
-  'font-work-sans text-[9px] tracking-[0.2em] uppercase',
-  'text-soft-gray hover:text-gold-line transition-colors py-1',
-].join(' ')
-
-// ── StatusPill ─────────────────────────────────────────────────────────────────
-
-function StatusPill({ status }: { status: TaskStatus }) {
-  const s = statusStyles[status]
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-work-sans tracking-wider uppercase whitespace-nowrap ${s.pill}`}>
-      {s.label}
-    </span>
-  )
-}
-
-// ── TaskRow ────────────────────────────────────────────────────────────────────
-
-function TaskRow({
-  task,
-  isEditing,
-  categories,
-  onUpdate,
-  onDelete,
+function EditableText({
+  value, onChange, className = '', placeholder = 'Click to edit…',
 }: {
-  task: Task
-  isEditing: boolean
-  categories: string[]
-  onUpdate: (id: string, changes: Partial<Task>) => void
-  onDelete: (id: string) => void
+  value: string
+  onChange: (v: string) => void
+  className?: string
+  placeholder?: string
 }) {
-  const [editingAssignee, setEditingAssignee] = useState(false)
-  const [assigneeInput, setAssigneeInput] = useState(task.assignee)
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(value)
 
-  const commitAssignee = () => {
-    setEditingAssignee(false)
-    onUpdate(task.id, { assignee: assigneeInput })
-  }
+  const save = () => { setEditing(false); onChange(draft) }
+  const cancel = () => { setEditing(false); setDraft(value) }
 
-  if (isEditing) {
+  if (editing) {
     return (
-      <div className="py-3 border-b border-soft-gray/20 last:border-0 space-y-2">
-        <div className="flex items-start gap-2">
-          <input
-            value={task.title}
-            onChange={e => onUpdate(task.id, { title: e.target.value })}
-            className={`${inputCls} flex-1`}
-            placeholder="Task title"
-          />
-          <button onClick={() => onDelete(task.id)} className={deleteBtnCls} title="Delete task">×</button>
-        </div>
-        <div className="flex flex-wrap gap-x-4 gap-y-2">
-          <div className="flex items-center gap-1.5 min-w-[160px]">
-            <span className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray flex-shrink-0">Category</span>
-            <input
-              list={`cats-${task.id}`}
-              value={task.category}
-              onChange={e => onUpdate(task.id, { category: e.target.value })}
-              className={`${smallInputCls} flex-1`}
-              placeholder="Category"
-            />
-            <datalist id={`cats-${task.id}`}>
-              {categories.map(c => <option key={c} value={c} />)}
-            </datalist>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray flex-shrink-0">Due</span>
-            <input
-              value={task.dueLabel}
-              onChange={e => onUpdate(task.id, { dueLabel: e.target.value })}
-              className={`${smallInputCls} w-24`}
-              placeholder="e.g. Jun 12"
-            />
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray flex-shrink-0">Assigned</span>
-            <input
-              value={task.assignee}
-              onChange={e => onUpdate(task.id, { assignee: e.target.value })}
-              className={`${smallInputCls} w-32`}
-              placeholder="Name"
-            />
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray flex-shrink-0">Status</span>
-            <select
-              value={task.status}
-              onChange={e => onUpdate(task.id, { status: e.target.value as TaskStatus })}
-              className={selectCls}
-            >
-              <option value="pending">Pending</option>
-              <option value="in-progress">In Progress</option>
-              <option value="done">Done</option>
-            </select>
-          </div>
-        </div>
-        {(task.notes || isEditing) && (
-          <input
-            value={task.notes}
-            onChange={e => onUpdate(task.id, { notes: e.target.value })}
-            className={`${smallInputCls} w-full`}
-            placeholder="Notes (optional)"
-          />
-        )}
-      </div>
+      <input
+        autoFocus
+        value={draft}
+        onChange={e => setDraft(e.target.value)}
+        onBlur={save}
+        onKeyDown={e => {
+          if (e.key === 'Enter') { e.preventDefault(); save() }
+          if (e.key === 'Escape') cancel()
+        }}
+        className={`${className} bg-warm-cream border-b border-gold-line outline-none w-full min-w-0`}
+      />
     )
   }
 
   return (
-    <div className={`flex items-start gap-3 py-3 border-b border-soft-gray/20 last:border-0 ${task.status === 'done' ? 'opacity-60' : ''}`}>
-      <button
-        onClick={() => onUpdate(task.id, { status: nextStatus[task.status] })}
-        className="mt-0.5 flex-shrink-0 w-5 h-5 rounded border border-gold-line/50 flex items-center justify-center hover:border-gold-line transition-colors"
-        title={`Mark as ${nextStatus[task.status]}`}
-      >
-        {task.status === 'done' && (
-          <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
-            <path d="M1 4L4 7L10 1" stroke="#C3AF82" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        )}
-        {task.status === 'in-progress' && (
-          <div className="w-2 h-2 rounded-full bg-dusty-lilac" />
-        )}
-      </button>
+    <span
+      role="button"
+      tabIndex={0}
+      onClick={() => { setEditing(true); setDraft(value) }}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { setEditing(true); setDraft(value) } }}
+      className={`${className} cursor-text hover:bg-warm-cream/60 active:bg-warm-cream rounded-sm px-0.5 -mx-0.5 transition-colors`}
+      title="Tap to edit"
+    >
+      {value || <span className="text-soft-gray/40 italic text-sm">{placeholder}</span>}
+    </span>
+  )
+}
 
-      <div className="flex-1 min-w-0">
-        <p className={`font-crimson text-sm text-dark-taupe leading-snug ${task.status === 'done' ? 'line-through' : ''}`}>
-          {task.title}
-        </p>
-        <div className="flex items-center flex-wrap gap-x-3 gap-y-1 mt-1">
-          <StatusPill status={task.status} />
-          {task.dueLabel && (
-            <span className="font-work-sans text-[9px] tracking-wider uppercase text-muted-rose/80">
-              Due {task.dueLabel}
-            </span>
+function EditableNumber({
+  value, onChange, className = '',
+}: {
+  value: number
+  onChange: (v: number) => void
+  className?: string
+}) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(String(value))
+
+  const save = () => {
+    setEditing(false)
+    const n = parseInt(draft, 10)
+    if (!isNaN(n) && n > 0) onChange(n)
+    else setDraft(String(value))
+  }
+
+  if (editing) {
+    return (
+      <input
+        autoFocus
+        type="number"
+        min={1}
+        value={draft}
+        onChange={e => setDraft(e.target.value)}
+        onBlur={save}
+        onKeyDown={e => {
+          if (e.key === 'Enter') { e.preventDefault(); save() }
+          if (e.key === 'Escape') { setEditing(false); setDraft(String(value)) }
+        }}
+        className={`${className} bg-warm-cream border-b border-gold-line outline-none w-20`}
+      />
+    )
+  }
+
+  return (
+    <span
+      role="button"
+      tabIndex={0}
+      onClick={() => { setEditing(true); setDraft(String(value)) }}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { setEditing(true); setDraft(String(value)) } }}
+      className={`${className} cursor-text hover:bg-warm-cream/60 active:bg-warm-cream rounded-sm px-0.5 -mx-0.5 transition-colors`}
+      title="Tap to edit"
+    >
+      {value}
+    </span>
+  )
+}
+
+// ── Urgency config ─────────────────────────────────────────────────────────────
+
+const URGENCY_STYLES: Record<DeadlineUrgency, { dot: string; card: string; labelColor: string }> = {
+  wedding:  { dot: 'bg-lilac',      card: 'border-lilac bg-lilac/10',           labelColor: 'text-dusty-lilac font-semibold' },
+  critical: { dot: 'bg-muted-rose', card: 'border-muted-rose bg-muted-rose/10', labelColor: 'text-muted-rose font-semibold' },
+  soon:     { dot: 'bg-gold-line',  card: 'border-gold-line bg-pale-gold/20',   labelColor: 'text-deep-ivory' },
+  upcoming: { dot: 'bg-pale-gold',  card: 'border-pale-gold bg-ivory',          labelColor: 'text-soft-gray' },
+}
+
+const URGENCY_OPTIONS: { value: DeadlineUrgency; label: string }[] = [
+  { value: 'critical', label: 'Critical' },
+  { value: 'soon',     label: 'Soon' },
+  { value: 'upcoming', label: 'Upcoming' },
+  { value: 'wedding',  label: 'Wedding Day' },
+]
+
+// ── Timeline section ───────────────────────────────────────────────────────────
+
+function TimelineSection({
+  deadlines,
+  onUpdate, onDelete, onAdd,
+  onAddBullet, onUpdateBullet, onDeleteBullet,
+}: {
+  deadlines: Deadline[]
+  onUpdate: (id: string, patch: Partial<Deadline>) => void
+  onDelete: (id: string) => void
+  onAdd: () => void
+  onAddBullet: (dlId: string) => void
+  onUpdateBullet: (dlId: string, bId: string, text: string) => void
+  onDeleteBullet: (dlId: string, bId: string) => void
+}) {
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-line">
+          Critical Deadlines
+        </h2>
+        <button
+          onClick={onAdd}
+          className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray hover:text-gold-line transition-colors"
+        >
+          + Add
+        </button>
+      </div>
+
+      <div className="relative">
+        <div className="absolute left-3 top-0 bottom-0 w-px bg-soft-gray/30" />
+        <div className="flex flex-col gap-5 pl-10">
+          {deadlines.map(dl => {
+            const s = URGENCY_STYLES[dl.urgency]
+            return (
+              <div key={dl.id} className="relative">
+                <div className={`absolute -left-7 top-2 w-3 h-3 rounded-full ${s.dot} ring-2 ring-ivory flex-shrink-0`} />
+                <div className={`border rounded-lg p-4 ${s.card}`}>
+                  {/* Date / label / urgency / delete row */}
+                  <div className="flex items-start justify-between gap-2 mb-2 flex-wrap">
+                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 flex-1 min-w-0">
+                      <EditableText
+                        value={dl.date}
+                        onChange={v => onUpdate(dl.id, { date: v })}
+                        className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray"
+                      />
+                      <EditableText
+                        value={dl.label}
+                        onChange={v => onUpdate(dl.id, { label: v })}
+                        className={`font-work-sans text-[10px] tracking-[0.2em] uppercase ${s.labelColor}`}
+                      />
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <select
+                        value={dl.urgency}
+                        onChange={e => onUpdate(dl.id, { urgency: e.target.value as DeadlineUrgency })}
+                        className="font-work-sans text-[9px] uppercase bg-transparent border border-soft-gray/30 rounded px-1 py-0.5 text-soft-gray focus:outline-none focus:border-gold-line"
+                      >
+                        {URGENCY_OPTIONS.map(o => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                      </select>
+                      <button
+                        onClick={() => onDelete(dl.id)}
+                        className="text-soft-gray/40 hover:text-muted-rose transition-colors w-6 h-6 flex items-center justify-center text-base"
+                        aria-label="Delete deadline"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <EditableText
+                    value={dl.title}
+                    onChange={v => onUpdate(dl.id, { title: v })}
+                    className="font-crimson text-lg font-semibold text-dark-taupe mb-3 block w-full"
+                  />
+
+                  {/* Bullets */}
+                  <ul className="space-y-2">
+                    {dl.bullets.map(b => (
+                      <li key={b.id} className="flex items-start gap-2 group/bullet">
+                        <span className="text-gold-line mt-0.5 flex-shrink-0 text-sm leading-snug">·</span>
+                        <EditableText
+                          value={b.text}
+                          onChange={v => onUpdateBullet(dl.id, b.id, v)}
+                          className="font-crimson text-sm text-deep-ivory leading-snug flex-1"
+                        />
+                        <button
+                          onClick={() => onDeleteBullet(dl.id, b.id)}
+                          className="text-soft-gray/30 hover:text-muted-rose transition-colors w-5 h-5 flex items-center justify-center text-base flex-shrink-0 opacity-0 group-hover/bullet:opacity-100"
+                          aria-label="Remove item"
+                        >
+                          ×
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={() => onAddBullet(dl.id)}
+                    className="mt-2.5 font-work-sans text-[9px] tracking-[0.15em] uppercase text-soft-gray/50 hover:text-gold-line transition-colors"
+                  >
+                    + add item
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── Task status config ─────────────────────────────────────────────────────────
+
+const STATUS_PILL: Record<TaskStatus, string> = {
+  done:          'bg-gold-line/20 text-deep-ivory border border-gold-line/40',
+  'in-progress': 'bg-lilac/20 text-dusty-lilac border border-lilac/40',
+  pending:       'bg-soft-gray/20 text-soft-gray border border-soft-gray/40',
+}
+const STATUS_LABEL: Record<TaskStatus, string> = {
+  done: 'Done', 'in-progress': 'In Progress', pending: 'Pending',
+}
+const STATUS_CYCLE: Record<TaskStatus, TaskStatus> = {
+  pending: 'in-progress', 'in-progress': 'done', done: 'pending',
+}
+
+// ── Task row ───────────────────────────────────────────────────────────────────
+
+function TaskRow({
+  task, allCategories,
+  onUpdate, onDelete,
+}: {
+  task: Task
+  allCategories: string[]
+  onUpdate: (id: string, patch: Partial<Task>) => void
+  onDelete: (id: string) => void
+}) {
+  const [showDetails, setShowDetails] = useState(false)
+
+  return (
+    <div className={`py-3 border-b border-soft-gray/20 last:border-0 group/task ${task.status === 'done' ? 'opacity-55' : ''}`}>
+      <div className="flex items-start gap-3">
+        {/* Status toggle */}
+        <button
+          onClick={() => onUpdate(task.id, { status: STATUS_CYCLE[task.status] })}
+          className="mt-0.5 flex-shrink-0 w-5 h-5 rounded border border-gold-line/50 flex items-center justify-center hover:border-gold-line transition-colors"
+          aria-label={`Status: ${task.status}. Tap to advance.`}
+        >
+          {task.status === 'done' && (
+            <svg width="11" height="9" viewBox="0 0 11 9" fill="none" aria-hidden="true">
+              <path d="M1 4L4 7L10 1" stroke="#C3AF82" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           )}
-          {editingAssignee ? (
-            <input
-              autoFocus
-              value={assigneeInput}
-              onChange={e => setAssigneeInput(e.target.value)}
-              onBlur={commitAssignee}
-              onKeyDown={e => { if (e.key === 'Enter') commitAssignee() }}
-              placeholder="assign to…"
-              className="font-work-sans text-[10px] tracking-wide text-deep-ivory bg-transparent border-b border-gold-line/50 focus:border-gold-line outline-none w-28 pb-0.5"
+          {task.status === 'in-progress' && <div className="w-2 h-2 rounded-full bg-dusty-lilac" />}
+        </button>
+
+        <div className="flex-1 min-w-0">
+          {/* Title row */}
+          <div className="flex items-start gap-1">
+            <EditableText
+              value={task.title}
+              onChange={v => onUpdate(task.id, { title: v })}
+              className={`font-crimson text-sm text-dark-taupe leading-snug flex-1 ${task.status === 'done' ? 'line-through' : ''}`}
             />
-          ) : (
-            <button
-              onClick={() => { setAssigneeInput(task.assignee); setEditingAssignee(true) }}
-              className="font-work-sans text-[10px] tracking-wide text-deep-ivory/60 hover:text-gold-line transition-colors"
-            >
-              {task.assignee ? `→ ${task.assignee}` : '+ assign'}
-            </button>
+            <div className="flex items-center gap-0.5 flex-shrink-0 ml-1">
+              <button
+                onClick={() => setShowDetails(!showDetails)}
+                className="text-soft-gray/40 hover:text-deep-ivory w-5 h-5 flex items-center justify-center text-[10px] transition-colors"
+                aria-label={showDetails ? 'Hide details' : 'Show details'}
+              >
+                {showDetails ? '▲' : '▼'}
+              </button>
+              <button
+                onClick={() => onDelete(task.id)}
+                className="text-soft-gray/25 hover:text-muted-rose w-5 h-5 flex items-center justify-center text-base transition-colors opacity-0 group-hover/task:opacity-100"
+                aria-label="Delete task"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+
+          {/* Meta row */}
+          <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-work-sans tracking-wider uppercase whitespace-nowrap ${STATUS_PILL[task.status]}`}>
+              {STATUS_LABEL[task.status]}
+            </span>
+
+            {/* Category — editable text with datalist suggestions */}
+            <CategoryEdit
+              value={task.category}
+              options={allCategories}
+              onChange={v => onUpdate(task.id, { category: v })}
+            />
+
+            {task.dueLabel && (
+              <EditableText
+                value={task.dueLabel}
+                onChange={v => onUpdate(task.id, { dueLabel: v })}
+                className="font-work-sans text-[9px] tracking-wider uppercase text-muted-rose/80"
+              />
+            )}
+
+            <EditableText
+              value={task.assignee}
+              onChange={v => onUpdate(task.id, { assignee: v })}
+              placeholder="+ assign"
+              className="font-work-sans text-[9px] tracking-wide text-deep-ivory/60 hover:text-gold-line"
+            />
+          </div>
+
+          {/* Expanded details */}
+          {showDetails && (
+            <div className="mt-2 space-y-1.5 pl-0">
+              {!task.dueLabel && (
+                <div className="flex items-center gap-2">
+                  <span className="font-work-sans text-[9px] uppercase tracking-wide text-soft-gray/60 flex-shrink-0">Due:</span>
+                  <EditableText
+                    value={task.dueLabel}
+                    onChange={v => onUpdate(task.id, { dueLabel: v })}
+                    placeholder="add due date…"
+                    className="font-crimson text-xs text-deep-ivory"
+                  />
+                </div>
+              )}
+              <div className="flex items-start gap-2">
+                <span className="font-work-sans text-[9px] uppercase tracking-wide text-soft-gray/60 flex-shrink-0 pt-0.5">Notes:</span>
+                <EditableText
+                  value={task.notes}
+                  onChange={v => onUpdate(task.id, { notes: v })}
+                  placeholder="add notes…"
+                  className="font-crimson text-xs text-deep-ivory flex-1"
+                />
+              </div>
+            </div>
           )}
         </div>
         {task.notes && (
@@ -482,273 +552,543 @@ function TaskRow({
   )
 }
 
-// ── DeadlineItem (draggable) ───────────────────────────────────────────────────
-
-function DeadlineItem({
-  dl, isEditing, associatedTasks, onUpdate, onDelete, onBulletUpdate, onBulletRemove, onBulletAdd,
-}: {
-  dl: Deadline
-  isEditing: boolean
-  associatedTasks: Task[]
-  onUpdate: (id: string, changes: Partial<Deadline>) => void
-  onDelete: (id: string) => void
-  onBulletUpdate: (dlId: string, i: number, val: string) => void
-  onBulletRemove: (dlId: string, i: number) => void
-  onBulletAdd: (dlId: string) => void
+// Inline category editor with datalist for suggestions
+function CategoryEdit({ value, options, onChange }: {
+  value: string
+  options: string[]
+  onChange: (v: string) => void
 }) {
-  const controls = useDragControls()
-  const s = urgencyStyles[dl.urgency]
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(value)
+  const listId = `cat-${value}-${Math.random().toString(36).slice(2, 6)}`
 
-  return (
-    <Reorder.Item value={dl} dragListener={false} dragControls={controls} as="div" className="relative">
-      <div className={`absolute -left-7 top-2 w-3 h-3 rounded-full ${s.dot} ring-2 ring-ivory`} />
+  const save = (val = draft) => {
+    setEditing(false)
+    onChange(val.trim() || value)
+  }
 
-      <div className={`relative border rounded-lg p-4 ${s.card}`}>
-        {/* Drag handle */}
-        <div
-          onPointerDown={e => controls.start(e)}
-          className="absolute top-3 right-3 cursor-grab active:cursor-grabbing text-soft-gray/30 hover:text-soft-gray/70 transition-colors touch-none select-none z-10"
-          title="Drag to reorder"
-        >
-          <svg width="10" height="14" viewBox="0 0 10 14" fill="currentColor" aria-hidden="true">
-            <circle cx="3" cy="2.5" r="1.2"/><circle cx="7" cy="2.5" r="1.2"/>
-            <circle cx="3" cy="7"   r="1.2"/><circle cx="7" cy="7"   r="1.2"/>
-            <circle cx="3" cy="11.5" r="1.2"/><circle cx="7" cy="11.5" r="1.2"/>
-          </svg>
-        </div>
+  if (editing) {
+    return (
+      <>
+        <input
+          autoFocus
+          list={listId}
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onBlur={() => save()}
+          onKeyDown={e => {
+            if (e.key === 'Enter') { e.preventDefault(); save() }
+            if (e.key === 'Escape') { setEditing(false); setDraft(value) }
+          }}
+          className="font-work-sans text-[9px] tracking-wide uppercase bg-warm-cream border border-gold-line/50 rounded px-1.5 py-0.5 text-soft-gray outline-none w-28"
+          placeholder="category…"
+        />
+        <datalist id={listId}>
+          {options.map(o => <option key={o} value={o} />)}
+        </datalist>
+      </>
+    )
+  }
 
-        {isEditing ? (
-          <div className="space-y-2 pr-6">
-            <div className="flex flex-wrap gap-2 items-center">
-              <input
-                value={dl.date}
-                onChange={e => onUpdate(dl.id, { date: e.target.value })}
-                placeholder="Date (e.g. May 5, 2026)"
-                className={`${smallInputCls} flex-1 min-w-[130px]`}
-              />
-              <input
-                value={dl.label}
-                onChange={e => onUpdate(dl.id, { label: e.target.value })}
-                placeholder="Label (e.g. CRITICAL)"
-                className={`${smallInputCls} flex-1 min-w-[100px]`}
-              />
-              <select
-                value={dl.urgency}
-                onChange={e => onUpdate(dl.id, { urgency: e.target.value as DeadlineUrgency })}
-                className={selectCls}
-              >
-                <option value="wedding">Wedding</option>
-                <option value="critical">Critical</option>
-                <option value="soon">Soon</option>
-                <option value="upcoming">Upcoming</option>
-              </select>
-              <button onClick={() => onDelete(dl.id)} className={deleteBtnCls} title="Delete deadline">×</button>
-            </div>
-            <input
-              value={dl.title}
-              onChange={e => onUpdate(dl.id, { title: e.target.value })}
-              placeholder="Milestone title"
-              className={inputCls}
-            />
-            <div className="space-y-1.5 mt-1">
-              {dl.bullets.map((b, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <input
-                    value={b}
-                    onChange={e => onBulletUpdate(dl.id, i, e.target.value)}
-                    placeholder="Bullet point"
-                    className={`${inputCls} flex-1`}
-                  />
-                  <button onClick={() => onBulletRemove(dl.id, i)} className={deleteBtnCls} title="Remove bullet">×</button>
-                </div>
-              ))}
-              <button onClick={() => onBulletAdd(dl.id)} className={addRowBtnCls}>+ add bullet</button>
-            </div>
-          </div>
-        ) : (
-          <div className="pr-5">
-            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 mb-2">
-              <span className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">{dl.date}</span>
-              <span className={`font-work-sans text-[10px] tracking-[0.2em] uppercase ${s.label}`}>{dl.label}</span>
-            </div>
-            <h3 className="font-crimson font-semibold text-lg text-dark-taupe mb-2 leading-snug">{dl.title}</h3>
-            <ul className="space-y-1">
-              {dl.bullets.map((b, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <span className="text-gold-line mt-1 flex-shrink-0 text-xs">·</span>
-                  <span className="font-crimson text-sm text-deep-ivory leading-snug">{b}</span>
-                </li>
-              ))}
-            </ul>
-            {associatedTasks.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-soft-gray/20">
-                <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray mb-2">Tasks</p>
-                <div className="space-y-1.5">
-                  {associatedTasks.map(t => (
-                    <div key={t.id} className="flex items-center gap-2">
-                      <span className={`flex-shrink-0 w-1.5 h-1.5 rounded-full ${
-                        t.status === 'done'        ? 'bg-gold-line'     :
-                        t.status === 'in-progress' ? 'bg-dusty-lilac'   :
-                                                     'bg-soft-gray/50'
-                      }`} />
-                      <span className={`font-crimson text-xs text-deep-ivory flex-1 leading-snug ${t.status === 'done' ? 'line-through opacity-50' : ''}`}>
-                        {t.title}
-                      </span>
-                      {t.assignee && (
-                        <span className="font-work-sans text-[9px] text-soft-gray flex-shrink-0">→ {t.assignee}</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </Reorder.Item>
-  )
-}
-
-// ── Edit mode toggle button ────────────────────────────────────────────────────
-
-function EditToggle({ isEditing, onToggle }: { isEditing: boolean; onToggle: () => void }) {
   return (
     <button
-      onClick={onToggle}
-      className={[
-        'font-work-sans text-[9px] tracking-[0.2em] uppercase px-3 py-1.5 border rounded transition-colors',
-        isEditing
-          ? 'bg-dark-taupe text-ivory border-dark-taupe'
-          : 'text-soft-gray border-soft-gray/40 hover:border-gold-line hover:text-deep-ivory',
-      ].join(' ')}
+      onClick={() => { setEditing(true); setDraft(value) }}
+      className="font-work-sans text-[9px] tracking-wide uppercase bg-warm-cream/50 border border-soft-gray/30 hover:border-gold-line/50 rounded px-1.5 py-0.5 text-soft-gray transition-colors"
     >
-      {isEditing ? 'Done' : 'Edit'}
+      {value}
     </button>
   )
 }
 
-// ── Main page ──────────────────────────────────────────────────────────────────
+// ── Tasks section ──────────────────────────────────────────────────────────────
+
+function TasksSection({
+  tasks, onUpdate, onDelete, onAdd,
+}: {
+  tasks: Task[]
+  onUpdate: (id: string, patch: Partial<Task>) => void
+  onDelete: (id: string) => void
+  onAdd: (category?: string) => void
+}) {
+  const [activeCategory, setActiveCategory] = useState('All')
+
+  const allCategories = Array.from(new Set(tasks.map(t => t.category))).sort()
+  const filterList = ['All', ...allCategories]
+
+  const grouped = allCategories.reduce<Record<string, Task[]>>((acc, cat) => {
+    acc[cat] = tasks.filter(t => t.category === cat)
+    return acc
+  }, {})
+
+  const filteredTasks = activeCategory === 'All' ? tasks : tasks.filter(t => t.category === activeCategory)
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-line">
+          Task Board
+        </h2>
+        <button
+          onClick={() => onAdd(activeCategory !== 'All' ? activeCategory : undefined)}
+          className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray hover:text-gold-line transition-colors"
+        >
+          + Add Task
+        </button>
+      </div>
+
+      <p className="font-crimson italic text-xs text-soft-gray/70 mb-4">
+        Tap the circle to cycle status · tap any field to edit
+      </p>
+
+      {/* Category filters */}
+      <div className="flex flex-wrap gap-1.5 mb-5">
+        {filterList.map(cat => (
+          <button
+            key={cat}
+            onClick={() => setActiveCategory(cat)}
+            className={`font-work-sans text-[9px] tracking-[0.15em] uppercase px-2.5 py-1.5 border rounded-full transition-colors min-h-[36px] ${
+              activeCategory === cat
+                ? 'bg-dark-taupe text-ivory border-dark-taupe'
+                : 'bg-transparent text-deep-ivory border-soft-gray/40 hover:border-gold-line'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {activeCategory === 'All'
+        ? Object.entries(grouped).map(([cat, catTasks]) => (
+          <div key={cat} className="mb-6">
+            <div className="flex items-center justify-between mb-1 pb-1 border-b border-soft-gray/20">
+              <span className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-soft-gray">
+                {cat}
+                <span className="ml-2 normal-case font-crimson text-xs text-soft-gray/60">
+                  {catTasks.filter(t => t.status === 'done').length}/{catTasks.length}
+                </span>
+              </span>
+              <button
+                onClick={() => onAdd(cat)}
+                className="font-work-sans text-[9px] uppercase tracking-wide text-soft-gray/50 hover:text-gold-line transition-colors"
+              >
+                + add
+              </button>
+            </div>
+            {catTasks.map(task => (
+              <TaskRow key={task.id} task={task} allCategories={allCategories} onUpdate={onUpdate} onDelete={onDelete} />
+            ))}
+          </div>
+        ))
+        : (
+          <div>
+            {filteredTasks.map(task => (
+              <TaskRow key={task.id} task={task} allCategories={allCategories} onUpdate={onUpdate} onDelete={onDelete} />
+            ))}
+          </div>
+        )
+      }
+    </section>
+  )
+}
+
+// ── Budget section ─────────────────────────────────────────────────────────────
+
+function BudgetSection({
+  items, scenarios,
+  onUpdateItem, onDeleteItem, onAddItem,
+  onUpdateScenario, onDeleteScenario, onAddScenario,
+}: {
+  items: BudgetItem[]
+  scenarios: GuestScenario[]
+  onUpdateItem: (id: string, patch: Partial<BudgetItem>) => void
+  onDeleteItem: (id: string) => void
+  onAddItem: (paid: boolean) => void
+  onUpdateScenario: (id: string, patch: Partial<GuestScenario>) => void
+  onDeleteScenario: (id: string) => void
+  onAddScenario: () => void
+}) {
+  const paidItems = items.filter(i => i.paid)
+  const pendingItems = items.filter(i => !i.paid)
+
+  return (
+    <section>
+      <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-line mb-5">
+        Budget Tracker
+      </h2>
+
+      <div className="grid sm:grid-cols-2 gap-5 mb-8">
+        {/* Paid column */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-gold-line inline-block" />
+              Already Paid
+            </h3>
+            <button onClick={() => onAddItem(true)} className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-soft-gray/60 hover:text-gold-line transition-colors">
+              + add
+            </button>
+          </div>
+          <div className="border border-soft-gray/20 rounded overflow-hidden">
+            {paidItems.map((item, i) => (
+              <div key={item.id} className={`flex items-center gap-2 px-3 py-2.5 group/bi ${i % 2 === 0 ? 'bg-ivory' : 'bg-warm-cream'}`}>
+                <EditableText
+                  value={item.item}
+                  onChange={v => onUpdateItem(item.id, { item: v })}
+                  className="font-crimson text-sm text-dark-taupe flex-1 min-w-0"
+                />
+                <EditableText
+                  value={item.cost}
+                  onChange={v => onUpdateItem(item.id, { cost: v })}
+                  className="font-crimson text-sm text-deep-ivory text-right flex-shrink-0"
+                />
+                <button
+                  onClick={() => onUpdateItem(item.id, { paid: false })}
+                  className="text-gold-line hover:text-soft-gray transition-colors flex-shrink-0 text-xs w-5 h-5 flex items-center justify-center"
+                  title="Move to pending"
+                >
+                  ✓
+                </button>
+                <button
+                  onClick={() => onDeleteItem(item.id)}
+                  className="text-soft-gray/25 hover:text-muted-rose transition-colors text-base flex-shrink-0 w-5 h-5 flex items-center justify-center opacity-0 group-hover/bi:opacity-100"
+                  aria-label="Delete item"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {paidItems.length === 0 && (
+              <p className="font-crimson italic text-sm text-soft-gray/50 px-3 py-3">No paid items.</p>
+            )}
+          </div>
+        </div>
+
+        {/* Pending column */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-muted-rose inline-block" />
+              Pending Payment
+            </h3>
+            <button onClick={() => onAddItem(false)} className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-soft-gray/60 hover:text-gold-line transition-colors">
+              + add
+            </button>
+          </div>
+          <div className="border border-soft-gray/20 rounded overflow-hidden">
+            {pendingItems.map((item, i) => (
+              <div key={item.id} className={`flex items-center gap-2 px-3 py-2.5 group/bi ${i % 2 === 0 ? 'bg-ivory' : 'bg-warm-cream'}`}>
+                <EditableText
+                  value={item.item}
+                  onChange={v => onUpdateItem(item.id, { item: v })}
+                  className="font-crimson text-sm text-dark-taupe flex-1 min-w-0"
+                />
+                <EditableText
+                  value={item.cost}
+                  onChange={v => onUpdateItem(item.id, { cost: v })}
+                  className="font-crimson text-sm text-deep-ivory text-right flex-shrink-0"
+                />
+                <button
+                  onClick={() => onUpdateItem(item.id, { paid: true })}
+                  className="text-soft-gray/40 hover:text-gold-line transition-colors flex-shrink-0 text-xs w-5 h-5 flex items-center justify-center"
+                  title="Mark as paid"
+                >
+                  ○
+                </button>
+                <button
+                  onClick={() => onDeleteItem(item.id)}
+                  className="text-soft-gray/25 hover:text-muted-rose transition-colors text-base flex-shrink-0 w-5 h-5 flex items-center justify-center opacity-0 group-hover/bi:opacity-100"
+                  aria-label="Delete item"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            {pendingItems.length === 0 && (
+              <p className="font-crimson italic text-sm text-soft-gray/50 px-3 py-3">No pending items.</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Reception scenarios */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory">
+            Reception Cost Scenarios
+          </h3>
+          <button
+            onClick={onAddScenario}
+            className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-soft-gray/60 hover:text-gold-line transition-colors"
+          >
+            + add
+          </button>
+        </div>
+        <p className="font-crimson italic text-xs text-soft-gray/60 mb-3">
+          Tap any number to edit. Total auto-calculates.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {scenarios.map(sc => {
+            const numTables = Math.ceil(sc.numGuests / sc.seatsPerTable)
+            const total = numTables * sc.costPerTable
+            return (
+              <div key={sc.id} className="border border-soft-gray/20 rounded-lg px-4 py-3 bg-warm-cream group/sc relative">
+                <button
+                  onClick={() => onDeleteScenario(sc.id)}
+                  className="absolute top-2 right-2 text-soft-gray/25 hover:text-muted-rose transition-colors text-base w-5 h-5 flex items-center justify-center opacity-0 group-hover/sc:opacity-100"
+                  aria-label="Delete scenario"
+                >
+                  ×
+                </button>
+
+                <div className="flex items-baseline gap-1.5 mb-1">
+                  <EditableNumber
+                    value={sc.numGuests}
+                    onChange={v => onUpdateScenario(sc.id, { numGuests: v })}
+                    className="font-crimson text-2xl text-dark-taupe"
+                  />
+                  <span className="font-crimson text-base text-deep-ivory">guests</span>
+                </div>
+
+                <p className="font-crimson text-sm text-deep-ivory mb-1.5">
+                  {numTables} tables · <span className="text-dark-taupe font-semibold">${total.toLocaleString()}</span> total
+                </p>
+
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  <div className="flex items-center gap-1 font-work-sans text-[9px] tracking-wide uppercase text-soft-gray">
+                    <span>$</span>
+                    <EditableNumber
+                      value={sc.costPerTable}
+                      onChange={v => onUpdateScenario(sc.id, { costPerTable: v })}
+                      className="font-work-sans text-[9px] uppercase text-soft-gray"
+                    />
+                    <span>/table</span>
+                  </div>
+                  <div className="flex items-center gap-1 font-work-sans text-[9px] tracking-wide uppercase text-soft-gray">
+                    <EditableNumber
+                      value={sc.seatsPerTable}
+                      onChange={v => onUpdateScenario(sc.id, { seatsPerTable: v })}
+                      className="font-work-sans text-[9px] uppercase text-soft-gray"
+                    />
+                    <span>seats/table</span>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── Vendor status config ───────────────────────────────────────────────────────
+
+const VENDOR_STATUS_PILL: Record<VendorStatus, string> = {
+  confirmed:      'bg-gold-line/20 text-deep-ivory border border-gold-line/40',
+  'deposit-paid': 'bg-pale-gold/30 text-deep-ivory border border-pale-gold/60',
+  pending:        'bg-soft-gray/20 text-soft-gray border border-soft-gray/40',
+  'in-discussion':'bg-lilac/20 text-dusty-lilac border border-lilac/40',
+}
+
+const VENDOR_STATUS_OPTIONS: { value: VendorStatus; label: string }[] = [
+  { value: 'confirmed',      label: 'Confirmed' },
+  { value: 'deposit-paid',   label: 'Deposit Paid' },
+  { value: 'pending',        label: 'Pending' },
+  { value: 'in-discussion',  label: 'In Discussion' },
+]
+
+// ── Vendors section ────────────────────────────────────────────────────────────
+
+function VendorField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray mb-0.5">{label}</p>
+      {children}
+    </div>
+  )
+}
+
+function VendorsSection({
+  vendors, onUpdate, onDelete, onAdd,
+}: {
+  vendors: Vendor[]
+  onUpdate: (id: string, patch: Partial<Vendor>) => void
+  onDelete: (id: string) => void
+  onAdd: () => void
+}) {
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+
+  const categories = Array.from(new Set(vendors.map(v => v.category))).sort()
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-line">
+          Vendor Contacts
+        </h2>
+        <button
+          onClick={onAdd}
+          className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray hover:text-gold-line transition-colors"
+        >
+          + Add Vendor
+        </button>
+      </div>
+
+      {categories.map(cat => (
+        <div key={cat} className="mb-6">
+          <p className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-soft-gray mb-2 pb-1 border-b border-soft-gray/20">
+            {cat}
+          </p>
+          <div className="flex flex-col gap-2">
+            {vendors.filter(v => v.category === cat).map(v => {
+              const isExpanded = expandedId === v.id
+              const statusLabel = VENDOR_STATUS_OPTIONS.find(o => o.value === v.status)?.label ?? v.status
+              return (
+                <div key={v.id} className="border border-soft-gray/20 rounded-lg bg-warm-cream group/vendor overflow-hidden">
+                  {/* Summary row */}
+                  <div className="flex items-center gap-2 px-4 py-3">
+                    <button
+                      onClick={() => setExpandedId(isExpanded ? null : v.id)}
+                      className="flex-1 min-w-0 flex items-center gap-2 text-left"
+                      aria-expanded={isExpanded}
+                    >
+                      <span className="font-crimson text-base font-semibold text-dark-taupe truncate">
+                        {v.vendor || 'New Vendor'}
+                      </span>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-work-sans tracking-wider uppercase flex-shrink-0 ${VENDOR_STATUS_PILL[v.status]}`}>
+                        {statusLabel}
+                      </span>
+                    </button>
+                    <span className="font-crimson text-sm text-deep-ivory flex-shrink-0 hidden sm:block">
+                      {v.budget}
+                    </span>
+                    <button
+                      onClick={() => setExpandedId(isExpanded ? null : v.id)}
+                      className="text-soft-gray/40 hover:text-deep-ivory transition-colors w-7 h-7 flex items-center justify-center text-[10px] flex-shrink-0"
+                      aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                    >
+                      {isExpanded ? '▲' : '▼'}
+                    </button>
+                    <button
+                      onClick={() => onDelete(v.id)}
+                      className="text-soft-gray/25 hover:text-muted-rose transition-colors text-base w-7 h-7 flex items-center justify-center flex-shrink-0 opacity-0 group-hover/vendor:opacity-100"
+                      aria-label="Delete vendor"
+                    >
+                      ×
+                    </button>
+                  </div>
+
+                  {/* Expanded details */}
+                  {isExpanded && (
+                    <div className="border-t border-soft-gray/15 px-4 py-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <VendorField label="Name">
+                        <EditableText value={v.vendor} onChange={val => onUpdate(v.id, { vendor: val })} className="font-crimson text-sm text-dark-taupe" />
+                      </VendorField>
+                      <VendorField label="Service">
+                        <EditableText value={v.service} onChange={val => onUpdate(v.id, { service: val })} className="font-crimson text-sm text-dark-taupe" placeholder="service description…" />
+                      </VendorField>
+                      <VendorField label="Category">
+                        <EditableText value={v.category} onChange={val => onUpdate(v.id, { category: val || v.category })} className="font-crimson text-sm text-dark-taupe" placeholder="e.g. Music, Venue…" />
+                      </VendorField>
+                      <VendorField label="Status">
+                        <select
+                          value={v.status}
+                          onChange={e => onUpdate(v.id, { status: e.target.value as VendorStatus })}
+                          className="font-crimson text-sm text-dark-taupe bg-transparent border-b border-gold-line/30 focus:border-gold-line outline-none py-0.5"
+                        >
+                          {VENDOR_STATUS_OPTIONS.map(o => (
+                            <option key={o.value} value={o.value}>{o.label}</option>
+                          ))}
+                        </select>
+                      </VendorField>
+                      <VendorField label="Budget">
+                        <EditableText value={v.budget} onChange={val => onUpdate(v.id, { budget: val })} className="font-crimson text-sm text-dark-taupe" placeholder="$0" />
+                      </VendorField>
+                      <VendorField label="Contact Name">
+                        <EditableText value={v.contact} onChange={val => onUpdate(v.id, { contact: val })} className="font-crimson text-sm text-dark-taupe" placeholder="contact name…" />
+                      </VendorField>
+                      <VendorField label="Phone">
+                        <EditableText value={v.phone} onChange={val => onUpdate(v.id, { phone: val })} className="font-crimson text-sm text-dark-taupe" placeholder="add phone…" />
+                      </VendorField>
+                      <VendorField label="Email">
+                        <EditableText value={v.email} onChange={val => onUpdate(v.id, { email: val })} className="font-crimson text-sm text-dark-taupe" placeholder="add email…" />
+                      </VendorField>
+                      <div className="sm:col-span-2">
+                        <VendorField label="Notes">
+                          <EditableText value={v.notes} onChange={val => onUpdate(v.id, { notes: val })} className="font-crimson text-sm text-dark-taupe" placeholder="add notes…" />
+                        </VendorField>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      ))}
+
+      {categories.length === 0 && (
+        <p className="font-crimson italic text-sm text-soft-gray text-center py-8">No vendors yet.</p>
+      )}
+    </section>
+  )
+}
+
+// ── Main dashboard ─────────────────────────────────────────────────────────────
 
 export default function PlannerDashboard() {
-  const [deadlines, setDeadlines]     = useState<Deadline[]>(INITIAL_DEADLINES)
-  const [tasks, setTasks]             = useState<Task[]>(INITIAL_TASKS)
+  const [deadlines, setDeadlines] = useState<Deadline[]>(INITIAL_DEADLINES)
+  const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(INITIAL_BUDGET_ITEMS)
-  const [vendors, setVendors]         = useState<Vendor[]>(INITIAL_VENDORS)
-  const [scenarios, setScenarios]     = useState<ReceptionScenario[]>(INITIAL_SCENARIOS)
-  const [categories, setCategories]   = useState<string[]>(INITIAL_CATEGORIES)
-  const [activeCategory, setActiveCategory] = useState('All')
-  const [activeSection, setActiveSection]   = useState<'timeline' | 'tasks' | 'budget' | 'vendors'>('timeline')
-  const [isEditing, setIsEditing]     = useState(false)
-  const [addingCategory, setAddingCategory] = useState(false)
-  const [newCatValue, setNewCatValue] = useState('')
+  const [scenarios, setScenarios] = useState<GuestScenario[]>(INITIAL_SCENARIOS)
+  const [vendors, setVendors] = useState<Vendor[]>(INITIAL_VENDORS)
+  const [activeSection, setActiveSection] = useState<'timeline' | 'tasks' | 'budget' | 'vendors'>('timeline')
 
-  // ── Persistence ─────────────────────────────────────────────────────────────
+  // Deadline handlers
+  const updateDeadline = (id: string, patch: Partial<Deadline>) =>
+    setDeadlines(p => p.map(d => d.id === id ? { ...d, ...patch } : d))
+  const deleteDeadline = (id: string) =>
+    setDeadlines(p => p.filter(d => d.id !== id))
+  const addDeadline = () =>
+    setDeadlines(p => [...p, { id: uid(), date: 'New Date', label: 'UPCOMING', urgency: 'upcoming', title: 'New Milestone', bullets: [{ id: uid(), text: 'Add details here' }] }])
+  const addBullet = (dlId: string) =>
+    setDeadlines(p => p.map(d => d.id === dlId ? { ...d, bullets: [...d.bullets, { id: uid(), text: 'New item' }] } : d))
+  const updateBullet = (dlId: string, bId: string, text: string) =>
+    setDeadlines(p => p.map(d => d.id === dlId ? { ...d, bullets: d.bullets.map(b => b.id === bId ? { ...b, text } : b) } : d))
+  const deleteBullet = (dlId: string, bId: string) =>
+    setDeadlines(p => p.map(d => d.id === dlId ? { ...d, bullets: d.bullets.filter(b => b.id !== bId) } : d))
 
-  const [initialized, setInitialized]       = useState(false)
-  const [saveStatus, setSaveStatus]         = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
-  const [kvMissing, setKvMissing]           = useState(false)
-  const dirtyRef     = useRef(false)
-  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const lastSaveIdRef = useRef('')
+  // Task handlers
+  const updateTask = (id: string, patch: Partial<Task>) =>
+    setTasks(p => p.map(t => t.id === id ? { ...t, ...patch } : t))
+  const deleteTask = (id: string) =>
+    setTasks(p => p.filter(t => t.id !== id))
+  const addTask = (category?: string) =>
+    setTasks(p => [...p, { id: uid(), title: 'New task', category: category ?? 'Other', status: 'pending', assignee: '', dueLabel: '', notes: '' }])
 
-  // Dirty-marking setters — use these in user-initiated handlers so the
-  // auto-save effect knows a real change happened (vs. a poll update).
-  const setDeadlinesD  = (v: Parameters<typeof setDeadlines>[0])  => { dirtyRef.current = true; setDeadlines(v)  }
-  const setTasksD      = (v: Parameters<typeof setTasks>[0])      => { dirtyRef.current = true; setTasks(v)      }
-  const setBudgetD     = (v: Parameters<typeof setBudgetItems>[0]) => { dirtyRef.current = true; setBudgetItems(v) }
-  const setVendorsD    = (v: Parameters<typeof setVendors>[0])    => { dirtyRef.current = true; setVendors(v)    }
-  const setScenariosD  = (v: Parameters<typeof setScenarios>[0])  => { dirtyRef.current = true; setScenarios(v)  }
-  const setCategoriesD = (v: Parameters<typeof setCategories>[0]) => { dirtyRef.current = true; setCategories(v) }
+  // Budget handlers
+  const updateBudgetItem = (id: string, patch: Partial<BudgetItem>) =>
+    setBudgetItems(p => p.map(i => i.id === id ? { ...i, ...patch } : i))
+  const deleteBudgetItem = (id: string) =>
+    setBudgetItems(p => p.filter(i => i.id !== id))
+  const addBudgetItem = (paid: boolean) =>
+    setBudgetItems(p => [...p, { id: uid(), item: 'New item', cost: '$0', paid }])
 
-  // Load saved state once on mount
-  useEffect(() => {
-    fetch('/api/planner-state')
-      .then(r => r.json())
-      .then((json) => {
-        if (json.kvMissing) { setKvMissing(true); return }
-        const { data } = json
-        if (!data) return
-        if (data.deadlines)   setDeadlines(data.deadlines)
-        if (data.tasks)       setTasks(data.tasks)
-        if (data.budgetItems) setBudgetItems(data.budgetItems)
-        if (data.vendors)     setVendors(data.vendors)
-        if (data.scenarios)   setScenarios(data.scenarios)
-        if (data.categories)  setCategories(data.categories)
-        if (data._id)         lastSaveIdRef.current = data._id
-      })
-      .catch(() => {})
-      .finally(() => setInitialized(true))
-  }, [])
+  // Scenario handlers
+  const updateScenario = (id: string, patch: Partial<GuestScenario>) =>
+    setScenarios(p => p.map(s => s.id === id ? { ...s, ...patch } : s))
+  const deleteScenario = (id: string) =>
+    setScenarios(p => p.filter(s => s.id !== id))
+  const addScenario = () =>
+    setScenarios(p => [...p, { id: uid(), numGuests: 100, costPerTable: 1600, seatsPerTable: 8 }])
 
-  // Debounced auto-save whenever user-initiated state changes occur
-  useEffect(() => {
-    if (!initialized || !dirtyRef.current) return
-    setSaveStatus('saving')
-    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
-    saveTimerRef.current = setTimeout(async () => {
-      const saveId = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
-      lastSaveIdRef.current = saveId
-      try {
-        const res = await fetch('/api/planner-state', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ deadlines, tasks, budgetItems, vendors, scenarios, categories, _id: saveId }),
-        })
-        const json = await res.json()
-        if (json.kvMissing) { setKvMissing(true); setSaveStatus('error'); return }
-        setSaveStatus('saved')
-        setTimeout(() => setSaveStatus('idle'), 2000)
-      } catch {
-        setSaveStatus('error')
-      }
-    }, 400)
-  }, [initialized, deadlines, tasks, budgetItems, vendors, scenarios, categories])
-
-  // Poll every 8 s for changes made by other users
-  useEffect(() => {
-    if (!initialized) return
-    const id = setInterval(async () => {
-      if (saveTimerRef.current) return // our own save is pending — skip
-      try {
-        const res = await fetch('/api/planner-state')
-        if (!res.ok) return
-        const { data } = await res.json()
-        if (!data?._id || data._id === lastSaveIdRef.current) return
-        // Someone else saved — apply without marking dirty
-        if (data.deadlines)   setDeadlines(data.deadlines)
-        if (data.tasks)       setTasks(data.tasks)
-        if (data.budgetItems) setBudgetItems(data.budgetItems)
-        if (data.vendors)     setVendors(data.vendors)
-        if (data.scenarios)   setScenarios(data.scenarios)
-        if (data.categories)  setCategories(data.categories)
-        lastSaveIdRef.current = data._id
-      } catch { /* silent */ }
-    }, 8000)
-    return () => clearInterval(id)
-  }, [initialized])
-
-  // ── Navigation ──────────────────────────────────────────────────────────────
-
-  const setSection = (s: typeof activeSection) => {
-    setActiveSection(s)
-    setIsEditing(false)
-  }
-
-  // ── Task handlers ───────────────────────────────────────────────────────────
-
-  const updateTask = (id: string, changes: Partial<Task>) => {
-    if (changes.category && !categories.includes(changes.category)) {
-      setCategoriesD(prev => [...prev, changes.category!])
-    }
-    setTasksD(prev => prev.map(t => t.id === id ? { ...t, ...changes } : t))
-  }
-
-  const deleteTask = (id: string) => setTasksD(prev => prev.filter(t => t.id !== id))
-
-  const addTask = () => {
-    const cat = activeCategory !== 'All' ? activeCategory : (categories[0] ?? 'Other')
-    setTasksD(prev => [...prev, { id: genId(), title: 'New task', category: cat, status: 'pending', assignee: '', dueLabel: '', notes: '' }])
-  }
+  // Vendor handlers
+  const updateVendor = (id: string, patch: Partial<Vendor>) =>
+    setVendors(p => p.map(v => v.id === id ? { ...v, ...patch } : v))
+  const deleteVendor = (id: string) =>
+    setVendors(p => p.filter(v => v.id !== id))
+  const addVendor = () =>
+    setVendors(p => [...p, { id: uid(), vendor: 'New Vendor', service: '', category: 'Other', contact: '', phone: '', email: '', budget: '', status: 'pending', notes: '' }])
 
   const commitNewCategory = () => {
     const trimmed = newCatValue.trim()
@@ -759,97 +1099,9 @@ export default function PlannerDashboard() {
     setAddingCategory(false)
   }
 
-  // ── Deadline handlers ───────────────────────────────────────────────────────
-
-  const updateDeadline = (id: string, changes: Partial<Deadline>) =>
-    setDeadlinesD(prev => prev.map(d => d.id === id ? { ...d, ...changes } : d))
-
-  const deleteDeadline = (id: string) => setDeadlinesD(prev => prev.filter(d => d.id !== id))
-
-  const addDeadline = () =>
-    setDeadlinesD(prev => [...prev, { id: genId(), date: '', label: '', title: 'New milestone', bullets: [], urgency: 'upcoming' }])
-
-  const updateBullet = (dlId: string, i: number, val: string) =>
-    updateDeadline(dlId, { bullets: deadlines.find(d => d.id === dlId)!.bullets.map((b, j) => j === i ? val : b) })
-
-  const removeBullet = (dlId: string, i: number) =>
-    updateDeadline(dlId, { bullets: deadlines.find(d => d.id === dlId)!.bullets.filter((_, j) => j !== i) })
-
-  const addBullet = (dlId: string) =>
-    updateDeadline(dlId, { bullets: [...deadlines.find(d => d.id === dlId)!.bullets, ''] })
-
-  // ── Budget handlers ─────────────────────────────────────────────────────────
-
-  const updateBudgetItem = (id: string, changes: Partial<BudgetItem>) =>
-    setBudgetD(prev => prev.map(b => b.id === id ? { ...b, ...changes } : b))
-
-  const deleteBudgetItem = (id: string) => setBudgetD(prev => prev.filter(b => b.id !== id))
-
-  const addBudgetItem = (status: 'paid' | 'pending') =>
-    setBudgetD(prev => [...prev, { id: genId(), item: 'New item', cost: '$0', status }])
-
-  // ── Vendor handlers ─────────────────────────────────────────────────────────
-
-  const updateVendor = (id: string, changes: Partial<Vendor>) =>
-    setVendorsD(prev => prev.map(v => v.id === id ? { ...v, ...changes } : v))
-
-  const deleteVendor = (id: string) => setVendorsD(prev => prev.filter(v => v.id !== id))
-
-  const addVendor = () =>
-    setVendorsD(prev => [...prev, { id: genId(), vendor: 'New Vendor', service: '', contact: '', phone: '', email: '', website: '', notes: '', budget: '', category: 'Other', status: 'pending' }])
-
-  // ── Scenario handlers ───────────────────────────────────────────────────────
-
-  const updateScenario = (id: string, changes: Partial<ReceptionScenario>) =>
-    setScenariosD(prev => prev.map(s => s.id === id ? { ...s, ...changes } : s))
-
-  const deleteScenario = (id: string) => setScenariosD(prev => prev.filter(s => s.id !== id))
-
-  const addScenario = () =>
-    setScenariosD(prev => [...prev, { id: genId(), label: `Scenario ${String.fromCharCode(65 + prev.length)}`, guests: 100, seatsPerTable: 8, costPerTable: 1600 }])
-
-  // ── Derived values ──────────────────────────────────────────────────────────
-
-  const allCats = [...categories, ...tasks.map(t => t.category).filter(c => !categories.includes(c))]
-
-  const groupedTasks = allCats.reduce<Record<string, Task[]>>((acc, cat) => {
-    const catTasks = tasks.filter(t => t.category === cat)
-    if (catTasks.length) acc[cat] = catTasks
-    return acc
-  }, {})
-
-  const deadlineTaskMap: Record<string, Task[]> = {}
-  for (const dl of deadlines) deadlineTaskMap[dl.id] = []
-  for (const t of tasks) {
-    if (!t.dueLabel) continue
-    const dlId = findClosestDeadlineId(t.dueLabel, deadlines)
-    if (dlId) (deadlineTaskMap[dlId] ??= []).push(t)
-  }
-
-  const filteredTasks = activeCategory === 'All' ? tasks : tasks.filter(t => t.category === activeCategory)
-
-  const vendorCats = [...new Set(vendors.map(v => v.category))]
-  const groupedVendors = vendorCats.reduce<Record<string, Vendor[]>>((acc, cat) => {
-    acc[cat] = vendors.filter(v => v.category === cat)
-    return acc
-  }, {})
-
-  const doneTasks       = tasks.filter(t => t.status === 'done').length
-  const inProgressTasks = tasks.filter(t => t.status === 'in-progress').length
-  const pendingTasks    = tasks.filter(t => t.status === 'pending').length
-
-  const paidItems    = budgetItems.filter(b => b.status === 'paid')
-  const pendingItems = budgetItems.filter(b => b.status === 'pending')
-  const paidTotal    = paidItems.reduce((sum, b) => sum + parseCost(b.cost), 0)
-  const pendingMin   = pendingItems.reduce((sum, b) => sum + parseCost(b.cost), 0)
-  const estimated    = paidTotal + pendingMin
-  const progressPct  = estimated > 0 ? Math.round(paidTotal / estimated * 100) : 0
-
-  const handleLogout = async () => {
-    await fetch('/api/planner-auth/logout', { method: 'POST' }).catch(() => {})
-    document.cookie = 'planner-auth=; Max-Age=0; path=/'
-    window.location.replace('/planner/login')
-  }
+  const doneTasks = tasks.filter(t => t.status === 'done').length
+  const inProgress = tasks.filter(t => t.status === 'in-progress').length
+  const pending = tasks.filter(t => t.status === 'pending').length
 
   const navItems: { key: typeof activeSection; label: string }[] = [
     { key: 'timeline', label: 'Timeline' },
@@ -862,45 +1114,24 @@ export default function PlannerDashboard() {
 
   return (
     <div className="min-h-screen bg-ivory">
-      {kvMissing && (
-        <div className="bg-muted-rose/20 border-b border-muted-rose/40 px-4 py-2 text-center">
-          <span className="font-work-sans text-[10px] tracking-[0.15em] uppercase text-muted-rose">
-            Storage not configured — edits will not persist. Add <code className="font-mono normal-case tracking-normal">KV_REST_API_URL</code> &amp; <code className="font-mono normal-case tracking-normal">KV_REST_API_TOKEN</code> in Vercel project settings.
+      {/* Top bar */}
+      <header className="sticky top-0 z-10 bg-ivory/95 backdrop-blur-sm border-b border-soft-gray/30 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto h-14 flex items-center justify-between gap-3">
+          <span className="font-italiana text-lg sm:text-xl text-dark-taupe tracking-wide leading-none flex-shrink-0">
+            Christine &amp; Michael
           </span>
-        </div>
-      )}
-      {/* ── Top bar ─────────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-10 bg-ivory border-b border-soft-gray/30 px-4 sm:px-8">
-        <div className="max-w-5xl mx-auto h-14 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <span className="font-italiana text-lg text-dark-taupe tracking-wide leading-none whitespace-nowrap">
-              Christine &amp; Michael
-            </span>
-            <span className="hidden sm:block font-work-sans text-[9px] tracking-[0.3em] uppercase text-soft-gray">
-              Wedding Coordination
-            </span>
-            {saveStatus === 'saving' && (
-              <span className="font-work-sans text-[9px] text-soft-gray/60 hidden sm:inline">saving…</span>
-            )}
-            {saveStatus === 'saved' && (
-              <span className="font-work-sans text-[9px] text-gold-line/70 hidden sm:inline">saved</span>
-            )}
-            {saveStatus === 'error' && (
-              <span className="font-work-sans text-[9px] text-muted-rose hidden sm:inline">save failed</span>
-            )}
-          </div>
 
-          <nav className="flex items-center gap-0.5 overflow-x-auto">
+          {/* Nav — scrollable on small screens */}
+          <nav className="flex items-center overflow-x-auto gap-0.5 flex-1 justify-center">
             {navItems.map(({ key, label }) => (
               <button
                 key={key}
-                onClick={() => setSection(key)}
-                className={[
-                  'font-work-sans text-[9px] tracking-[0.2em] uppercase px-2.5 py-1.5 transition-colors whitespace-nowrap flex-shrink-0',
+                onClick={() => setActiveSection(key)}
+                className={`font-work-sans text-[9px] tracking-[0.2em] uppercase px-2.5 sm:px-3 py-2 whitespace-nowrap transition-colors min-h-[44px] border-b-2 ${
                   activeSection === key
-                    ? 'text-dark-taupe border-b-2 border-gold-line'
-                    : 'text-soft-gray hover:text-deep-ivory',
-                ].join(' ')}
+                    ? 'text-dark-taupe border-gold-line'
+                    : 'text-soft-gray hover:text-deep-ivory border-transparent'
+                }`}
               >
                 {label}
               </button>
@@ -909,591 +1140,72 @@ export default function PlannerDashboard() {
 
           <button
             onClick={handleLogout}
-            className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray hover:text-muted-rose transition-colors flex-shrink-0"
+            className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray hover:text-muted-rose transition-colors flex-shrink-0 min-h-[44px] flex items-center"
           >
             Exit
           </button>
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-8 py-6">
-        {/* ── Stats row ───────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 sm:py-7">
+        {/* Stats strip */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
           {[
-            { label: 'Total Tasks', value: tasks.length,    color: 'text-dark-taupe'   },
-            { label: 'Done',        value: doneTasks,        color: 'text-deep-ivory'   },
-            { label: 'In Progress', value: inProgressTasks,  color: 'text-dusty-lilac'  },
-            { label: 'Pending',     value: pendingTasks,     color: 'text-soft-gray'    },
+            { label: 'Total',       value: tasks.length, color: 'text-dark-taupe' },
+            { label: 'Done',        value: doneTasks,    color: 'text-deep-ivory' },
+            { label: 'In Progress', value: inProgress,   color: 'text-dusty-lilac' },
+            { label: 'Pending',     value: pending,      color: 'text-soft-gray' },
           ].map(({ label, value, color }) => (
-            <div key={label} className="bg-warm-cream border border-soft-gray/20 rounded px-4 py-3">
-              <p className={`font-crimson font-semibold text-3xl ${color} leading-none mb-1`}>{value}</p>
-              <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray">{label}</p>
+            <div key={label} className="bg-warm-cream border border-soft-gray/20 rounded px-3 py-2.5">
+              <p className={`font-crimson text-2xl sm:text-3xl ${color} leading-none mb-0.5`}>{value}</p>
+              <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray">{label}</p>
             </div>
           ))}
         </div>
 
-        {/* ── Timeline ────────────────────────────────────────────────────── */}
+        {/* Active section */}
         {activeSection === 'timeline' && (
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-line">
-                Critical Deadlines
-              </h2>
-              <EditToggle isEditing={isEditing} onToggle={() => setIsEditing(e => !e)} />
-            </div>
-
-            <div className="relative">
-              <div className="absolute left-3 top-0 bottom-0 w-px bg-soft-gray/30" />
-
-              <Reorder.Group
-                axis="y"
-                values={deadlines}
-                onReorder={setDeadlinesD}
-                as="div"
-                className="flex flex-col gap-5 pl-10"
-              >
-                {deadlines.map(dl => (
-                  <DeadlineItem
-                    key={dl.id}
-                    dl={dl}
-                    isEditing={isEditing}
-                    associatedTasks={deadlineTaskMap[dl.id] ?? []}
-                    onUpdate={updateDeadline}
-                    onDelete={deleteDeadline}
-                    onBulletUpdate={updateBullet}
-                    onBulletRemove={removeBullet}
-                    onBulletAdd={addBullet}
-                  />
-                ))}
-              </Reorder.Group>
-            </div>
-
-            {isEditing && (
-              <div className="mt-4 ml-10">
-                <button onClick={addDeadline} className={addRowBtnCls}>+ Add deadline</button>
-              </div>
-            )}
-          </section>
+          <TimelineSection
+            deadlines={deadlines}
+            onUpdate={updateDeadline}
+            onDelete={deleteDeadline}
+            onAdd={addDeadline}
+            onAddBullet={addBullet}
+            onUpdateBullet={updateBullet}
+            onDeleteBullet={deleteBullet}
+          />
         )}
-
-        {/* ── Tasks ───────────────────────────────────────────────────────── */}
         {activeSection === 'tasks' && (
-          <section>
-            <div className="flex items-center justify-between mb-4 gap-3">
-              <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-line">
-                Task Board
-              </h2>
-              <div className="flex items-center gap-3">
-                {!isEditing && (
-                  <p className="hidden sm:block font-crimson italic text-xs text-soft-gray">
-                    Click ○ to cycle status · click "assign" to set name
-                  </p>
-                )}
-                <EditToggle isEditing={isEditing} onToggle={() => setIsEditing(e => !e)} />
-              </div>
-            </div>
-
-            {/* Category filter */}
-            <div className="flex gap-2 mb-6 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-none">
-              {['All', ...allCats].map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={[
-                    'flex-shrink-0 font-work-sans text-[9px] tracking-[0.15em] uppercase px-3 py-1.5 border rounded-full transition-colors',
-                    activeCategory === cat
-                      ? 'bg-dark-taupe text-ivory border-dark-taupe'
-                      : 'bg-transparent text-deep-ivory border-soft-gray/40 hover:border-gold-line hover:text-dark-taupe',
-                  ].join(' ')}
-                >
-                  {cat}
-                </button>
-              ))}
-              {isEditing && (
-                addingCategory ? (
-                  <div className="flex-shrink-0 flex items-center gap-1">
-                    <input
-                      autoFocus
-                      value={newCatValue}
-                      onChange={e => setNewCatValue(e.target.value)}
-                      onBlur={commitNewCategory}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') commitNewCategory()
-                        if (e.key === 'Escape') { setNewCatValue(''); setAddingCategory(false) }
-                      }}
-                      placeholder="Category name"
-                      className={`${smallInputCls} w-28`}
-                    />
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setAddingCategory(true)}
-                    className="flex-shrink-0 font-work-sans text-[9px] tracking-[0.15em] uppercase px-3 py-1.5 border border-dashed border-soft-gray/40 rounded-full text-soft-gray hover:border-gold-line transition-colors"
-                  >
-                    + category
-                  </button>
-                )
-              )}
-            </div>
-
-            {/* Task list */}
-            {activeCategory === 'All' ? (
-              Object.entries(groupedTasks).map(([cat, catTasks]) => (
-                <div key={cat} className="mb-6">
-                  <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-soft-gray mb-2 pb-1 border-b border-soft-gray/20 flex items-center gap-2">
-                    {cat}
-                    <span className="normal-case font-crimson text-xs">
-                      {catTasks.filter(t => t.status === 'done').length}/{catTasks.length}
-                    </span>
-                  </h3>
-                  {catTasks.map(task => (
-                    <TaskRow
-                      key={task.id}
-                      task={task}
-                      isEditing={isEditing}
-                      categories={allCats}
-                      onUpdate={updateTask}
-                      onDelete={deleteTask}
-                    />
-                  ))}
-                  {isEditing && activeCategory === 'All' && (
-                    <button
-                      onClick={() => setTasks(prev => [...prev, { id: genId(), title: 'New task', category: cat, status: 'pending', assignee: '', dueLabel: '', notes: '' }])}
-                      className={`${addRowBtnCls} mt-1 pl-8`}
-                    >
-                      + add to {cat}
-                    </button>
-                  )}
-                </div>
-              ))
-            ) : (
-              <div>
-                {filteredTasks.map(task => (
-                  <TaskRow
-                    key={task.id}
-                    task={task}
-                    isEditing={isEditing}
-                    categories={allCats}
-                    onUpdate={updateTask}
-                    onDelete={deleteTask}
-                  />
-                ))}
-              </div>
-            )}
-
-            {isEditing && activeCategory !== 'All' && (
-              <button onClick={addTask} className={`${addRowBtnCls} mt-2`}>+ Add task</button>
-            )}
-          </section>
+          <TasksSection
+            tasks={tasks}
+            onUpdate={updateTask}
+            onDelete={deleteTask}
+            onAdd={addTask}
+          />
         )}
-
-        {/* ── Budget ──────────────────────────────────────────────────────── */}
         {activeSection === 'budget' && (
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-line">
-                Budget Tracker
-              </h2>
-              <EditToggle isEditing={isEditing} onToggle={() => setIsEditing(e => !e)} />
-            </div>
-
-            {/* Summary cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-              <div className="bg-warm-cream border border-soft-gray/20 rounded px-4 py-4 text-center">
-                <p className="font-crimson font-semibold text-2xl text-deep-ivory">{formatDollars(paidTotal)}</p>
-                <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray mt-1">Total Paid</p>
-              </div>
-              <div className="bg-warm-cream border border-soft-gray/20 rounded px-4 py-4 text-center">
-                <p className="font-crimson font-semibold text-2xl text-muted-rose">{formatDollars(pendingMin)}+</p>
-                <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray mt-1">Remaining (est. min)</p>
-              </div>
-              <div className="bg-warm-cream border border-soft-gray/20 rounded px-4 py-4 text-center">
-                <p className="font-crimson font-semibold text-2xl text-dark-taupe">{formatDollars(estimated)}+</p>
-                <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray mt-1">Estimated Total</p>
-              </div>
-            </div>
-
-            {/* Progress bar */}
-            <div className="mb-8">
-              <div className="flex justify-between mb-1">
-                <span className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray">Budget paid</span>
-                <span className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-deep-ivory">{progressPct}%</span>
-              </div>
-              <div className="h-1.5 bg-soft-gray/20 rounded-full overflow-hidden">
-                <div className="h-full bg-gold-line rounded-full transition-all" style={{ width: `${progressPct}%` }} />
-              </div>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-6">
-              {/* Paid */}
-              <div>
-                <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory mb-3 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-gold-line inline-block" />
-                  Already Paid
-                </h3>
-                <div className="border border-soft-gray/20 rounded overflow-hidden">
-                  {paidItems.map((item, i) => (
-                    <div key={item.id} className={`flex items-center gap-2 px-3 py-2 ${i % 2 === 0 ? 'bg-ivory' : 'bg-warm-cream'}`}>
-                      {isEditing ? (
-                        <>
-                          <input
-                            value={item.item}
-                            onChange={e => updateBudgetItem(item.id, { item: e.target.value })}
-                            className={`${smallInputCls} flex-1`}
-                            placeholder="Item name"
-                          />
-                          <input
-                            value={item.cost}
-                            onChange={e => updateBudgetItem(item.id, { cost: e.target.value })}
-                            className={`${smallInputCls} w-24`}
-                            placeholder="$0"
-                          />
-                          <button
-                            onClick={() => updateBudgetItem(item.id, { status: 'pending' })}
-                            className="font-work-sans text-[9px] text-soft-gray hover:text-muted-rose transition-colors whitespace-nowrap"
-                            title="Move to pending"
-                          >
-                            → pending
-                          </button>
-                          <button onClick={() => deleteBudgetItem(item.id)} className={`${deleteBtnCls} w-6 h-6 text-base`} title="Delete">×</button>
-                        </>
-                      ) : (
-                        <>
-                          <span className="font-crimson text-sm text-dark-taupe flex-1">{item.item}</span>
-                          <span className="font-crimson text-sm text-deep-ivory">{item.cost}</span>
-                          <span className="text-gold-line text-xs">✓</span>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                  <div className="flex items-center justify-between px-3 py-2 bg-pale-gold/20 border-t border-soft-gray/20">
-                    <span className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-deep-ivory">Subtotal</span>
-                    <span className="font-crimson font-semibold text-base text-deep-ivory">{formatDollars(paidTotal)}</span>
-                  </div>
-                  {isEditing && (
-                    <div className="px-3 py-2 bg-ivory border-t border-soft-gray/10">
-                      <button onClick={() => addBudgetItem('paid')} className={addRowBtnCls}>+ Add paid item</button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Pending */}
-              <div>
-                <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory mb-3 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-muted-rose inline-block" />
-                  Pending Payment
-                </h3>
-                <div className="border border-soft-gray/20 rounded overflow-hidden">
-                  {pendingItems.map((item, i) => (
-                    <div key={item.id} className={`flex items-center gap-2 px-3 py-2 ${i % 2 === 0 ? 'bg-ivory' : 'bg-warm-cream'}`}>
-                      {isEditing ? (
-                        <>
-                          <input
-                            value={item.item}
-                            onChange={e => updateBudgetItem(item.id, { item: e.target.value })}
-                            className={`${smallInputCls} flex-1`}
-                            placeholder="Item name"
-                          />
-                          <input
-                            value={item.cost}
-                            onChange={e => updateBudgetItem(item.id, { cost: e.target.value })}
-                            className={`${smallInputCls} w-24`}
-                            placeholder="$0"
-                          />
-                          <button
-                            onClick={() => updateBudgetItem(item.id, { status: 'paid' })}
-                            className="font-work-sans text-[9px] text-soft-gray hover:text-gold-line transition-colors whitespace-nowrap"
-                            title="Mark as paid"
-                          >
-                            → paid
-                          </button>
-                          <button onClick={() => deleteBudgetItem(item.id)} className={`${deleteBtnCls} w-6 h-6 text-base`} title="Delete">×</button>
-                        </>
-                      ) : (
-                        <>
-                          <span className="font-crimson text-sm text-dark-taupe flex-1">{item.item}</span>
-                          <span className="font-crimson text-sm text-deep-ivory">{item.cost}</span>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                  <div className="flex items-center justify-between px-3 py-2 bg-muted-rose/10 border-t border-soft-gray/20">
-                    <span className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-deep-ivory">Subtotal (est. min)</span>
-                    <span className="font-crimson font-semibold text-base text-muted-rose">{formatDollars(pendingMin)}+</span>
-                  </div>
-                  {isEditing && (
-                    <div className="px-3 py-2 bg-ivory border-t border-soft-gray/10">
-                      <button onClick={() => addBudgetItem('pending')} className={addRowBtnCls}>+ Add pending item</button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Reception scenarios */}
-            <div className="mt-8">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory">
-                  Reception Cost Scenarios
-                </h3>
-                {isEditing && (
-                  <button onClick={addScenario} className={addRowBtnCls}>+ Add scenario</button>
-                )}
-              </div>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {scenarios.map((sc) => {
-                  const tables = Math.ceil(sc.guests / sc.seatsPerTable)
-                  const total  = tables * sc.costPerTable
-                  return (
-                    <div key={sc.id} className="border border-soft-gray/20 rounded px-4 py-4 bg-warm-cream">
-                      {isEditing ? (
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between gap-2">
-                            <input
-                              value={sc.label}
-                              onChange={e => updateScenario(sc.id, { label: e.target.value })}
-                              className={`${smallInputCls} flex-1`}
-                              placeholder="Label"
-                            />
-                            <button onClick={() => deleteScenario(sc.id)} className={`${deleteBtnCls} w-7 h-7 text-base`}>×</button>
-                          </div>
-                          <div className="grid grid-cols-3 gap-2">
-                            <div>
-                              <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Guests</label>
-                              <input
-                                type="number"
-                                value={sc.guests}
-                                onChange={e => updateScenario(sc.id, { guests: parseInt(e.target.value) || 0 })}
-                                className={`${smallInputCls} w-full`}
-                                min={1}
-                              />
-                            </div>
-                            <div>
-                              <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Seats/Table</label>
-                              <input
-                                type="number"
-                                value={sc.seatsPerTable}
-                                onChange={e => updateScenario(sc.id, { seatsPerTable: parseInt(e.target.value) || 1 })}
-                                className={`${smallInputCls} w-full`}
-                                min={1}
-                              />
-                            </div>
-                            <div>
-                              <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">$/Table</label>
-                              <input
-                                type="number"
-                                value={sc.costPerTable}
-                                onChange={e => updateScenario(sc.id, { costPerTable: parseInt(e.target.value) || 0 })}
-                                className={`${smallInputCls} w-full`}
-                                min={0}
-                              />
-                            </div>
-                          </div>
-                          <p className="font-crimson text-xs text-deep-ivory pt-1">
-                            → {tables} tables · <strong>{formatDollars(total)}</strong> total
-                          </p>
-                        </div>
-                      ) : (
-                        <>
-                          <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray mb-1">{sc.label}</p>
-                          <p className="font-crimson font-semibold text-xl text-dark-taupe">{sc.guests} guests</p>
-                          <p className="font-crimson text-sm text-deep-ivory">
-                            {tables} tables of {sc.seatsPerTable} · {formatDollars(total)} total
-                          </p>
-                          <p className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray mt-1">
-                            {formatDollars(sc.costPerTable)}/table
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </section>
+          <BudgetSection
+            items={budgetItems}
+            scenarios={scenarios}
+            onUpdateItem={updateBudgetItem}
+            onDeleteItem={deleteBudgetItem}
+            onAddItem={addBudgetItem}
+            onUpdateScenario={updateScenario}
+            onDeleteScenario={deleteScenario}
+            onAddScenario={addScenario}
+          />
         )}
-
-        {/* ── Vendors ─────────────────────────────────────────────────────── */}
         {activeSection === 'vendors' && (
-          <section>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-line">
-                Vendor Contacts
-              </h2>
-              <div className="flex items-center gap-3">
-                {isEditing && (
-                  <button onClick={addVendor} className={addRowBtnCls}>+ Add vendor</button>
-                )}
-                <EditToggle isEditing={isEditing} onToggle={() => setIsEditing(e => !e)} />
-              </div>
-            </div>
-
-            {isEditing ? (
-              // Edit mode: flat list, all fields expanded
-              <div className="grid gap-4">
-                {vendors.map((v) => (
-                  <div key={v.id} className="border border-soft-gray/20 rounded-lg px-4 py-4 bg-warm-cream space-y-3">
-                    {/* Row 1: name · status · category · delete */}
-                    <div className="flex flex-wrap items-start gap-2">
-                      <input
-                        value={v.vendor}
-                        onChange={e => updateVendor(v.id, { vendor: e.target.value })}
-                        placeholder="Vendor name"
-                        className={`${inputCls} flex-1 min-w-[140px] font-semibold`}
-                      />
-                      <select
-                        value={v.status}
-                        onChange={e => updateVendor(v.id, { status: e.target.value as Vendor['status'] })}
-                        className={selectCls}
-                      >
-                        <option value="confirmed">Confirmed</option>
-                        <option value="deposit-paid">Deposit Paid</option>
-                        <option value="in-discussion">In Discussion</option>
-                        <option value="pending">Pending</option>
-                      </select>
-                      <input
-                        list={`vcats-${v.id}`}
-                        value={v.category}
-                        onChange={e => updateVendor(v.id, { category: e.target.value })}
-                        placeholder="Category"
-                        className={`${smallInputCls} w-32`}
-                      />
-                      <datalist id={`vcats-${v.id}`}>
-                        {vendorCats.map(c => <option key={c} value={c} />)}
-                      </datalist>
-                      <button onClick={() => deleteVendor(v.id)} className={deleteBtnCls} title="Delete vendor">×</button>
-                    </div>
-                    {/* Row 2: service */}
-                    <div className="flex flex-wrap gap-2">
-                      <div className="flex-1 min-w-[180px]">
-                        <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Service</label>
-                        <input
-                          value={v.service}
-                          onChange={e => updateVendor(v.id, { service: e.target.value })}
-                          placeholder="Service description"
-                          className={inputCls}
-                        />
-                      </div>
-                    </div>
-                    {/* Row 3: contact name · phone · email */}
-                    <div className="flex flex-wrap gap-2">
-                      <div className="flex-1 min-w-[140px]">
-                        <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Contact Name</label>
-                        <input
-                          value={v.contact}
-                          onChange={e => updateVendor(v.id, { contact: e.target.value })}
-                          placeholder="Name"
-                          className={inputCls}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-[120px]">
-                        <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Phone</label>
-                        <input
-                          value={v.phone}
-                          onChange={e => updateVendor(v.id, { phone: e.target.value })}
-                          placeholder="(555) 000-0000"
-                          type="tel"
-                          className={inputCls}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-[160px]">
-                        <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Email</label>
-                        <input
-                          value={v.email}
-                          onChange={e => updateVendor(v.id, { email: e.target.value })}
-                          placeholder="email@example.com"
-                          type="email"
-                          className={inputCls}
-                        />
-                      </div>
-                    </div>
-                    {/* Row 4: website · notes */}
-                    <div className="flex flex-wrap gap-2">
-                      <div className="flex-1 min-w-[180px]">
-                        <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Website</label>
-                        <input
-                          value={v.website}
-                          onChange={e => updateVendor(v.id, { website: e.target.value })}
-                          placeholder="https://..."
-                          type="url"
-                          className={inputCls}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-[180px]">
-                        <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Notes</label>
-                        <input
-                          value={v.notes}
-                          onChange={e => updateVendor(v.id, { notes: e.target.value })}
-                          placeholder="Any notes…"
-                          className={inputCls}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              // Read mode: grouped by category
-              <div className="space-y-8">
-                {Object.entries(groupedVendors).map(([cat, catVendors]) => (
-                  <div key={cat}>
-                    <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-soft-gray mb-3 pb-1 border-b border-soft-gray/20">
-                      {cat}
-                    </h3>
-                    <div className="grid gap-3">
-                      {catVendors.map((v) => (
-                        <div key={v.id} className="border border-soft-gray/20 rounded-lg px-4 py-4 bg-warm-cream">
-                          <div className="flex flex-wrap items-start justify-between gap-3">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-3 flex-wrap mb-1">
-                                <h4 className="font-crimson font-semibold text-lg text-dark-taupe leading-none">{v.vendor}</h4>
-                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-work-sans tracking-wider uppercase ${vendorStatusStyles[v.status]}`}>
-                                  {vendorStatusLabel[v.status]}
-                                </span>
-                              </div>
-                              <p className="font-crimson text-sm text-deep-ivory">{v.service}</p>
-                              {v.notes && (
-                                <p className="font-crimson text-xs text-soft-gray italic mt-1">{v.notes}</p>
-                              )}
-                            </div>
-                            <div className="flex flex-wrap gap-x-5 gap-y-2 text-right shrink-0">
-                              {(v.contact || v.phone || v.email) && (
-                                <div>
-                                  <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray">Contact</p>
-                                  {v.contact && <p className="font-crimson text-sm text-dark-taupe">{v.contact}</p>}
-                                  {v.phone   && <p className="font-crimson text-xs text-deep-ivory">{v.phone}</p>}
-                                  {v.email   && <p className="font-crimson text-xs text-deep-ivory">{v.email}</p>}
-                                </div>
-                              )}
-                              {v.website && (
-                                <div>
-                                  <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray">Website</p>
-                                  <a
-                                    href={v.website}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="font-crimson text-xs text-gold-line hover:underline"
-                                  >
-                                    {v.website.replace(/^https?:\/\//, '')}
-                                  </a>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+          <VendorsSection
+            vendors={vendors}
+            onUpdate={updateVendor}
+            onDelete={deleteVendor}
+            onAdd={addVendor}
+          />
         )}
 
-        {/* ── Footer ──────────────────────────────────────────────────────── */}
-        <div className="mt-12 pt-6 border-t border-soft-gray/20 text-center">
-          <p className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-soft-gray/50">
+        <div className="mt-10 pt-5 border-t border-soft-gray/20 text-center">
+          <p className="font-work-sans text-[8px] tracking-[0.25em] uppercase text-soft-gray/40">
             Christine &amp; Michael · September 12, 2026 · Planning Portal
           </p>
         </div>
