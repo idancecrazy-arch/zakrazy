@@ -72,6 +72,9 @@ body {
 }
 
 /* ── Input resets ── */
-input:focus, textarea:focus, select:focus {
+/* Remove outline on mouse/pointer focus only; keyboard focus ring is preserved */
+input:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+select:focus:not(:focus-visible) {
   outline: none;
 }
