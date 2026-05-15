@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Planner portal: separate auth layer
@@ -23,5 +23,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!enter|api/auth|api/planner-auth|_next|favicon\\.ico).*)'],
+  matcher: ['/((?!enter|api/auth|api/planner-auth|api/planner-state|_next|favicon\\.ico).*)'],
 }

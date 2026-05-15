@@ -93,15 +93,17 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <label className="font-work-sans text-xs sm:text-[13px] tracking-[0.12em] uppercase text-dark-taupe/85 font-medium">
-        {label}
-        {optional && (
-          <span className="ml-2 normal-case tracking-normal font-crimson italic text-sm text-muted-rose">
-            optional
-          </span>
-        )}
+      <label className="font-work-sans text-xs sm:text-[13px] tracking-[0.12em] uppercase text-dark-taupe/85 font-medium flex flex-col gap-2">
+        <span>
+          {label}
+          {optional && (
+            <span className="ml-2 normal-case tracking-normal font-crimson italic text-sm text-muted-rose">
+              optional
+            </span>
+          )}
+        </span>
+        {children}
       </label>
-      {children}
       {error && (
         <p className="font-crimson italic text-sm text-muted-rose">{error}</p>
       )}

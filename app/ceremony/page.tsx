@@ -57,7 +57,7 @@ export default function CeremonyPage() {
         <div className="border border-pale-gold/40 overflow-hidden mb-14">
           <iframe
             title="St. Joseph's Church location"
-            src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyD-placeholder&q=St.+Joseph's+Church,+371+Sixth+Avenue,+New+York,+NY+10014`}
+            src={VENUE.googleMapsEmbed}
             width="100%"
             height="300"
             style={{ border: 0 }}

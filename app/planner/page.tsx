@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { Reorder, useDragControls } from 'framer-motion'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -543,6 +544,9 @@ function TaskRow({
             </div>
           )}
         </div>
+        {task.notes && (
+          <p className="font-crimson text-xs text-soft-gray mt-1 italic">{task.notes}</p>
+        )}
       </div>
     </div>
   )
@@ -1086,10 +1090,13 @@ export default function PlannerDashboard() {
   const addVendor = () =>
     setVendors(p => [...p, { id: uid(), vendor: 'New Vendor', service: '', category: 'Other', contact: '', phone: '', email: '', budget: '', status: 'pending', notes: '' }])
 
-  const handleLogout = async () => {
-    await fetch('/api/planner-auth/logout', { method: 'POST' }).catch(() => {})
-    document.cookie = 'planner-auth=; Max-Age=0; path=/'
-    window.location.replace('/planner/login')
+  const commitNewCategory = () => {
+    const trimmed = newCatValue.trim()
+    if (trimmed && !categories.includes(trimmed)) {
+      setCategoriesD(prev => [...prev, trimmed])
+    }
+    setNewCatValue('')
+    setAddingCategory(false)
   }
 
   const doneTasks = tasks.filter(t => t.status === 'done').length
@@ -1098,10 +1105,12 @@ export default function PlannerDashboard() {
 
   const navItems: { key: typeof activeSection; label: string }[] = [
     { key: 'timeline', label: 'Timeline' },
-    { key: 'tasks',    label: 'Tasks' },
-    { key: 'budget',   label: 'Budget' },
-    { key: 'vendors',  label: 'Vendors' },
+    { key: 'tasks',    label: 'Tasks'    },
+    { key: 'budget',   label: 'Budget'   },
+    { key: 'vendors',  label: 'Vendors'  },
   ]
+
+  // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
     <div className="min-h-screen bg-ivory">
