@@ -42,7 +42,10 @@ export default function CountdownTimer() {
   if (!timeLeft) return null
 
   const units: { label: string; value: number }[] = [
-    { label: 'Days', value: timeLeft.days },
+    { label: 'Days',    value: timeLeft.days },
+    { label: 'Hours',   value: timeLeft.hours },
+    { label: 'Minutes', value: timeLeft.minutes },
+    { label: 'Seconds', value: timeLeft.seconds },
   ]
 
   return (

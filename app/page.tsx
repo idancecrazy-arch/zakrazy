@@ -13,7 +13,7 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-start pt-52 sm:pt-52 text-center px-6 overflow-hidden">
+      <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-start pt-52 text-center px-6 overflow-hidden">
 
         {/* Celestial wisp background texture */}
         <svg
@@ -41,15 +41,15 @@ export default function HomePage() {
         {/* Venue lines */}
         <div className="flex flex-col items-center gap-1 mb-8 sm:mb-14">
           <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-[#8C8782]">
-            <span className="text-[#C3AF82]">Ceremony</span>
+            <span className="text-gold-line">Ceremony</span>
             &ensp;·&ensp;{VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}
           </p>
           <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-[#8C8782]">
-            <span className="text-[#C3AF82]">Reception</span>
+            <span className="text-gold-line">Reception</span>
             &ensp;·&ensp;{RECEPTION_VENUE.shortName}&ensp;·&ensp;{RECEPTION_VENUE.neighborhood}
           </p>
           <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-[#8C8782] mt-1">
-            {VENUE.city}, {VENUE.city}
+            {VENUE.city}, {VENUE.state}
           </p>
         </div>
 
