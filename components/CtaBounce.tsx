@@ -22,7 +22,7 @@ export default function CtaBounce() {
         ${bouncing ? 'animate-subtle-bounce' : ''}
       `}
     >
-      Confirm Your Details
+      RSVP Now
     </Link>
   )
 }
