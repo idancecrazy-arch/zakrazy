@@ -64,14 +64,14 @@ const fontVars = [
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `Save the Date — ${COUPLE.displayNames} · September 12, 2026`,
+    default: `${COUPLE.displayNames} · September 12, 2026`,
     template: `%s — ${COUPLE.displayNames}`,
   },
-  description: `${COUPLE.displayNames} are getting married on September 12, 2026 at ${VENUE.shortName} in ${VENUE.neighborhood}, ${VENUE.city}. Save the date!`,
+  description: `${COUPLE.displayNames} are getting married on September 12, 2026 at ${VENUE.shortName} in ${VENUE.neighborhood}, ${VENUE.city}. Please RSVP!`,
   openGraph: {
     type: 'website',
     siteName: `${COUPLE.displayNames} Wedding`,
-    title: `Save the Date — ${COUPLE.displayNames} · September 12, 2026`,
+    title: `${COUPLE.displayNames} · September 12, 2026`,
     description: `Join us in celebrating the marriage of ${COUPLE.displayNames} on September 12, 2026 at ${VENUE.shortName}, Greenwich Village, New York.`,
   },
   icons: {

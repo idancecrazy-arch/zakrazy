@@ -6,7 +6,7 @@ import CountdownTimer from '@/components/CountdownTimer'
 import { VENUE, RECEPTION_VENUE } from '@/lib/constants'
 
 export const metadata: Metadata = {
-  title: 'Save the Date',
+  title: 'Home',
 }
 
 export default function HomePage() {
@@ -30,7 +30,7 @@ export default function HomePage() {
 
         {/* Main heading */}
         <h1 className="font-italiana text-6xl sm:text-7xl md:text-8xl text-dark-taupe tracking-wide leading-none mb-6">
-          Save the Date
+          You&rsquo;re Invited
         </h1>
 
         {/* Date */}
@@ -73,7 +73,7 @@ export default function HomePage() {
       {/* ── Final section ────────────────────────────────── */}
       <section className="bg-ivory py-16 flex flex-col items-center gap-6 text-center px-6">
         <p className="font-lora italic text-base text-deep-ivory max-w-xs leading-relaxed">
-          Formal invitation to follow — we cannot wait to celebrate with you.
+          We cannot wait to celebrate with you — please let us know you&rsquo;ll be joining us.
         </p>
         <Link
           href="/rsvp"
@@ -84,7 +84,7 @@ export default function HomePage() {
             transition-all duration-300
           "
         >
-          Confirm Your Details
+          RSVP Now
         </Link>
       </section>
     </>
