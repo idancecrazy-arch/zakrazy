@@ -47,7 +47,7 @@ export default function RSVPPage() {
 
           <CrossMotif size={32} color="#D2C3A0" />
 
-          <h1 className="font-italiana text-4xl sm:text-5xl md:text-6xl text-dark-taupe tracking-wide leading-tight">
+          <h1 className="font-poiret text-4xl sm:text-5xl md:text-6xl text-dark-taupe tracking-widest leading-tight">
             RSVP
           </h1>
 
