@@ -6,22 +6,12 @@ const FAQS = [
   {
     question: 'What is the dress code?',
     answer:
-      'Formal attire. Tuxedos or dark suits for gentlemen; evening gowns or cocktail dresses for ladies. Everything is indoors, so no need to worry about outdoor footwear.',
+      'Formal attire. Tuxedos or dark suits for gentlemen; evening gowns or formal dresses for ladies. Everything is indoors, so no need to worry about outdoor footwear.',
   },
   {
     question: 'Is the ceremony and reception indoors?',
     answer:
-      'Yes — both the ceremony at St. Joseph\'s Church and the reception at Golden Unicorn are entirely indoors. No umbrellas or outdoor shoes required.',
-  },
-  {
-    question: 'What is the parking situation?',
-    answer:
-      'Street parking in Greenwich Village and Chinatown is limited, especially on weekends. We recommend using paid parking garages nearby, or arriving by subway or rideshare. Specific garage recommendations will be shared in the formal invitation.',
-  },
-  {
-    question: 'How do I get there by subway?',
-    answer:
-      'St. Joseph\'s Church (Greenwich Village) is easily reached via the A/C/E to West 4th Street, or the 1 train to Christopher Street. Golden Unicorn (Chinatown) is close to the J/Z/N/Q/R/6 trains at Canal Street. A formal map and directions will be included in the invitation.',
+      'Yes — both the ceremony at St. Joseph\'s Church and the reception at Golden Unicorn are entirely indoors.',
   },
   {
     question: 'How long is the ceremony?',
@@ -34,19 +24,14 @@ const FAQS = [
       'Children are warmly welcome! Please indicate on your RSVP if children will be joining your party, and let us know if a high chair is needed. The reception features family-style dining that works beautifully for all ages.',
   },
   {
-    question: 'Can my plus one bring their own plus one?',
-    answer:
-      'Due to venue capacity, our guest list is carefully curated. Plus ones are welcome where indicated on your invitation — unfortunately, plus ones cannot extend additional guests.',
-  },
-  {
-    question: 'Is the venue wheelchair accessible?',
-    answer:
-      'We are confirming accessibility details for both venues and will include this information in the formal invitation. Please note any accessibility needs in the Special Requests field of your RSVP and we\'ll be in touch directly.',
-  },
-  {
     question: 'What kind of food will be served at the reception?',
     answer:
-      'Golden Unicorn serves beautiful family-style Chinese cuisine. Dishes will be shared across the table. Please note any dietary restrictions, allergies, or preferences on your RSVP so we can work with the venue to accommodate you.',
+      'Golden Unicorn serves beautiful family-style Chinese cuisine. Dishes will be shared across the table. Please note any dietary restrictions or allergies on your RSVP so we can work with the venue to accommodate you.',
+  },
+  {
+    question: 'Any tips for getting to New York?',
+    answer:
+      'September 12th falls on a busy weekend in New York City with several large events happening around the same time. We strongly recommend booking flights and hotels as early as possible — rates and availability will tighten as the date approaches. Once you\'re in the city, public transit is the easiest way to get around: the MTA subway now accepts tap-to-pay with a credit/debit card or Apple Pay/Google Pay directly at the turnstile, so there\'s no need to buy a MetroCard.',
   },
 ] as const
 

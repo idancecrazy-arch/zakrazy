@@ -1,6 +1,5 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import RosePetals from '@/components/RosePetals'
 import { CONTACT_EMAIL } from '@/lib/constants'
 
 export const metadata: Metadata = {
@@ -20,10 +19,8 @@ export default async function ThankYouPage({ searchParams }: Props) {
   const wantsHotel = params.hotel === '1'
 
   return (
-    <div className="relative min-h-screen bg-ivory flex flex-col items-center justify-center px-6 py-24 overflow-hidden">
-      <RosePetals />
-
-      <div className="relative z-10 flex flex-col items-center gap-10 text-center max-w-lg">
+    <div className="min-h-screen bg-ivory flex flex-col items-center justify-center px-6 py-24">
+      <div className="flex flex-col items-center gap-10 text-center max-w-lg">
         {/* Main message */}
         <div className="flex flex-col gap-4">
           <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray">

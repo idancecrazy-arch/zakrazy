@@ -70,7 +70,6 @@ export default function RSVPFlow() {
   const [hasChildren, setHasChildren] = useState(false)
   const [children, setChildren] = useState<Child[]>([])
   const [dietary, setDietary] = useState('')
-  const [specialRequests, setSpecialRequests] = useState('')
   const [hotelInterest, setHotelInterest] = useState(false)
   const [hotelModalOpen, setHotelModalOpen] = useState(false)
 
@@ -125,7 +124,6 @@ export default function RSVPFlow() {
           plusOneName: plusOne ? plusOneName.trim() : undefined,
           children: hasChildren && children.length > 0 ? children : undefined,
           dietaryRestrictions: dietary.trim() || undefined,
-          specialRequests: specialRequests.trim() || undefined,
           hotelInterest,
         }),
       })
@@ -351,22 +349,6 @@ export default function RSVPFlow() {
                 onChange={(e) => setDietary(e.target.value)}
                 rows={3}
                 placeholder="Please list any allergies, vegetarian/vegan preferences, or other dietary restrictions…"
-                className={`${inputClass} resize-none`}
-              />
-            </Field>
-          </div>
-        )}
-
-        {/* ── Special Requests (attending only) ────────────── */}
-        {attending === true && (
-          <div className="flex flex-col gap-5">
-            <h2 className={sectionHeadingClass}>Anything Else?</h2>
-            <Field label="Special Requests or Questions" optional>
-              <textarea
-                value={specialRequests}
-                onChange={(e) => setSpecialRequests(e.target.value)}
-                rows={3}
-                placeholder="Is there anything else we should know? (transportation, seating preferences, accessibility needs, etc.)"
                 className={`${inputClass} resize-none`}
               />
             </Field>
