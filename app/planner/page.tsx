@@ -47,6 +47,11 @@ type Vendor = {
   budget: string
   category: string
   status: 'confirmed' | 'deposit-paid' | 'pending' | 'in-discussion'
+  remainingCost: string
+  paymentDueDate: string
+  tipOnDayOf: boolean
+  contractFileName: string
+  contractData: string
 }
 
 type ReceptionScenario = {
@@ -191,15 +196,17 @@ const INITIAL_BUDGET_ITEMS: BudgetItem[] = [
   { id: 'b13', item: 'Ceremony music – Jin Krista',  cost: '$2,000',          status: 'pending' },
 ]
 
+const VENDOR_DEFAULTS = { remainingCost: '', paymentDueDate: '', tipOnDayOf: false, contractFileName: '', contractData: '' }
+
 const INITIAL_VENDORS: Vendor[] = [
-  { id: 'v1', vendor: 'Jin Krista',          service: 'Ceremony Music',          contact: '', phone: '', email: '', website: '', notes: '', budget: '$2,000',           category: 'Music',         status: 'confirmed'     },
-  { id: 'v2', vendor: 'Golden Unicorn',      service: 'Reception Venue',         contact: '', phone: '', email: '', website: '', notes: '', budget: '$20,800–$24,000',  category: 'Venue',         status: 'deposit-paid'  },
-  { id: 'v3', vendor: 'Photographer',        service: 'Photography (6–8 hrs)',   contact: '', phone: '', email: '', website: '', notes: '', budget: '$3,000–$4,000',    category: 'Photography',   status: 'pending'       },
-  { id: 'v4', vendor: 'DJ',                  service: 'Reception Entertainment', contact: '', phone: '', email: '', website: '', notes: '', budget: '$3,000',           category: 'Entertainment', status: 'pending'       },
-  { id: 'v5', vendor: 'Florist',             service: 'Florals & Arrangements',  contact: '', phone: '', email: '', website: '', notes: '', budget: '$3,000',           category: 'Florals',       status: 'pending'       },
-  { id: 'v6', vendor: 'Lion Dancers',        service: 'Cultural Entertainment',  contact: '', phone: '', email: '', website: '', notes: '', budget: '$1,000',           category: 'Entertainment', status: 'pending'       },
-  { id: 'v7', vendor: "St. Joseph's Church", service: 'Ceremony Venue',          contact: '', phone: '', email: '', website: '', notes: '', budget: '$2,500 (paid)',     category: 'Venue',         status: 'confirmed'     },
-  { id: 'v8', vendor: 'Wedding Planner',     service: 'Overall Coordination',    contact: '', phone: '', email: '', website: '', notes: '', budget: 'TBD',             category: 'Coordination',  status: 'in-discussion' },
+  { id: 'v1', vendor: 'Jin Krista',          service: 'Ceremony Music',          contact: '', phone: '', email: '', website: '', notes: '', budget: '$2,000',           category: 'Music',         status: 'confirmed',     ...VENDOR_DEFAULTS },
+  { id: 'v2', vendor: 'Golden Unicorn',      service: 'Reception Venue',         contact: '', phone: '', email: '', website: '', notes: '', budget: '$20,800–$24,000',  category: 'Venue',         status: 'deposit-paid',  ...VENDOR_DEFAULTS },
+  { id: 'v3', vendor: 'Photographer',        service: 'Photography (6–8 hrs)',   contact: '', phone: '', email: '', website: '', notes: '', budget: '$3,000–$4,000',    category: 'Photography',   status: 'pending',       ...VENDOR_DEFAULTS },
+  { id: 'v4', vendor: 'DJ',                  service: 'Reception Entertainment', contact: '', phone: '', email: '', website: '', notes: '', budget: '$3,000',           category: 'Entertainment', status: 'pending',       ...VENDOR_DEFAULTS },
+  { id: 'v5', vendor: 'Florist',             service: 'Florals & Arrangements',  contact: '', phone: '', email: '', website: '', notes: '', budget: '$3,000',           category: 'Florals',       status: 'pending',       ...VENDOR_DEFAULTS },
+  { id: 'v6', vendor: 'Lion Dancers',        service: 'Cultural Entertainment',  contact: '', phone: '', email: '', website: '', notes: '', budget: '$1,000',           category: 'Entertainment', status: 'pending',       ...VENDOR_DEFAULTS },
+  { id: 'v7', vendor: "St. Joseph's Church", service: 'Ceremony Venue',          contact: '', phone: '', email: '', website: '', notes: '', budget: '$2,500 (paid)',     category: 'Venue',         status: 'confirmed',     ...VENDOR_DEFAULTS },
+  { id: 'v8', vendor: 'Wedding Planner',     service: 'Overall Coordination',    contact: '', phone: '', email: '', website: '', notes: '', budget: 'TBD',             category: 'Coordination',  status: 'in-discussion', ...VENDOR_DEFAULTS },
 ]
 
 const INITIAL_SCENARIOS: ReceptionScenario[] = [
@@ -796,7 +803,7 @@ export default function PlannerDashboard() {
   const deleteVendor = (id: string) => setVendorsD(prev => prev.filter(v => v.id !== id))
 
   const addVendor = () =>
-    setVendorsD(prev => [...prev, { id: genId(), vendor: 'New Vendor', service: '', contact: '', phone: '', email: '', website: '', notes: '', budget: '', category: 'Other', status: 'pending' }])
+    setVendorsD(prev => [...prev, { id: genId(), vendor: 'New Vendor', service: '', contact: '', phone: '', email: '', website: '', notes: '', budget: '', category: 'Other', status: 'pending', ...VENDOR_DEFAULTS }])
 
   // ── Scenario handlers ───────────────────────────────────────────────────────
 
@@ -1430,6 +1437,80 @@ export default function PlannerDashboard() {
                         />
                       </div>
                     </div>
+                    {/* Row 5: remaining cost · payment due date · tip on day of */}
+                    <div className="flex flex-wrap gap-2 items-end">
+                      <div className="flex-1 min-w-[140px]">
+                        <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Remaining Balance</label>
+                        <input
+                          value={v.remainingCost}
+                          onChange={e => updateVendor(v.id, { remainingCost: e.target.value })}
+                          placeholder="$0"
+                          className={inputCls}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-[140px]">
+                        <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Payment Due Date</label>
+                        <input
+                          value={v.paymentDueDate}
+                          onChange={e => updateVendor(v.id, { paymentDueDate: e.target.value })}
+                          placeholder="e.g. Aug 1, 2026"
+                          className={inputCls}
+                        />
+                      </div>
+                      <div className="flex items-center gap-2 pb-1.5">
+                        <input
+                          id={`tip-${v.id}`}
+                          type="checkbox"
+                          checked={!!v.tipOnDayOf}
+                          onChange={e => updateVendor(v.id, { tipOnDayOf: e.target.checked })}
+                          className="accent-gold-line w-4 h-4"
+                        />
+                        <label htmlFor={`tip-${v.id}`} className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray cursor-pointer whitespace-nowrap">
+                          Tip on Day-of
+                        </label>
+                      </div>
+                    </div>
+                    {/* Row 6: contract upload */}
+                    <div>
+                      <label className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray block mb-1">Contract</label>
+                      {v.contractFileName ? (
+                        <div className="flex items-center gap-3">
+                          <a
+                            href={v.contractData}
+                            download={v.contractFileName}
+                            className="font-crimson text-xs text-gold-line hover:underline truncate max-w-[200px]"
+                            title={v.contractFileName}
+                          >
+                            {v.contractFileName}
+                          </a>
+                          <button
+                            onClick={() => updateVendor(v.id, { contractFileName: '', contractData: '' })}
+                            className="font-work-sans text-[9px] tracking-wider uppercase text-muted-rose hover:underline"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ) : (
+                        <label className={`${inputCls} flex items-center gap-2 cursor-pointer`}>
+                          <span className="text-soft-gray text-xs">Choose file…</span>
+                          <input
+                            type="file"
+                            accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+                            className="sr-only"
+                            onChange={e => {
+                              const file = e.target.files?.[0]
+                              if (!file) return
+                              const reader = new FileReader()
+                              reader.onload = () => updateVendor(v.id, {
+                                contractFileName: file.name,
+                                contractData: reader.result as string,
+                              })
+                              reader.readAsDataURL(file)
+                            }}
+                          />
+                        </label>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1451,10 +1532,48 @@ export default function PlannerDashboard() {
                                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-work-sans tracking-wider uppercase ${vendorStatusStyles[v.status]}`}>
                                   {vendorStatusLabel[v.status]}
                                 </span>
+                                {v.tipOnDayOf && (
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-work-sans tracking-wider uppercase bg-muted-rose/20 text-muted-rose border border-muted-rose/40">
+                                    Tip Day-of
+                                  </span>
+                                )}
                               </div>
                               <p className="font-crimson text-sm text-deep-ivory">{v.service}</p>
                               {v.notes && (
                                 <p className="font-crimson text-xs text-soft-gray italic mt-1">{v.notes}</p>
+                              )}
+                              {/* Payment tracking */}
+                              {(v.remainingCost || v.paymentDueDate) && (
+                                <div className="flex flex-wrap items-center gap-3 mt-2">
+                                  {v.remainingCost && (
+                                    <div className="flex items-center gap-1">
+                                      <span className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray">Balance:</span>
+                                      <span className="font-crimson text-sm font-semibold text-dark-taupe">{v.remainingCost}</span>
+                                    </div>
+                                  )}
+                                  {v.paymentDueDate && (
+                                    <div className="flex items-center gap-1">
+                                      <span className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray">Due:</span>
+                                      <span className="font-crimson text-sm text-dark-taupe">{v.paymentDueDate}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                              {/* Contract */}
+                              {v.contractFileName && (
+                                <div className="mt-2">
+                                  <a
+                                    href={v.contractData}
+                                    download={v.contractFileName}
+                                    className="inline-flex items-center gap-1.5 font-work-sans text-[9px] tracking-[0.2em] uppercase text-gold-line hover:underline"
+                                    title={v.contractFileName}
+                                  >
+                                    <svg width="10" height="12" viewBox="0 0 10 12" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+                                      <path d="M1 11h8M5 1v7m0 0L2.5 5.5M5 8l2.5-2.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    </svg>
+                                    Contract
+                                  </a>
+                                </div>
                               )}
                             </div>
                             <div className="flex flex-wrap gap-x-5 gap-y-2 text-right shrink-0">
