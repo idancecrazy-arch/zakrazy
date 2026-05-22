@@ -2,17 +2,27 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 const childSchema = z.object({
-  name: z.string().min(1, 'Child name is required'),
-  age: z.string().min(1, 'Child age is required'),
+  name: z.string().min(1),
+  age: z.string().min(1),
   highChair: z.boolean(),
 })
 
 const schema = z.object({
-  recordId: z.string().min(1, 'Record ID is required'),
-  guestName: z.string().min(1),
+  guestName: z.string().min(1, 'Name is required'),
   attending: z.boolean(),
+  // Contact update (optional)
+  updateContact: z.boolean().optional(),
+  email: z.string().email().optional().or(z.literal('')),
+  phone: z.string().optional(),
+  address1: z.string().optional(),
+  address2: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  zip: z.string().optional(),
+  // Party
   plusOneName: z.string().optional(),
   children: z.array(childSchema).optional(),
+  // Other
   dietaryRestrictions: z.string().optional(),
   specialRequests: z.string().optional(),
   hotelInterest: z.boolean().optional(),
@@ -34,54 +44,43 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const {
-    recordId,
-    guestName,
-    attending,
-    plusOneName,
-    children,
-    dietaryRestrictions,
-    specialRequests,
-    hotelInterest,
-  } = parsed.data
-
+  const data = parsed.data
   const submittedAt = new Date().toISOString()
 
-  console.log('RSVP_SUBMISSION', JSON.stringify({
-    recordId,
-    guestName,
-    attending,
-    plusOneName,
-    children,
-    dietaryRestrictions,
-    specialRequests,
-    hotelInterest,
-    submittedAt,
-  }))
+  console.log('RSVP_SUBMISSION', JSON.stringify({ ...data, submittedAt }))
 
   const airtableKey = process.env.AIRTABLE_API_KEY
   const airtableBase = process.env.AIRTABLE_BASE_ID
   const airtableTable = process.env.AIRTABLE_GUEST_TABLE ?? 'Guest List'
 
+  if (!airtableKey || !airtableBase) {
+    return NextResponse.json({ error: 'Airtable not configured' }, { status: 503 })
+  }
+
   const fields: Record<string, unknown> = {
-    'RSVP Status': attending ? 'Accepted' : 'Declined',
-    'Hotel Interest': hotelInterest ?? false,
+    'Guest Name': data.guestName,
+    'RSVP Status': data.attending ? 'Accepted' : 'Declined',
+    'Hotel Interest': data.hotelInterest ?? false,
     'Submitted Timestamp': submittedAt,
   }
 
-  if (attending) {
-    if (plusOneName) fields['Plus One Name'] = plusOneName
-    if (children && children.length > 0) {
-      fields['Children'] = JSON.stringify(children)
-    }
-    if (dietaryRestrictions) fields['Dietary Restrictions'] = dietaryRestrictions
-    if (specialRequests) fields['Special Requests'] = specialRequests
+  if (data.updateContact) {
+    if (data.email) fields['Email'] = data.email
+    if (data.phone) fields['Phone'] = data.phone
+    if (data.address1) fields['Address'] = [data.address1, data.address2, data.city, data.state, data.zip].filter(Boolean).join(', ')
+  }
+
+  if (data.attending) {
+    if (data.plusOneName) fields['Plus One Name'] = data.plusOneName
+    if (data.children && data.children.length > 0) fields['Children'] = JSON.stringify(data.children)
+    if (data.dietaryRestrictions) fields['Dietary Restrictions'] = data.dietaryRestrictions
+    if (data.specialRequests) fields['Special Requests'] = data.specialRequests
   }
 
   const res = await fetch(
-    `https://api.airtable.com/v0/${encodeURIComponent(airtableBase!)}/${encodeURIComponent(airtableTable)}/${encodeURIComponent(recordId)}`,
+    `https://api.airtable.com/v0/${encodeURIComponent(airtableBase)}/${encodeURIComponent(airtableTable)}`,
     {
-      method: 'PATCH',
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${airtableKey}`,
         'Content-Type': 'application/json',
@@ -92,7 +91,7 @@ export async function POST(req: NextRequest) {
 
   if (!res.ok) {
     const errText = await res.text()
-    console.error('Airtable RSVP patch failed:', errText)
+    console.error('Airtable RSVP post failed:', errText)
     return NextResponse.json({ error: 'Failed to save RSVP' }, { status: 502 })
   }
 
