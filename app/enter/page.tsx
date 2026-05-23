@@ -2,12 +2,10 @@
 
 import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import BackgammonBoard from '@/components/BackgammonBoard'
-
 type Stage =
   | { name: 'idle' }
   | { name: 'loading' }
-  | { name: 'success'; type: 'text' | 'board'; message: string }
+  | { name: 'success' }
   | { name: 'error'; message: string }
 
 function EnterForm() {
@@ -23,10 +21,7 @@ function EnterForm() {
   useEffect(() => {
     if (stage.name !== 'success') return
     // Use window.location to force a full request so the middleware sees the new auth cookie.
-    // router.push does a soft navigation that can use prefetched/cached payloads from before
-    // the cookie was set, causing the middleware to redirect back to /enter.
-    const t = setTimeout(() => { window.location.replace(from) }, 3000)
-    return () => clearTimeout(t)
+    window.location.replace(from)
   }, [stage, from])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,16 +44,13 @@ function EnterForm() {
         return
       }
 
-      const data = await res.json() as { type: 'text' | 'board'; message: string }
-      setStage({ name: 'success', type: data.type, message: data.message })
+      setStage({ name: 'success' })
     } catch {
       setStage({ name: 'error', message: 'Something went wrong. Please try again.' })
       setPassword('')
       setTimeout(() => inputRef.current?.focus(), 50)
     }
   }
-
-  const handleContinue = () => { window.location.replace(from) }
 
   const showForm = stage.name === 'idle' || stage.name === 'loading' || stage.name === 'error'
 
@@ -134,53 +126,6 @@ function EnterForm() {
         </div>
       )}
 
-      {/* Success: text response */}
-      {stage.name === 'success' && stage.type === 'text' && (
-        <div className="relative z-10 flex flex-col items-center gap-10 text-center">
-          <p className="font-cormorant text-7xl sm:text-8xl md:text-9xl text-dark-taupe tracking-wide">
-            {stage.message}
-          </p>
-
-          <button
-            onClick={handleContinue}
-            className="
-              font-work-sans text-[11px] tracking-[0.25em] uppercase
-              px-10 py-4 border border-gold-line text-dark-taupe
-              hover:bg-blush hover:border-shell-pink
-              transition-all duration-300
-            "
-          >
-            Continue
-          </button>
-
-          <p className="font-lora italic text-sm text-soft-gray">
-            Redirecting in a moment…
-          </p>
-        </div>
-      )}
-
-      {/* Success: backgammon board */}
-      {stage.name === 'success' && stage.type === 'board' && (
-        <div className="relative z-10 flex flex-col items-center gap-8 text-center w-full max-w-xl">
-          <BackgammonBoard />
-
-          <button
-            onClick={handleContinue}
-            className="
-              font-work-sans text-[11px] tracking-[0.25em] uppercase
-              px-10 py-4 border border-gold-line text-dark-taupe
-              hover:bg-blush hover:border-shell-pink
-              transition-all duration-300
-            "
-          >
-            Continue
-          </button>
-
-          <p className="font-lora italic text-sm text-soft-gray">
-            Redirecting in a moment…
-          </p>
-        </div>
-      )}
     </div>
   )
 }
