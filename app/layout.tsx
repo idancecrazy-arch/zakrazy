@@ -5,6 +5,7 @@ import {
   Crimson_Pro,
   IM_Fell_English,
   Cinzel,
+  Great_Vibes,
 } from 'next/font/google'
 import './globals.css'
 import Navigation from '@/components/Navigation'
@@ -16,6 +17,13 @@ const cormorant = Cormorant_Garamond({
   style: ['normal', 'italic'],
   subsets: ['latin'],
   variable: '--font-italiana',
+  display: 'swap',
+})
+
+const greatVibes = Great_Vibes({
+  weight: ['400'],
+  subsets: ['latin'],
+  variable: '--font-great-vibes',
   display: 'swap',
 })
 
@@ -54,6 +62,7 @@ const cinzel = Cinzel({
 
 const fontVars = [
   cormorant.variable,
+  greatVibes.variable,
   cinzelDecorative.variable,
   crimsonPro.variable,
   imFellEnglish.variable,

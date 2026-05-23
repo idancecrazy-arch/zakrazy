@@ -3,6 +3,7 @@ import { Metadata } from 'next'
 import CrossMotif from '@/components/CrossMotif'
 import CtaBounce from '@/components/CtaBounce'
 import CountdownTimer from '@/components/CountdownTimer'
+import InvitationModal from '@/components/InvitationModal'
 import { VENUE, RECEPTION_VENUE } from '@/lib/constants'
 
 export const metadata: Metadata = {
@@ -12,6 +13,8 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
+      <InvitationModal />
+
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-start pt-52 text-center px-6 overflow-hidden">
 
