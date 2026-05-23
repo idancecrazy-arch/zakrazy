@@ -8,11 +8,9 @@ export interface Child {
 
 interface PartyCompositionProps {
   plusOneAllowed: boolean
-  plusOne: boolean
   plusOneName: string
   hasChildren: boolean
   children: Child[]
-  onPlusOneToggle: (v: boolean) => void
   onPlusOneNameChange: (v: string) => void
   onChildrenToggle: (v: boolean) => void
   onChildrenChange: (children: Child[]) => void
@@ -30,11 +28,9 @@ const checkboxClass = 'w-5 h-5 border border-gold-line/60 accent-gold-line curso
 
 export default function PartyComposition({
   plusOneAllowed,
-  plusOne,
   plusOneName,
   hasChildren,
   children,
-  onPlusOneToggle,
   onPlusOneNameChange,
   onChildrenToggle,
   onChildrenChange,
@@ -59,32 +55,19 @@ export default function PartyComposition({
       {/* Plus One */}
       {plusOneAllowed && (
         <div className="flex flex-col gap-3">
-          <label className={checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={plusOne}
-              onChange={(e) => onPlusOneToggle(e.target.checked)}
-              className={checkboxClass}
-            />
-            <span className="font-crimson text-base sm:text-lg text-dark-taupe">
-              I&apos;m bringing a plus one
-            </span>
-          </label>
-
-          {plusOne && (
-            <div className="pl-8 flex flex-col gap-2">
-              <input
-                type="text"
-                value={plusOneName}
-                onChange={(e) => onPlusOneNameChange(e.target.value)}
-                placeholder="Plus one's full name"
-                aria-label="Plus one name"
-                className={inputClass}
-              />
-              {errors.plusOneName && (
-                <p className="font-crimson italic text-sm text-muted-rose">{errors.plusOneName}</p>
-              )}
-            </div>
+          <p className="font-work-sans text-[11px] tracking-[0.15em] uppercase text-dark-taupe/70">
+            Your Plus One
+          </p>
+          <input
+            type="text"
+            value={plusOneName}
+            onChange={(e) => onPlusOneNameChange(e.target.value)}
+            placeholder="Plus one's full name"
+            aria-label="Plus one name"
+            className={inputClass}
+          />
+          {errors.plusOneName && (
+            <p className="font-crimson italic text-sm text-muted-rose">{errors.plusOneName}</p>
           )}
         </div>
       )}

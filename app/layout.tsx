@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
-import localFont from 'next/font/local'
 import {
   Cinzel_Decorative,
+  Cormorant_Garamond,
   Crimson_Pro,
   IM_Fell_English,
   Cinzel,
@@ -11,11 +11,10 @@ import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import { COUPLE, VENUE, SITE_URL } from '@/lib/constants'
 
-const balzak = localFont({
-  src: [
-    { path: '../public/Balzak.woff', weight: '400', style: 'normal' },
-    { path: '../public/Balzak.otf', weight: '400', style: 'normal' },
-  ],
+const cormorant = Cormorant_Garamond({
+  weight: ['300', '400', '500', '600'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
   variable: '--font-italiana',
   display: 'swap',
 })
@@ -54,7 +53,7 @@ const cinzel = Cinzel({
 })
 
 const fontVars = [
-  balzak.variable,
+  cormorant.variable,
   cinzelDecorative.variable,
   crimsonPro.variable,
   imFellEnglish.variable,

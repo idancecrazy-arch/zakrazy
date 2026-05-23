@@ -24,7 +24,6 @@ const schema = z.object({
   children: z.array(childSchema).optional(),
   // Other
   dietaryRestrictions: z.string().optional(),
-  hotelInterest: z.boolean().optional(),
 })
 
 export async function POST(req: NextRequest) {
@@ -59,7 +58,6 @@ export async function POST(req: NextRequest) {
   const fields: Record<string, unknown> = {
     'Guest Name': data.guestName,
     'RSVP Status': data.attending ? 'Accepted' : 'Declined',
-    'Hotel Interest': data.hotelInterest ?? false,
     'Submitted Timestamp': submittedAt,
   }
 

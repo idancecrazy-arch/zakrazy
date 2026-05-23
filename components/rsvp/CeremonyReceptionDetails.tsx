@@ -16,8 +16,8 @@ export default function CeremonyReceptionDetails() {
           <br />
           {VENUE.city}, {VENUE.state} {VENUE.zip}
         </p>
-        <p className="font-lora italic text-base text-deep-ivory">
-          Time: <span className="font-crimson not-italic text-dark-taupe/70">TBD — details to follow</span>
+        <p className="font-crimson text-base text-dark-taupe/80">
+          Please arrive by 1:30pm.
         </p>
         <a
           href={VENUE.googleMapsUrl}
@@ -44,8 +44,8 @@ export default function CeremonyReceptionDetails() {
           <br />
           {RECEPTION_VENUE.city}, {RECEPTION_VENUE.state} {RECEPTION_VENUE.zip}
         </p>
-        <p className="font-lora italic text-base text-deep-ivory">
-          Time: <span className="font-crimson not-italic text-dark-taupe/70">TBD — details to follow</span>
+        <p className="font-crimson text-base text-dark-taupe/80">
+          Cocktail hour starts at 5pm.
         </p>
         <p className="font-crimson italic text-sm text-muted-rose">
           Family-style dining · Everything is indoors

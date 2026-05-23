@@ -109,12 +109,25 @@ export default function TravelPage() {
         {/* Hotels */}
         <div className="flex flex-col gap-8">
           <h2 className="font-italiana text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
-            Recommended Hotels
+            Hotel Block
           </h2>
-          <p className="font-crimson text-base text-dark-taupe/80 leading-relaxed">
-            We&apos;ve highlighted nearby hotels for your convenience. Rates and availability vary —
-            book early as September in New York fills quickly.
-          </p>
+
+          <div className="bg-warm-cream/60 border border-pale-gold/50 p-6 flex flex-col gap-3">
+            <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-gold-line">
+              Important — Book Early
+            </p>
+            <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
+              September 12th is a particularly busy weekend in New York City, with several major
+              events happening across the city. We strongly encourage all out-of-town guests to
+              book flights and accommodations as soon as possible — hotel availability will tighten
+              significantly as the date approaches.
+            </p>
+            <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
+              We have arranged preferred rates at the Conrad New York Downtown for immediate family
+              and wedding-party suites, and a group code at the Fairfield by Marriott for additional
+              guests. Details for each are listed below.
+            </p>
+          </div>
 
           {HOTELS.map((hotel, i) => (
             <div
