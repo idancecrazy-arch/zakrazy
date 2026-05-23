@@ -8,7 +8,7 @@ import PartyComposition, { type Child } from './PartyComposition'
 import CeremonyReceptionDetails from './CeremonyReceptionDetails'
 
 const sectionHeadingClass =
-  'font-italiana text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50'
+  'font-cormorant text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50'
 
 const inputClass =
   'w-full bg-ivory border border-gold-line/60 px-4 py-3.5 min-h-[48px] font-crimson text-base sm:text-lg text-dark-taupe placeholder:text-soft-gray focus:border-gold-line focus:ring-0 transition-colors duration-200'
@@ -158,7 +158,7 @@ export default function RSVPFlow() {
   if (isPastDeadline()) {
     return (
       <div className="flex flex-col items-center gap-6 text-center py-16 px-6">
-        <h2 className="font-italiana text-3xl text-dark-taupe tracking-wide">RSVP Period Has Closed</h2>
+        <h2 className="font-cormorant text-3xl text-dark-taupe tracking-wide">RSVP Period Has Closed</h2>
         <p className="font-crimson text-lg text-dark-taupe/80 max-w-sm leading-relaxed">
           Thank you for your interest. If you believe this is an error, please reach out directly.
         </p>
@@ -396,7 +396,7 @@ export default function RSVPFlow() {
       {attending === true && (
         <div className="flex flex-col gap-3 bg-warm-cream/40 border border-pale-gold/30 p-5">
           <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-gold-line">Dress Code</p>
-          <p className="font-italiana text-xl text-dark-taupe tracking-wide">Formal Attire</p>
+          <p className="font-cormorant text-xl text-dark-taupe tracking-wide">Formal Attire</p>
           <p className="font-crimson text-base text-dark-taupe/80 leading-relaxed">
             Tuxedos or dark suits for gentlemen; evening gowns or formal dresses for ladies.
             Everything is indoors — no need to worry about outdoor footwear.

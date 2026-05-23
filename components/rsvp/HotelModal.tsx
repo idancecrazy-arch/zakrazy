@@ -42,7 +42,7 @@ export default function HotelModal({ open, onClose }: HotelModalProps) {
       {/* Panel */}
       <div className="relative z-10 bg-ivory w-full sm:max-w-2xl max-h-[90vh] overflow-y-auto sm:rounded-none shadow-xl">
         <div className="sticky top-0 bg-ivory border-b border-pale-gold/50 px-6 py-4 flex items-center justify-between">
-          <h2 className="font-italiana text-2xl text-dark-taupe tracking-wide">Hotel Options</h2>
+          <h2 className="font-cormorant text-2xl text-dark-taupe tracking-wide">Hotel Options</h2>
           <button
             type="button"
             onClick={onClose}
@@ -61,7 +61,7 @@ export default function HotelModal({ open, onClose }: HotelModalProps) {
 
           {HOTELS.map((hotel) => (
             <div key={hotel.name} className="flex flex-col gap-2 pb-6 border-b border-pale-gold/40 last:border-0 last:pb-0">
-              <h3 className="font-italiana text-xl text-dark-taupe tracking-wide">{hotel.name}</h3>
+              <h3 className="font-cormorant text-xl text-dark-taupe tracking-wide">{hotel.name}</h3>
               <p className="font-work-sans text-[10px] tracking-[0.18em] uppercase text-gold-line">
                 {hotel.neighborhood}
               </p>

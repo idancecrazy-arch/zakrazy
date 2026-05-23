@@ -23,7 +23,7 @@ export default async function AdminPage() {
           <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-soft-gray">
             Admin
           </p>
-          <h1 className="font-italiana text-4xl sm:text-5xl text-dark-taupe tracking-wide">
+          <h1 className="font-cormorant text-4xl sm:text-5xl text-dark-taupe tracking-wide">
             RSVP Dashboard
           </h1>
           <p className="font-crimson italic text-base text-deep-ivory">

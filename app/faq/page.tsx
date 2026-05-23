@@ -31,7 +31,7 @@ export default function FAQPage() {
 
         {/* Still have questions */}
         <div className="mt-16 pt-10 border-t border-pale-gold/40 flex flex-col items-center gap-4 text-center">
-          <p className="font-italiana text-2xl text-dark-taupe tracking-wide">
+          <p className="font-cormorant text-2xl text-dark-taupe tracking-wide">
             Still have questions?
           </p>
           <p className="font-crimson text-base text-dark-taupe/80 leading-relaxed max-w-sm">

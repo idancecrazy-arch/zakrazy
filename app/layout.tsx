@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import localFont from 'next/font/local'
 import {
   Cinzel_Decorative,
   Cormorant_Garamond,
@@ -12,14 +13,26 @@ import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import { COUPLE, VENUE, SITE_URL } from '@/lib/constants'
 
-const cormorant = Cormorant_Garamond({
-  weight: ['300', '400', '500', '600'],
-  style: ['normal', 'italic'],
-  subsets: ['latin'],
+// Hero / couple-name display font
+const balzak = localFont({
+  src: [
+    { path: '../public/Balzak.woff', weight: '400', style: 'normal' },
+    { path: '../public/Balzak.otf', weight: '400', style: 'normal' },
+  ],
   variable: '--font-italiana',
   display: 'swap',
 })
 
+// Readable serif for logistical section headers
+const cormorant = Cormorant_Garamond({
+  weight: ['300', '400', '500', '600'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+  variable: '--font-cormorant',
+  display: 'swap',
+})
+
+// Invitation script
 const greatVibes = Great_Vibes({
   weight: ['400'],
   subsets: ['latin'],
@@ -61,6 +74,7 @@ const cinzel = Cinzel({
 })
 
 const fontVars = [
+  balzak.variable,
   cormorant.variable,
   greatVibes.variable,
   cinzelDecorative.variable,

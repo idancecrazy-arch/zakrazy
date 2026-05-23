@@ -28,7 +28,7 @@ export default function TravelPage() {
 
         {/* Venues */}
         <div className="flex flex-col gap-10 mb-16">
-          <h2 className="font-italiana text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
+          <h2 className="font-cormorant text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
             Venues
           </h2>
 
@@ -36,7 +36,7 @@ export default function TravelPage() {
             <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-gold-line">
               Ceremony
             </p>
-            <p className="font-italiana text-xl text-dark-taupe tracking-wide">{VENUE.shortName}</p>
+            <p className="font-cormorant text-xl text-dark-taupe tracking-wide">{VENUE.shortName}</p>
             <p className="font-crimson text-base text-dark-taupe/80">
               {VENUE.address}, {VENUE.neighborhood}
               <br />
@@ -58,7 +58,7 @@ export default function TravelPage() {
             <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-gold-line">
               Reception
             </p>
-            <p className="font-italiana text-xl text-dark-taupe tracking-wide">{RECEPTION_VENUE.shortName}</p>
+            <p className="font-cormorant text-xl text-dark-taupe tracking-wide">{RECEPTION_VENUE.shortName}</p>
             <p className="font-crimson text-base text-dark-taupe/80">
               {RECEPTION_VENUE.address}, {RECEPTION_VENUE.neighborhood}
               <br />
@@ -80,7 +80,7 @@ export default function TravelPage() {
 
         {/* Getting There */}
         <div className="flex flex-col gap-6 mb-16">
-          <h2 className="font-italiana text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
+          <h2 className="font-cormorant text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
             Getting There
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -108,7 +108,7 @@ export default function TravelPage() {
 
         {/* Hotels */}
         <div className="flex flex-col gap-8">
-          <h2 className="font-italiana text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
+          <h2 className="font-cormorant text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
             Hotel Block
           </h2>
 
@@ -134,7 +134,7 @@ export default function TravelPage() {
               key={hotel.name}
               className={`flex flex-col gap-3 pb-8 ${i < HOTELS.length - 1 ? 'border-b border-pale-gold/40' : ''}`}
             >
-              <p className="font-italiana text-xl text-dark-taupe tracking-wide">{hotel.name}</p>
+              <p className="font-cormorant text-xl text-dark-taupe tracking-wide">{hotel.name}</p>
               <p className="font-work-sans text-[10px] tracking-[0.18em] uppercase text-gold-line">
                 {hotel.neighborhood}
               </p>

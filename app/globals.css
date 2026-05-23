@@ -33,6 +33,9 @@
   .font-work-sans {
     font-family: var(--font-work-sans), 'Palatino Linotype', serif;
   }
+  .font-cormorant {
+    font-family: var(--font-cormorant), 'Garamond', 'Palatino Linotype', serif;
+  }
   .font-script {
     font-family: var(--font-great-vibes), cursive;
   }

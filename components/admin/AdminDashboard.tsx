@@ -70,14 +70,14 @@ export default function AdminDashboard() {
             <span className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">
               {label}
             </span>
-            <span className="font-italiana text-3xl text-dark-taupe tracking-wide">{value}</span>
+            <span className="font-cormorant text-3xl text-dark-taupe tracking-wide">{value}</span>
           </div>
         ))}
       </div>
 
       {/* Response breakdown */}
       <div className="flex flex-col gap-4">
-        <h2 className="font-italiana text-2xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
+        <h2 className="font-cormorant text-2xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
           Response Breakdown
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -87,7 +87,7 @@ export default function AdminDashboard() {
             { label: 'Not Yet Responded', value: stats.pending, color: 'text-soft-gray' },
           ].map(({ label, value, color }) => (
             <div key={label} className="flex flex-col gap-1">
-              <span className={`font-italiana text-4xl tracking-wide ${color}`}>{value}</span>
+              <span className={`font-cormorant text-4xl tracking-wide ${color}`}>{value}</span>
               <span className="font-work-sans text-[10px] tracking-[0.18em] uppercase text-dark-taupe/70">
                 {label}
               </span>
@@ -98,7 +98,7 @@ export default function AdminDashboard() {
 
       {/* Party counts */}
       <div className="flex flex-col gap-4">
-        <h2 className="font-italiana text-2xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
+        <h2 className="font-cormorant text-2xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
           Guest Counts
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -109,7 +109,7 @@ export default function AdminDashboard() {
             { label: 'High Chairs', value: stats.highChairCount },
           ].map(({ label, value }) => (
             <div key={label} className="flex flex-col gap-1">
-              <span className="font-italiana text-3xl text-dark-taupe tracking-wide">{value}</span>
+              <span className="font-cormorant text-3xl text-dark-taupe tracking-wide">{value}</span>
               <span className="font-work-sans text-[10px] tracking-[0.18em] uppercase text-dark-taupe/70">
                 {label}
               </span>
@@ -120,14 +120,14 @@ export default function AdminDashboard() {
           <span className="font-work-sans text-[10px] tracking-[0.18em] uppercase text-dark-taupe/70">
             Hotel Interest:
           </span>
-          <span className="font-italiana text-2xl text-dark-taupe">{stats.hotelInterestCount}</span>
+          <span className="font-cormorant text-2xl text-dark-taupe">{stats.hotelInterestCount}</span>
           <span className="font-crimson italic text-sm text-muted-rose">guests</span>
         </div>
       </div>
 
       {/* Dietary restrictions */}
       <div className="flex flex-col gap-4">
-        <h2 className="font-italiana text-2xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
+        <h2 className="font-cormorant text-2xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
           Dietary Restrictions ({stats.dietaryList.length})
         </h2>
         {stats.dietaryList.length === 0 ? (
@@ -145,7 +145,7 @@ export default function AdminDashboard() {
 
       {/* Export */}
       <div className="flex flex-col gap-3 pt-2">
-        <h2 className="font-italiana text-2xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
+        <h2 className="font-cormorant text-2xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
           Export
         </h2>
         <p className="font-crimson text-base text-dark-taupe/80">

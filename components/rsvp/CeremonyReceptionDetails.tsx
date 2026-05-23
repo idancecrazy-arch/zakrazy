@@ -8,7 +8,7 @@ export default function CeremonyReceptionDetails() {
         <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-gold-line">
           Ceremony
         </p>
-        <p className="font-italiana text-2xl text-dark-taupe tracking-wide">
+        <p className="font-cormorant text-2xl text-dark-taupe tracking-wide">
           {VENUE.shortName}
         </p>
         <p className="font-crimson text-base text-dark-taupe/80 leading-relaxed">
@@ -36,7 +36,7 @@ export default function CeremonyReceptionDetails() {
         <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-gold-line">
           Reception
         </p>
-        <p className="font-italiana text-2xl text-dark-taupe tracking-wide">
+        <p className="font-cormorant text-2xl text-dark-taupe tracking-wide">
           {RECEPTION_VENUE.shortName}
         </p>
         <p className="font-crimson text-base text-dark-taupe/80 leading-relaxed">
