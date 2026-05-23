@@ -3,84 +3,6 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
-// Ink splatter blobs scattered around the backdrop edges
-function BackdropInk() {
-  return (
-    <svg
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      viewBox="0 0 100 100"
-      preserveAspectRatio="xMidYMid slice"
-      aria-hidden="true"
-    >
-      {/* Top-left cluster */}
-      <ellipse cx="4" cy="5" rx="2.8" ry="1.9" fill="#0f0e0e" opacity="0.7" transform="rotate(-20 4 5)" />
-      <circle cx="9" cy="2.5" r="1.4" fill="#0f0e0e" opacity="0.65" />
-      <circle cx="2" cy="10" r="1" fill="#0f0e0e" opacity="0.6" />
-      <circle cx="12" cy="5.5" r="0.7" fill="#0f0e0e" opacity="0.55" />
-      <circle cx="6" cy="13" r="0.5" fill="#0f0e0e" opacity="0.5" />
-      <ellipse cx="15" cy="3" rx="1.5" ry="0.9" fill="#0f0e0e" opacity="0.5" transform="rotate(15 15 3)" />
-      <circle cx="1.5" cy="17" r="0.6" fill="#0f0e0e" opacity="0.45" />
-      <circle cx="19" cy="7" r="0.4" fill="#0f0e0e" opacity="0.4" />
-
-      {/* Top-right cluster */}
-      <ellipse cx="92" cy="4" rx="3.2" ry="2" fill="#0f0e0e" opacity="0.7" transform="rotate(25 92 4)" />
-      <circle cx="97" cy="9" r="1.6" fill="#0f0e0e" opacity="0.65" />
-      <circle cx="88" cy="2" r="1.1" fill="#0f0e0e" opacity="0.6" />
-      <circle cx="95" cy="14" r="0.8" fill="#0f0e0e" opacity="0.55" />
-      <ellipse cx="83" cy="6" rx="1.8" ry="1" fill="#0f0e0e" opacity="0.5" transform="rotate(-10 83 6)" />
-      <circle cx="98.5" cy="18" r="0.5" fill="#0f0e0e" opacity="0.45" />
-      <circle cx="80" cy="3" r="0.4" fill="#0f0e0e" opacity="0.4" />
-
-      {/* Bottom-left cluster */}
-      <ellipse cx="5" cy="94" rx="2.5" ry="1.7" fill="#0f0e0e" opacity="0.68" transform="rotate(10 5 94)" />
-      <circle cx="11" cy="97.5" r="1.5" fill="#0f0e0e" opacity="0.62" />
-      <circle cx="2.5" cy="88" r="1.2" fill="#0f0e0e" opacity="0.58" />
-      <circle cx="16" cy="95" r="0.7" fill="#0f0e0e" opacity="0.5" />
-      <ellipse cx="8" cy="86" rx="1.6" ry="0.9" fill="#0f0e0e" opacity="0.48" transform="rotate(-18 8 86)" />
-      <circle cx="3" cy="82" r="0.5" fill="#0f0e0e" opacity="0.42" />
-      <circle cx="20" cy="98" r="0.4" fill="#0f0e0e" opacity="0.38" />
-
-      {/* Bottom-right cluster */}
-      <ellipse cx="95" cy="93" rx="3" ry="2" fill="#0f0e0e" opacity="0.68" transform="rotate(-15 95 93)" />
-      <circle cx="98.5" cy="87" r="1.4" fill="#0f0e0e" opacity="0.62" />
-      <circle cx="89" cy="97" r="1.2" fill="#0f0e0e" opacity="0.58" />
-      <circle cx="84" cy="92" r="0.8" fill="#0f0e0e" opacity="0.5" />
-      <ellipse cx="93" cy="82" rx="1.5" ry="1" fill="#0f0e0e" opacity="0.48" transform="rotate(20 93 82)" />
-      <circle cx="99" cy="79" r="0.5" fill="#0f0e0e" opacity="0.4" />
-      <circle cx="78" cy="96" r="0.4" fill="#0f0e0e" opacity="0.38" />
-
-      {/* Left & right mid-edge specks */}
-      <circle cx="1.5" cy="48" r="0.9" fill="#0f0e0e" opacity="0.45" />
-      <circle cx="3" cy="55" r="0.5" fill="#0f0e0e" opacity="0.38" />
-      <circle cx="98" cy="44" r="0.8" fill="#0f0e0e" opacity="0.42" />
-      <circle cx="97" cy="58" r="0.5" fill="#0f0e0e" opacity="0.36" />
-    </svg>
-  )
-}
-
-// Subtle ink texture inside the card itself
-function CardInkTexture() {
-  return (
-    <svg
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      viewBox="0 0 100 162"
-      preserveAspectRatio="xMidYMid meet"
-      aria-hidden="true"
-      style={{ opacity: 0.045 }}
-    >
-      {/* Very subtle corner dots only — keeps center readable */}
-      <circle cx="4" cy="6" r="1.8" fill="#0a0a14" />
-      <circle cx="8" cy="3" r="1" fill="#0a0a14" />
-      <circle cx="2" cy="12" r="0.7" fill="#0a0a14" />
-      <circle cx="96" cy="5" r="1.6" fill="#0a0a14" />
-      <circle cx="93" cy="10" r="0.9" fill="#0a0a14" />
-      <circle cx="3" cy="155" r="1.4" fill="#0a0a14" />
-      <circle cx="7" cy="158" r="0.8" fill="#0a0a14" />
-      <circle cx="97" cy="157" r="1.5" fill="#0a0a14" />
-      <circle cx="94" cy="153" r="0.7" fill="#0a0a14" />
-    </svg>
-  )
-}
 
 export default function InvitationModal() {
   const [open, setOpen] = useState(false)
@@ -103,9 +25,6 @@ export default function InvitationModal() {
       aria-modal="true"
       aria-label="Wedding Invitation"
     >
-      {/* Ink splatter in the backdrop */}
-      <BackdropInk />
-
       {/* Relative wrapper so envelope + card stack together */}
       <div className="relative flex items-center justify-center">
 
@@ -159,8 +78,6 @@ export default function InvitationModal() {
             boxShadow: '0 4px 24px rgba(30,24,18,0.22)',
           }}
         >
-          <CardInkTexture />
-
           {/* Close button */}
           <button
             type="button"
