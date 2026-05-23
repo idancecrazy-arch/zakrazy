@@ -21,17 +21,17 @@ const FAQS = [
   {
     question: 'Are children welcome?',
     answer:
-      'Children are warmly welcome! Please indicate on your RSVP if children will be joining your party, and let us know if a high chair is needed. The reception features family-style dining that works beautifully for all ages.',
+      'Children are welcome! Please indicate on your RSVP if children will be joining your party, and let us know if a high chair is needed.',
   },
   {
     question: 'What kind of food will be served at the reception?',
     answer:
-      'Golden Unicorn serves beautiful family-style Chinese cuisine. Dishes will be shared across the table. Please note any dietary restrictions or allergies on your RSVP so we can work with the venue to accommodate you.',
+      'Golden Unicorn will be serving a Chinese banquet style dinner. Dishes will be shared family style at your table. Please note any dietary restrictions or allergies on your RSVP so we can work with the venue to accommodate you.',
   },
   {
     question: 'Any tips for getting to New York?',
     answer:
-      'September 12th falls on a busy weekend in New York City with several large events happening around the same time. We strongly recommend booking flights and hotels as early as possible — rates and availability will tighten as the date approaches. Once you\'re in the city, public transit is the easiest way to get around: the MTA subway now accepts tap-to-pay with a credit/debit card or Apple Pay/Google Pay directly at the turnstile, so there\'s no need to buy a MetroCard.',
+      'September 12th falls on a busy weekend in New York City with several large events happening that weekend. We strongly recommend booking flights and hotels as early as possible. The local airports are JFK, LGA, and EWR. We also highly recommend the Amtrak train if you are on the eastern seaboard.',
   },
 ] as const
 
