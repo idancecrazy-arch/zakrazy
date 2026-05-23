@@ -137,7 +137,7 @@ function EnterForm() {
       {/* Success: text response */}
       {stage.name === 'success' && stage.type === 'text' && (
         <div className="relative z-10 flex flex-col items-center gap-10 text-center">
-          <p className="font-italiana text-7xl sm:text-8xl md:text-9xl text-dark-taupe tracking-wide">
+          <p className="font-cormorant text-7xl sm:text-8xl md:text-9xl text-dark-taupe tracking-wide">
             {stage.message}
           </p>
 
