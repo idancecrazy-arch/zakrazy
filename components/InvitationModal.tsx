@@ -4,12 +4,11 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-// Soft vignette applied to the paper card so edges dissolve into the backdrop
 const cardMask = [
-  'radial-gradient(ellipse 82% 86% at 50% 50%,',
-  '  black 42%,',
-  '  rgba(0,0,0,0.82) 60%,',
-  '  rgba(0,0,0,0.38) 78%,',
+  'radial-gradient(ellipse 80% 84% at 50% 50%,',
+  '  black 38%,',
+  '  rgba(0,0,0,0.80) 58%,',
+  '  rgba(0,0,0,0.35) 76%,',
   '  transparent 100%)',
 ].join('')
 
@@ -27,17 +26,16 @@ export default function InvitationModal() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 px-4"
-      style={{ background: 'rgba(56, 48, 40, 0.75)', backdropFilter: 'blur(8px)' }}
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 px-4"
+      style={{ background: 'rgba(30, 24, 18, 0.80)', backdropFilter: 'blur(8px)' }}
       onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}
       role="dialog"
       aria-modal="true"
       aria-label="Wedding Invitation"
     >
-      {/* Card + button stacked vertically */}
       <div className="relative flex flex-col items-center gap-5">
 
-        {/* Close button — top-right of the card area */}
+        {/* Close button */}
         <button
           type="button"
           onClick={() => setOpen(false)}
@@ -51,40 +49,71 @@ export default function InvitationModal() {
           </svg>
         </button>
 
-        {/* Paper card — calligraphy floats on warm cotton-paper */}
+        {/* Photo card — golden ratio portrait */}
         <div
           style={{
-            width: 'min(82vw, 440px)',
-            // Warm handmade-paper gradient
-            background: [
-              'radial-gradient(ellipse at 30% 25%, #F9F4EA 0%, transparent 55%),',
-              'radial-gradient(ellipse at 72% 78%, #F3EDD8 0%, transparent 55%),',
-              'linear-gradient(160deg, #FAF6ED 0%, #F5EEE0 55%, #FAF6ED 100%)',
-            ].join(' '),
-            // Dissolve all four edges into the backdrop
+            width: 'min(78vw, 400px)',
+            aspectRatio: '1 / 1.618',
+            position: 'relative',
             maskImage: cardMask,
             WebkitMaskImage: cardMask,
-            // Subtle depth
-            boxShadow: '0 8px 48px rgba(40,32,22,0.35), 0 2px 12px rgba(40,32,22,0.2)',
+            boxShadow: '0 12px 60px rgba(20,14,8,0.55), 0 2px 16px rgba(20,14,8,0.3)',
+            overflow: 'hidden',
           }}
         >
-          {/* Calligraphy image — multiply blend makes white bg vanish */}
           <Image
-            src="/invite-font.png"
-            alt="Christine & Michael wedding invitation text"
-            width={960}
-            height={1200}
-            className="w-full h-auto"
-            style={{
-              mixBlendMode: 'multiply',
-              padding: '9% 10% 6%',
-              display: 'block',
-            }}
+            src="/img-0021.jpg"
+            alt="Christine & Michael at Bethesda Terrace"
+            fill
+            className="object-cover object-center"
             priority
           />
+
+          {/* Gradient overlay so text sits on dark lower portion */}
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.12) 50%, rgba(0,0,0,0.68) 100%)',
+            }}
+          />
+
+          {/* Invitation text overlay */}
+          <div
+            className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 text-center"
+            style={{ padding: '0 8% 10%' }}
+          >
+            <p className="font-work-sans text-white/70 tracking-[0.2em] uppercase"
+              style={{ fontSize: 'clamp(0.52rem, 1.4vw, 0.6rem)' }}>
+              Together with their families
+            </p>
+            <h2
+              className="font-italiana text-white leading-tight"
+              style={{ fontSize: 'clamp(1.5rem, 5vw, 2.1rem)', letterSpacing: '0.04em' }}
+            >
+              Christine &amp; Michael
+            </h2>
+            <p className="font-crimson italic text-white/85"
+              style={{ fontSize: 'clamp(0.8rem, 2.2vw, 0.95rem)' }}>
+              request the honour of your presence
+            </p>
+            <div className="w-8 h-px bg-white/40 my-1" />
+            <p className="font-crimson text-white/80"
+              style={{ fontSize: 'clamp(0.75rem, 2vw, 0.88rem)' }}>
+              Saturday, the twelfth of September
+            </p>
+            <p className="font-crimson text-white/80"
+              style={{ fontSize: 'clamp(0.75rem, 2vw, 0.88rem)' }}>
+              two thousand and twenty-six
+            </p>
+            <p className="font-crimson text-white/70 mt-1"
+              style={{ fontSize: 'clamp(0.7rem, 1.8vw, 0.82rem)' }}>
+              New York City
+            </p>
+          </div>
         </div>
 
-        {/* RSVP button — sits below the card, never covers it */}
+        {/* RSVP button — below the card */}
         <Link
           href="/rsvp"
           onClick={() => setOpen(false)}

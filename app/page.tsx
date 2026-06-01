@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Metadata } from 'next'
 import CrossMotif from '@/components/CrossMotif'
 import CtaBounce from '@/components/CtaBounce'
@@ -16,48 +17,52 @@ export default function HomePage() {
       <InvitationModal />
 
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative min-h-screen bg-ivory flex flex-col items-center justify-start pt-52 text-center px-6 overflow-hidden">
+      <section className="relative min-h-screen flex flex-col items-center justify-start pt-52 text-center px-6 overflow-hidden">
 
-        {/* Celestial wisp background texture */}
-        <svg
-          className="absolute inset-0 w-full h-full opacity-[0.035] pointer-events-none"
-          viewBox="0 0 800 600"
-          preserveAspectRatio="xMidYMid slice"
-          aria-hidden="true"
-        >
-          <path d="M 0 200 C 200 100, 400 300, 800 150" stroke="#C3AF82" strokeWidth="80" fill="none" />
-          <path d="M 0 400 C 300 250, 500 450, 800 350" stroke="#C3AF82" strokeWidth="60" fill="none" />
-          <path d="M 0 550 C 250 480, 550 520, 800 480" stroke="#C3AF82" strokeWidth="40" fill="none" />
-          <path d="M 100 50 C 300 120, 600 20, 800 80" stroke="#C3AF82" strokeWidth="50" fill="none" />
-        </svg>
+        {/* Hero photo background */}
+        <Image
+          src="/img-0195.jpg"
+          alt="Christine & Michael"
+          fill
+          className="object-cover object-center"
+          priority
+        />
+
+        {/* Soft overlay — light at top, darker at bottom so text reads */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(to bottom, rgba(250,246,240,0.55) 0%, rgba(250,246,240,0.30) 40%, rgba(30,24,18,0.45) 100%)',
+          }}
+        />
 
         {/* Main heading */}
-        <h1 className="font-italiana text-6xl sm:text-7xl md:text-8xl text-dark-taupe tracking-wide leading-none mb-6">
+        <h1 className="relative font-italiana text-6xl sm:text-7xl md:text-8xl text-dark-taupe tracking-wide leading-none mb-6 drop-shadow-sm">
           You&rsquo;re Invited
         </h1>
 
         {/* Date */}
-        <p className="font-italiana text-2xl sm:text-3xl text-[#8C7DA0] tracking-[0.2em] mb-4">
+        <p className="relative font-italiana text-2xl sm:text-3xl text-[#5C4F72] tracking-[0.2em] mb-4 drop-shadow-sm">
           September <span className="text-3xl sm:text-4xl">12, 2026</span>
         </p>
 
         {/* Venue lines */}
-        <div className="flex flex-col items-center gap-1 mb-8 sm:mb-14">
-          <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-[#8C8782]">
+        <div className="relative flex flex-col items-center gap-1 mb-8 sm:mb-14">
+          <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-dark-taupe/80">
             <span className="text-gold-line">Ceremony</span>
             &ensp;·&ensp;{VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}
           </p>
-          <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-[#8C8782]">
+          <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-dark-taupe/80">
             <span className="text-gold-line">Reception</span>
             &ensp;·&ensp;{RECEPTION_VENUE.shortName}&ensp;·&ensp;{RECEPTION_VENUE.neighborhood}
           </p>
-          <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-[#8C8782] mt-1">
+          <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-dark-taupe/80 mt-1">
             {VENUE.city}, {VENUE.state}
           </p>
         </div>
 
         {/* Cross → CTA */}
-        <div className="flex flex-col items-center gap-6 sm:gap-8">
+        <div className="relative flex flex-col items-center gap-6 sm:gap-8">
           <CrossMotif size={72} color="#D2C3A0" strokeWidth={5.5} />
           <CtaBounce />
         </div>
