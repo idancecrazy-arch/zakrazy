@@ -50,9 +50,9 @@ export default function HomePage() {
           >
             Christine<br />&amp;<br />Michael
           </h1>
-          <p className="font-cormorant text-white/90 leading-snug"
-            style={{ fontSize: 'clamp(1.2rem, 3.2vw, 1.7rem)', letterSpacing: '0.04em' }}>
-            request the honor of your presence<br />at their wedding
+          <p className="font-cormorant uppercase text-white/90 leading-snug"
+            style={{ fontSize: 'clamp(1rem, 2.6vw, 1.4rem)', letterSpacing: '0.14em' }}>
+            Request the Honor of Your Presence<br />at Their Wedding
           </p>
         </div>
       </section>
