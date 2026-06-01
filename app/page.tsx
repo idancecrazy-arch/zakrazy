@@ -39,7 +39,7 @@ export default function HomePage() {
         />
 
         {/* Invitation text — sits above the couple */}
-        <div className="relative flex flex-col items-center gap-3 text-center" style={{ marginTop: '-15vh' }}>
+        <div className="relative flex flex-col items-center text-center" style={{ marginTop: '-15vh', gap: '0.5rem' }}>
           <p className="font-cormorant text-white/70 tracking-[0.28em] uppercase"
             style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>
             Together with their families
@@ -51,7 +51,7 @@ export default function HomePage() {
             Christine<br />&amp;<br />Michael
           </h1>
           <p className="font-cormorant uppercase text-white/90 leading-snug"
-            style={{ fontSize: 'clamp(1rem, 2.6vw, 1.4rem)', letterSpacing: '0.14em' }}>
+            style={{ fontSize: 'clamp(1rem, 2.6vw, 1.4rem)', letterSpacing: '0.14em', marginTop: '3rem' }}>
             Request the Honor of Your Presence<br />at Their Wedding
           </p>
         </div>
