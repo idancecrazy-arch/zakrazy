@@ -69,45 +69,47 @@ export default function InvitationModal() {
             priority
           />
 
-          {/* Gradient overlay so text sits on dark lower portion */}
+          {/* Gradient overlay — darken top arch ceiling + bottom for text */}
           <div
             style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.12) 50%, rgba(0,0,0,0.68) 100%)',
+              background: [
+                'linear-gradient(to bottom,',
+                '  rgba(0,0,0,0.45) 0%,',
+                '  rgba(0,0,0,0.20) 30%,',
+                '  rgba(0,0,0,0.15) 55%,',
+                '  rgba(0,0,0,0.55) 100%)',
+              ].join(' '),
             }}
           />
 
-          {/* Invitation text overlay */}
+          {/* Invitation text — positioned in lower-middle of the card */}
           <div
-            className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 text-center"
-            style={{ padding: '0 8% 10%' }}
+            className="absolute inset-x-0 flex flex-col items-center gap-1 text-center"
+            style={{ top: '52%', padding: '0 8%' }}
           >
-            <p className="font-work-sans text-white/70 tracking-[0.2em] uppercase"
-              style={{ fontSize: 'clamp(0.52rem, 1.4vw, 0.6rem)' }}>
+            <p className="font-work-sans text-white/65 tracking-[0.2em] uppercase"
+              style={{ fontSize: 'clamp(0.48rem, 1.3vw, 0.56rem)' }}>
               Together with their families
             </p>
             <h2
-              className="font-italiana text-white leading-tight"
-              style={{ fontSize: 'clamp(1.5rem, 5vw, 2.1rem)', letterSpacing: '0.04em' }}
+              className="font-italiana text-white leading-snug"
+              style={{ fontSize: 'clamp(1.6rem, 5.5vw, 2.3rem)', letterSpacing: '0.04em' }}
             >
-              Christine &amp; Michael
+              Christine<br />&amp;<br />Michael
             </h2>
-            <p className="font-crimson italic text-white/85"
-              style={{ fontSize: 'clamp(0.8rem, 2.2vw, 0.95rem)' }}>
+            <p className="font-crimson italic text-white/80"
+              style={{ fontSize: 'clamp(0.78rem, 2.1vw, 0.92rem)' }}>
               request the honour of your presence
             </p>
-            <div className="w-8 h-px bg-white/40 my-1" />
-            <p className="font-crimson text-white/80"
-              style={{ fontSize: 'clamp(0.75rem, 2vw, 0.88rem)' }}>
-              Saturday, the twelfth of September
+            <div className="w-8 h-px bg-white/35 my-1.5" />
+            <p className="font-italiana text-white/90"
+              style={{ fontSize: 'clamp(0.85rem, 2.4vw, 1.05rem)', letterSpacing: '0.06em' }}>
+              Saturday, September 12, 2026
             </p>
-            <p className="font-crimson text-white/80"
-              style={{ fontSize: 'clamp(0.75rem, 2vw, 0.88rem)' }}>
-              two thousand and twenty-six
-            </p>
-            <p className="font-crimson text-white/70 mt-1"
-              style={{ fontSize: 'clamp(0.7rem, 1.8vw, 0.82rem)' }}>
+            <p className="font-crimson text-white/65 mt-0.5"
+              style={{ fontSize: 'clamp(0.68rem, 1.8vw, 0.8rem)' }}>
               New York City
             </p>
           </div>
