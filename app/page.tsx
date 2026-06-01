@@ -4,7 +4,6 @@ import { Metadata } from 'next'
 import CrossMotif from '@/components/CrossMotif'
 import CtaBounce from '@/components/CtaBounce'
 import CountdownTimer from '@/components/CountdownTimer'
-import InvitationModal from '@/components/InvitationModal'
 import { VENUE, RECEPTION_VENUE } from '@/lib/constants'
 
 export const metadata: Metadata = {
@@ -14,70 +13,91 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      <InvitationModal />
+      {/* ── Invite Hero ───────────────────────────────────── */}
+      <section className="relative h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden">
 
-      {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-start pt-44 text-center px-6 overflow-hidden">
-
-        {/* Hero photo background */}
         <Image
-          src="/img-0195.jpg"
-          alt="Christine & Michael"
+          src="/img-0021.jpg"
+          alt="Christine & Michael at Bethesda Terrace"
           fill
           className="object-cover object-center"
           priority
         />
 
-        {/* Overlay — bright ivory wash at top fading to clear, then a white band near bottom for venue text */}
+        {/* Overlay — darken ceiling/edges, keep couple visible */}
         <div
           className="absolute inset-0"
           style={{
             background: [
               'linear-gradient(to bottom,',
-              '  rgba(250,246,240,0.82) 0%,',
-              '  rgba(250,246,240,0.55) 18%,',
-              '  rgba(250,246,240,0.10) 45%,',
-              '  rgba(250,246,240,0.10) 62%,',
-              '  rgba(250,246,240,0.88) 80%,',
-              '  rgba(250,246,240,0.96) 100%)',
+              '  rgba(0,0,0,0.52) 0%,',
+              '  rgba(0,0,0,0.18) 38%,',
+              '  rgba(0,0,0,0.18) 62%,',
+              '  rgba(0,0,0,0.60) 100%)',
             ].join(' '),
           }}
         />
 
-        {/* Main heading */}
-        <h1 className="relative font-italiana text-6xl sm:text-7xl md:text-8xl text-dark-taupe tracking-wide leading-none mb-6 drop-shadow-sm">
-          You&rsquo;re Invited
-        </h1>
-
-        {/* Date */}
-        <p className="relative font-italiana text-2xl sm:text-3xl text-[#5C4F72] tracking-[0.2em] mb-4 drop-shadow-sm">
-          September <span className="text-3xl sm:text-4xl">12, 2026</span>
-        </p>
-
-        {/* Cross → CTA — pushed down so couple photo has breathing room */}
-        <div className="relative flex flex-col items-center gap-6 sm:gap-8 mt-[32vh]">
-          <CrossMotif size={72} color="#C3AF82" strokeWidth={5.5} />
-          <CtaBounce />
-        </div>
-
-        {/* Venue lines — anchored near bottom on the white wash */}
-        <div className="relative flex flex-col items-center gap-1 mt-10 pb-10">
-          <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-dark-taupe/75">
-            <span className="text-gold-line">Ceremony</span>
-            &ensp;·&ensp;{VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}
+        {/* Invitation text */}
+        <div className="relative flex flex-col items-center gap-2 text-center" style={{ marginTop: '18vh' }}>
+          <p className="font-work-sans text-white/60 tracking-[0.22em] uppercase"
+            style={{ fontSize: 'clamp(0.5rem, 1.4vw, 0.58rem)' }}>
+            Together with their families
           </p>
-          <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-dark-taupe/75">
-            <span className="text-gold-line">Reception</span>
-            &ensp;·&ensp;{RECEPTION_VENUE.shortName}&ensp;·&ensp;{RECEPTION_VENUE.neighborhood}
+          <h1
+            className="font-italiana text-white leading-snug"
+            style={{ fontSize: 'clamp(2rem, 7vw, 3.2rem)', letterSpacing: '0.05em' }}
+          >
+            Christine<br />&amp;<br />Michael
+          </h1>
+          <p className="font-crimson italic text-white/80"
+            style={{ fontSize: 'clamp(0.82rem, 2.2vw, 1rem)' }}>
+            request the honour of your presence
           </p>
-          <p className="font-work-sans text-sm font-bold tracking-[0.25em] uppercase text-dark-taupe/75 mt-1">
-            {VENUE.city}, {VENUE.state}
+          <div className="w-8 h-px bg-white/35 my-2" />
+          <p className="font-italiana text-white/90"
+            style={{ fontSize: 'clamp(0.9rem, 2.6vw, 1.15rem)', letterSpacing: '0.06em' }}>
+            Saturday, September 12, 2026
+          </p>
+          <p className="font-crimson text-white/60 mt-0.5"
+            style={{ fontSize: 'clamp(0.7rem, 1.8vw, 0.82rem)' }}>
+            New York City
           </p>
         </div>
       </section>
 
+      {/* ── You're Invited ───────────────────────────────── */}
+      <section className="bg-ivory pt-24 pb-16 px-6 flex flex-col items-center text-center gap-6">
+        <h2 className="font-italiana text-5xl sm:text-6xl md:text-7xl text-dark-taupe tracking-wide leading-none">
+          You&rsquo;re Invited
+        </h2>
+
+        <p className="font-italiana text-2xl sm:text-3xl text-[#5C4F72] tracking-[0.18em]">
+          September 12, 2026
+        </p>
+
+        <div className="flex flex-col items-center gap-1">
+          <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-dark-taupe/70">
+            <span className="text-gold-line">Ceremony</span>
+            &ensp;·&ensp;{VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}
+          </p>
+          <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-dark-taupe/70">
+            <span className="text-gold-line">Reception</span>
+            &ensp;·&ensp;{RECEPTION_VENUE.shortName}&ensp;·&ensp;{RECEPTION_VENUE.neighborhood}
+          </p>
+          <p className="font-work-sans text-sm font-bold tracking-[0.25em] uppercase text-dark-taupe/70 mt-1">
+            {VENUE.city}, {VENUE.state}
+          </p>
+        </div>
+
+        <div className="flex flex-col items-center gap-6 mt-4">
+          <CrossMotif size={64} color="#C3AF82" strokeWidth={5.5} />
+          <CtaBounce />
+        </div>
+      </section>
+
       {/* ── Countdown ────────────────────────────────────── */}
-      <section className="bg-ivory py-20 px-6">
+      <section className="bg-ivory py-16 px-6 border-t border-pale-gold/30">
         <div className="max-w-3xl mx-auto flex flex-col items-center gap-6 text-center">
           <CountdownTimer />
           <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray">
@@ -86,7 +106,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Final section ────────────────────────────────── */}
+      {/* ── Final CTA ────────────────────────────────────── */}
       <section className="bg-ivory py-16 flex flex-col items-center gap-6 text-center px-6">
         <p className="font-lora italic text-base text-deep-ivory max-w-xs leading-relaxed">
           We cannot wait to celebrate with you — please let us know you&rsquo;ll be joining us.

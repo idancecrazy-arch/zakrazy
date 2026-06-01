@@ -65,6 +65,7 @@ export default function RSVPFlow() {
   const [zip, setZip] = useState('')
 
   const [attending, setAttending] = useState<boolean | null>(null)
+  const [welcomeReception, setWelcomeReception] = useState<boolean | null>(null)
   const [plusOneName, setPlusOneName] = useState('')
   const [hasChildren, setHasChildren] = useState(false)
   const [children, setChildren] = useState<Child[]>([])
@@ -86,6 +87,7 @@ export default function RSVPFlow() {
     setGuest(null)
     setUpdateContact(null)
     setAttending(null)
+    setWelcomeReception(null)
     setPlusOneName('')
     setHasChildren(false)
     setChildren([])
@@ -138,6 +140,7 @@ export default function RSVPFlow() {
           plusOneName: guest?.plusOneAllowed ? plusOneName.trim() : undefined,
           children: hasChildren && children.length > 0 ? children : undefined,
           dietaryRestrictions: dietary.trim() || undefined,
+          welcomeReception: attending ? (welcomeReception ?? undefined) : undefined,
         }),
       })
 
@@ -324,6 +327,34 @@ export default function RSVPFlow() {
           {errors.attending && (
             <p className="font-crimson italic text-sm text-muted-rose">{errors.attending}</p>
           )}
+        </div>
+      )}
+
+      {/* ── Welcome Reception (attending only) ───────────── */}
+      {attending === true && (
+        <div className="flex flex-col gap-5">
+          <h2 className={sectionHeadingClass}>Welcome Reception</h2>
+          <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
+            We are hosting a casual welcome reception on <strong>Friday, September 11th</strong>.
+            Will you be joining us?
+          </p>
+          <div className="flex flex-col gap-3" role="group" aria-label="Welcome reception">
+            {[
+              { value: true, label: 'Yes, I\'ll be there' },
+              { value: false, label: 'No, I cannot make it' },
+            ].map(({ value, label }) => (
+              <label key={label} className={checkboxLabel}>
+                <input
+                  type="radio"
+                  name="welcomeReception"
+                  checked={welcomeReception === value}
+                  onChange={() => setWelcomeReception(value)}
+                  className="w-5 h-5 accent-gold-line cursor-pointer flex-shrink-0"
+                />
+                <span className="font-crimson text-base sm:text-lg text-dark-taupe">{label}</span>
+              </label>
+            ))}
+          </div>
         </div>
       )}
 

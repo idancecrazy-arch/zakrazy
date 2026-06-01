@@ -24,6 +24,7 @@ const schema = z.object({
   children: z.array(childSchema).optional(),
   // Other
   dietaryRestrictions: z.string().optional(),
+  welcomeReception: z.boolean().optional(),
 })
 
 export async function POST(req: NextRequest) {
@@ -71,6 +72,7 @@ export async function POST(req: NextRequest) {
     if (data.plusOneName) fields['Plus One Name'] = data.plusOneName
     if (data.children && data.children.length > 0) fields['Children'] = JSON.stringify(data.children)
     if (data.dietaryRestrictions) fields['Dietary Restrictions'] = data.dietaryRestrictions
+    if (data.welcomeReception !== undefined) fields['Welcome Reception'] = data.welcomeReception
   }
 
   const res = await fetch(
