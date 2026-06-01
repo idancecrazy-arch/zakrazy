@@ -39,9 +39,9 @@ export default function HomePage() {
         />
 
         {/* Invitation text — sits above the couple */}
-        <div className="relative flex flex-col items-center gap-2 text-center" style={{ marginTop: '-15vh' }}>
-          <p className="font-work-sans text-white/60 tracking-[0.22em] uppercase"
-            style={{ fontSize: 'clamp(0.5rem, 1.4vw, 0.58rem)' }}>
+        <div className="relative flex flex-col items-center gap-3 text-center" style={{ marginTop: '-15vh' }}>
+          <p className="font-cormorant text-white/70 tracking-[0.28em] uppercase"
+            style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>
             Together with their families
           </p>
           <h1
@@ -50,18 +50,9 @@ export default function HomePage() {
           >
             Christine<br />&amp;<br />Michael
           </h1>
-          <p className="font-italiana text-white/85"
-            style={{ fontSize: 'clamp(0.9rem, 2.4vw, 1.1rem)', letterSpacing: '0.04em', lineHeight: 1.5 }}>
+          <p className="font-cormorant text-white/90 leading-snug"
+            style={{ fontSize: 'clamp(1.2rem, 3.2vw, 1.7rem)', letterSpacing: '0.04em' }}>
             request the honor of your presence<br />at their wedding
-          </p>
-          <div className="w-8 h-px bg-white/35 my-2" />
-          <p className="font-italiana text-white/90"
-            style={{ fontSize: 'clamp(0.9rem, 2.6vw, 1.15rem)', letterSpacing: '0.06em' }}>
-            Saturday, September 12, 2026
-          </p>
-          <p className="font-italiana text-white/60 mt-0.5"
-            style={{ fontSize: 'clamp(0.8rem, 2vw, 0.95rem)', letterSpacing: '0.04em' }}>
-            New York City
           </p>
         </div>
       </section>
