@@ -68,15 +68,15 @@ export default function HomePage() {
         </p>
 
         <div className="flex flex-col items-center gap-1">
-          <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-dark-taupe/70">
+          <p className="font-work-sans text-sm tracking-[0.2em] uppercase text-dark-taupe/70">
             <span className="text-gold-line">Ceremony</span>
             &ensp;·&ensp;{VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}
           </p>
-          <p className="font-work-sans text-[10px] tracking-[0.25em] uppercase text-dark-taupe/70">
+          <p className="font-work-sans text-sm tracking-[0.2em] uppercase text-dark-taupe/70">
             <span className="text-gold-line">Reception</span>
             &ensp;·&ensp;{RECEPTION_VENUE.shortName}&ensp;·&ensp;{RECEPTION_VENUE.neighborhood}
           </p>
-          <p className="font-work-sans text-sm font-bold tracking-[0.25em] uppercase text-dark-taupe/70 mt-1">
+          <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-dark-taupe/70 mt-1">
             {VENUE.city}, {VENUE.state}
           </p>
         </div>
