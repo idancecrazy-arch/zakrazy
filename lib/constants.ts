@@ -47,35 +47,12 @@ export const RSVP_DEADLINE_DISPLAY = 'July 15, 2026'
 
 export const HOTELS = [
   {
-    name: 'Conrad New York Downtown',
-    address: '102 North End Ave, New York, NY 10282',
-    neighborhood: 'Battery Park City',
-    distanceToCeremony: '~2.5 miles to ceremony · ~1 mile to reception',
-    note: 'Primary hotel for getting-ready suites and immediate family.',
-    bookingInfo: 'Visit conradnewyork.com or call (212) 945-0100 to book. Mention the Liu-Zakrajsek wedding for preferred rates.',
-  },
-  {
     name: 'Fairfield by Marriott Financial District',
     address: '99 Washington St, New York, NY 10006',
     neighborhood: 'Financial District',
     distanceToCeremony: '~2 miles to ceremony · ~0.7 miles to reception',
-    note: 'Comfortable, well-priced option with easy subway access.',
-    bookingInfo: 'Book at marriott.com/NYCFF or call 1-800-228-2800. Use group code LZ2026 if available.',
-  },
-  {
-    name: 'Hotel Indigo Lower East Side',
-    address: '171 Ludlow St, New York, NY 10002',
-    neighborhood: 'Lower East Side',
-    distanceToCeremony: '~3 miles to ceremony · ~1.5 miles to reception',
-    note: 'Boutique hotel with a lively neighborhood feel.',
-    bookingInfo: 'Book at ihg.com or call (212) 237-1776.',
-  },
-  {
-    name: 'Wyndham Garden Chinatown',
-    address: '93 Bowery, New York, NY 10002',
-    neighborhood: 'Chinatown',
-    distanceToCeremony: '~2.5 miles to ceremony · ~0.2 miles to reception',
-    note: 'Closest hotel to the reception venue.',
-    bookingInfo: 'Book at wyndham.com or call (212) 226-6898.',
+    note: 'We have arranged a group rate for guests. Booking is entirely optional — please feel free to stay wherever works best for you.',
+    bookingUrl: 'https://www.marriott.com/event-reservations/reservation-link.mi?id=1780494830832&key=GRP&app=resvlink',
+    bookingInfo: 'Use the link below to access our group rate.',
   },
 ] as const
