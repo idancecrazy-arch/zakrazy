@@ -17,7 +17,6 @@ const partyMemberSchema = z.object({
 const schema = z.object({
   guestName: z.string().min(1, 'Name is required'),
   attending: z.boolean(),
-  // Contact update (optional)
   updateContact: z.boolean().optional(),
   email: z.string().email().optional().or(z.literal('')),
   phone: z.string().optional(),
@@ -26,14 +25,33 @@ const schema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   zip: z.string().optional(),
-  // Party
   plusOneName: z.string().optional(),
   children: z.array(childSchema).optional(),
   partyMembers: z.array(partyMemberSchema).optional(),
-  // Other
   dietaryRestrictions: z.string().optional(),
   welcomeReception: z.boolean().optional(),
 })
+
+async function createRecord(
+  base: string,
+  table: string,
+  key: string,
+  fields: Record<string, unknown>,
+): Promise<void> {
+  const res = await fetch(
+    `https://api.airtable.com/v0/${encodeURIComponent(base)}/${encodeURIComponent(table)}`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields }),
+    },
+  )
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '')
+    console.error('Airtable record creation failed:', res.status, errText)
+    throw new Error(`Airtable error ${res.status}`)
+  }
+}
 
 export async function POST(req: NextRequest) {
   let body: unknown
@@ -64,61 +82,51 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Airtable not configured' }, { status: 503 })
   }
 
-  const fields: Record<string, unknown> = {
-    'Guest Name': data.guestName,
-    'RSVP Status': data.attending ? 'Accepted' : 'Declined',
-    'Submitted Timestamp': submittedAt,
-  }
+  try {
+    // Primary guest record
+    const primaryFields: Record<string, unknown> = {
+      'Name': data.guestName,
+      'RSVP Status': data.attending ? 'Accepted' : 'Declined',
+      'Submitted Timestamp': submittedAt,
+    }
+    if (data.updateContact) {
+      if (data.email) primaryFields['Email'] = data.email
+      if (data.phone) primaryFields['Phone'] = data.phone
+      if (data.address1) primaryFields['Address'] = [data.address1, data.address2, data.city, data.state, data.zip].filter(Boolean).join(', ')
+    }
+    if (data.attending) {
+      if (data.children && data.children.length > 0) primaryFields['Children'] = JSON.stringify(data.children)
+      if (data.dietaryRestrictions) primaryFields['Dietary Restrictions'] = data.dietaryRestrictions
+      if (data.welcomeReception !== undefined) primaryFields['Welcome Reception'] = data.welcomeReception
+    }
+    await createRecord(airtableBase, airtableTable, airtableKey, primaryFields)
 
-  if (data.updateContact) {
-    if (data.email) fields['Email'] = data.email
-    if (data.phone) fields['Phone'] = data.phone
-    if (data.address1) fields['Address'] = [data.address1, data.address2, data.city, data.state, data.zip].filter(Boolean).join(', ')
-  }
-
-  if (data.attending) {
-    if (data.plusOneName) fields['Plus One Name'] = data.plusOneName
-    if (data.children && data.children.length > 0) fields['Children'] = JSON.stringify(data.children)
-    if (data.dietaryRestrictions) fields['Dietary Restrictions'] = data.dietaryRestrictions
-    if (data.welcomeReception !== undefined) fields['Welcome Reception'] = data.welcomeReception
-  }
-
-  const res = await fetch(
-    `https://api.airtable.com/v0/${encodeURIComponent(airtableBase)}/${encodeURIComponent(airtableTable)}`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${airtableKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ fields }),
-    },
-  )
-
-  if (!res.ok) {
-    const errText = await res.text()
-    console.error('Airtable RSVP post failed:', errText)
-    return NextResponse.json({ error: 'Failed to save RSVP' }, { status: 502 })
-  }
-
-  // Create one record per additional party member
-  if (data.partyMembers && data.partyMembers.length > 0) {
-    const airtableUrl = `https://api.airtable.com/v0/${encodeURIComponent(airtableBase)}/${encodeURIComponent(airtableTable)}`
-    for (const member of data.partyMembers) {
-      const memberFields: Record<string, unknown> = {
-        'Guest Name': member.name,
+    // Plus-one as its own record
+    if (data.attending && data.plusOneName) {
+      await createRecord(airtableBase, airtableTable, airtableKey, {
+        'Name': data.plusOneName,
         'Primary Guest': data.guestName,
-        'RSVP Status': member.attending ? 'Accepted' : 'Declined',
+        'RSVP Status': 'Accepted',
         'Submitted Timestamp': submittedAt,
-      }
-      if (member.dietaryRestrictions) memberFields['Dietary Restrictions'] = member.dietaryRestrictions
-      if (member.welcomeReception !== undefined) memberFields['Welcome Reception'] = member.welcomeReception
-      await fetch(airtableUrl, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${airtableKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fields: memberFields }),
       })
     }
+
+    // One record per additional party member
+    if (data.partyMembers && data.partyMembers.length > 0) {
+      for (const member of data.partyMembers) {
+        const memberFields: Record<string, unknown> = {
+          'Name': member.name,
+          'Primary Guest': data.guestName,
+          'RSVP Status': member.attending ? 'Accepted' : 'Declined',
+          'Submitted Timestamp': submittedAt,
+        }
+        if (member.dietaryRestrictions) memberFields['Dietary Restrictions'] = member.dietaryRestrictions
+        if (member.welcomeReception !== undefined) memberFields['Welcome Reception'] = member.welcomeReception
+        await createRecord(airtableBase, airtableTable, airtableKey, memberFields)
+      }
+    }
+  } catch {
+    return NextResponse.json({ error: 'Failed to save RSVP' }, { status: 502 })
   }
 
   return NextResponse.json({ success: true }, { status: 200 })
