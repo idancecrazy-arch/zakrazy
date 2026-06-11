@@ -70,9 +70,18 @@ export default function HotelModal({ open, onClose }: HotelModalProps) {
               {hotel.note && (
                 <p className="font-crimson text-base text-dark-taupe/85">{hotel.note}</p>
               )}
-              <p className="font-crimson text-sm text-dark-taupe/70 mt-1 leading-relaxed">
-                {hotel.bookingInfo}
-              </p>
+              {'rates' in hotel && hotel.rates && (
+                <div className="flex flex-col gap-0.5 mt-1">
+                  {(hotel.rates as string).split('\n').map((line: string) => (
+                    <p key={line} className="font-crimson text-sm text-dark-taupe/85">{line}</p>
+                  ))}
+                </div>
+              )}
+              {'accessCode' in hotel && hotel.accessCode && (
+                <p className="font-crimson text-sm text-dark-taupe/70">
+                  Access code: <span className="font-work-sans tracking-widest text-dark-taupe">{hotel.accessCode as string}</span>
+                </p>
+              )}
             </div>
           ))}
 
