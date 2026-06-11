@@ -14,6 +14,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Not configured' }, { status: 503 })
   }
 
+  console.log('Airtable lookup config — base:', airtableBase, 'table:', airtableTable)
+
   const safeSearch = search.replace(/"/g, '').replace(/'/g, '')
   const formula = encodeURIComponent(
     `FIND(LOWER("${safeSearch}"), LOWER({Guest Name})) > 0`,
