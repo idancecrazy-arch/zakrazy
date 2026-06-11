@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
   const airtableKey = process.env.AIRTABLE_API_KEY
   const airtableBase = process.env.AIRTABLE_BASE_ID
-  const airtableTable = process.env.AIRTABLE_GUEST_TABLE ?? 'Guest List'
+  const airtableTable = process.env.AIRTABLE_RSVP_TABLE ?? 'RSVP Responses'
 
   if (!airtableKey || !airtableBase) {
     return NextResponse.json({ error: 'Airtable not configured' }, { status: 503 })

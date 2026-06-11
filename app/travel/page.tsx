@@ -108,11 +108,10 @@ export default function TravelPage() {
 
           <div className="bg-warm-cream/60 border border-pale-gold/50 p-6 flex flex-col gap-3">
             <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-gold-line">
-              Important — Book Early
+              Book Early
             </p>
             <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
-              September 12th is a particularly busy weekend in New York City. We strongly encourage
-              all out-of-town guests to book flights and accommodations as soon as possible.
+              September 12th is a busy weekend in NYC. Book flights and accommodations early.
             </p>
           </div>
 

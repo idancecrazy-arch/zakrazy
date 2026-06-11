@@ -387,7 +387,7 @@ export default function RSVPFlow() {
               value={dietary}
               onChange={(e) => setDietary(e.target.value)}
               rows={3}
-              placeholder="Please list any allergies, vegetarian/vegan preferences, or other dietary restrictions…"
+              placeholder="List any allergies or dietary restrictions…"
               className={`${inputClass} resize-none`}
             />
           </Field>
@@ -401,8 +401,7 @@ export default function RSVPFlow() {
             Travel &amp; Accommodations
           </p>
           <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
-            September 12th is a busy weekend in New York City. We strongly encourage out-of-town
-            guests to book flights and hotels as early as possible — availability is limited.
+            September 12th is a busy weekend in NYC. Book flights and hotels early.
           </p>
           <Link
             href="/travel"
@@ -429,8 +428,7 @@ export default function RSVPFlow() {
           <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-gold-line">Dress Code</p>
           <p className="font-cormorant text-xl text-dark-taupe tracking-wide">Formal Attire</p>
           <p className="font-crimson text-base text-dark-taupe/80 leading-relaxed">
-            Tuxedos or dark suits for gentlemen; evening gowns or formal dresses for ladies.
-            Everything is indoors — no need to worry about outdoor footwear.
+            Tuxedos or dark suits for gentlemen; evening gowns or formal dresses for ladies. Everything is indoors.
           </p>
         </div>
       )}

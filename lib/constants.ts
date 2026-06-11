@@ -39,8 +39,8 @@ export const CHURCH_HISTORY = `
 St. Joseph's Church was built in 1833 and is one of the oldest Roman Catholic church
 buildings in Manhattan still in active use. Designed in the Greek Revival style, the
 church's Doric columns and coffered ceiling create an atmosphere of solemn beauty.
-The Transfiguration altarpiece — bathed in warm candlelight — has witnessed generations
-of faith, devotion, and love in the heart of Greenwich Village.
+The Transfiguration altarpiece, bathed in warm candlelight, has witnessed generations
+of faith and devotion in the heart of Greenwich Village.
 `.trim()
 
 export const RSVP_DEADLINE_DISPLAY = 'August 12, 2026'
@@ -52,7 +52,7 @@ export const HOTELS = [
     neighborhood: 'Battery Park City',
     distanceToCeremony: '~3 miles to ceremony · ~1.5 miles to reception',
     rates: '$429 · Deluxe Suite Two Doubles\n$449 · Hudson River View Suite',
-    note: 'We have arranged a group rate for guests. Booking is entirely optional — please feel free to stay wherever works best for you.',
+    note: 'We have arranged a group rate for guests. Booking is optional. Stay wherever works best for you.',
     bookingUrl: 'https://book.passkey.com/go/LiuZakrajsekWedding',
     accessCode: 'LZWED26',
   },
@@ -62,7 +62,7 @@ export const HOTELS = [
     neighborhood: 'Financial District',
     distanceToCeremony: '~2.5 miles to ceremony · ~0.5 miles to reception',
     rates: '$319 · 1 Queen\n$349 · 2 Queen',
-    note: 'We have arranged a group rate for guests. Booking is entirely optional — please feel free to stay wherever works best for you.',
+    note: 'We have arranged a group rate for guests. Booking is optional. Stay wherever works best for you.',
     bookingUrl: 'https://www.marriott.com/event-reservations/reservation-link.mi?id=1780494830832&key=GRP&app=resvlink',
     accessCode: null,
   },

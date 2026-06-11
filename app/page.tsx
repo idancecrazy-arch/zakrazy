@@ -104,7 +104,7 @@ export default function HomePage() {
       {/* ── Final CTA ────────────────────────────────────── */}
       <section className="bg-ivory py-16 flex flex-col items-center gap-6 text-center px-6">
         <p className="font-lora italic text-base text-deep-ivory max-w-xs leading-relaxed">
-          We cannot wait to celebrate with you — please let us know you&rsquo;ll be joining us.
+          We can&rsquo;t wait to celebrate with you. Please let us know you&rsquo;ll be joining us.
         </p>
         <Link
           href="/rsvp"

@@ -39,13 +39,11 @@ export default async function ThankYouPage({ searchParams }: Props) {
         {/* Attending message */}
         {attending ? (
           <p className="font-lora italic text-lg text-dark-taupe/85 leading-relaxed">
-            Your RSVP has been received. We are so looking forward to celebrating with you
-            on September 12th — it means the world to us.
+            Your RSVP has been received. We can&apos;t wait to see you on September 12th.
           </p>
         ) : (
           <p className="font-lora italic text-lg text-dark-taupe/85 leading-relaxed">
-            We&apos;re sorry you won&apos;t be able to make it, and we appreciate you letting us know.
-            You&apos;ll be in our thoughts on our special day.
+            We&apos;re sorry you can&apos;t make it. You&apos;ll be in our thoughts.
           </p>
         )}
 
@@ -75,7 +73,7 @@ export default async function ThankYouPage({ searchParams }: Props) {
         {/* Hotel note */}
         {attending && wantsHotel && (
           <p className="font-crimson italic text-base text-muted-rose">
-            We&apos;ve noted your interest in hotel accommodations and will be in touch with details.
+            We&apos;ve noted your interest in hotel accommodations.
           </p>
         )}
 

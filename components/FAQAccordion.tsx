@@ -6,32 +6,32 @@ const FAQS = [
   {
     question: 'What is the dress code?',
     answer:
-      'Formal attire. Tuxedos or dark suits for gentlemen; evening gowns or formal dresses for ladies. Everything is indoors, so no need to worry about outdoor footwear.',
+      'Formal attire. Tuxedos or dark suits for gentlemen; evening gowns or formal dresses for ladies. Everything is indoors.',
   },
   {
     question: 'Is the ceremony and reception indoors?',
     answer:
-      'Yes — both the ceremony at St. Joseph\'s Church and the reception at Golden Unicorn are entirely indoors.',
+      'Yes, both the ceremony at St. Joseph\'s Church and the reception at Golden Unicorn are entirely indoors.',
   },
   {
     question: 'How long is the ceremony?',
     answer:
-      'The ceremony is approximately 30–45 minutes. Please plan to arrive a few minutes early so we can begin promptly.',
+      'About 30 to 45 minutes. Please arrive a few minutes early.',
   },
   {
     question: 'Are children welcome?',
     answer:
-      'Children are welcome! Please indicate on your RSVP if children will be joining your party, and let us know if a high chair is needed.',
+      'Children are welcome. Note on your RSVP if children will be attending and if a high chair is needed.',
   },
   {
     question: 'What kind of food will be served at the reception?',
     answer:
-      'Golden Unicorn will be serving a Chinese banquet style dinner. Dishes will be shared family style at your table. Please note any dietary restrictions or allergies on your RSVP so we can work with the venue to accommodate you.',
+      'Golden Unicorn serves a Chinese banquet dinner, family style. Note any dietary restrictions or allergies on your RSVP.',
   },
   {
     question: 'Any tips for getting to New York?',
     answer:
-      'September 12th falls on a busy weekend in New York City with several large events happening that weekend. We strongly recommend booking flights and hotels as early as possible. The local airports are JFK, LGA, and EWR. We also highly recommend the Amtrak train if you are on the eastern seaboard.',
+      'September 12th is a busy weekend in NYC. Book flights and hotels early. Airports: JFK, LGA, and EWR. Amtrak is a great option if you\'re on the East Coast.',
   },
 ] as const
 
