@@ -31,7 +31,7 @@ export default function PhotoCarousel() {
   }, [])
 
   return (
-    <div className="relative w-full h-[70vh] sm:h-[80vh] overflow-hidden">
+    <div className="relative w-full h-[85vh] sm:h-screen overflow-hidden">
       {PHOTOS.map((photo, i) => (
         <div
           key={photo.src}
