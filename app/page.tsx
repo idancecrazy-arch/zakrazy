@@ -4,6 +4,7 @@ import { Metadata } from 'next'
 import CrossMotif from '@/components/CrossMotif'
 import CtaBounce from '@/components/CtaBounce'
 import CountdownTimer from '@/components/CountdownTimer'
+import PhotoCarousel from '@/components/PhotoCarousel'
 import { VENUE, RECEPTION_VENUE } from '@/lib/constants'
 
 export const metadata: Metadata = {
@@ -86,6 +87,9 @@ export default function HomePage() {
           <CtaBounce />
         </div>
       </section>
+
+      {/* ── Photo Carousel ───────────────────────────────── */}
+      <PhotoCarousel />
 
       {/* ── Countdown ────────────────────────────────────── */}
       <section className="bg-ivory py-16 px-6 border-t border-pale-gold/30">

@@ -52,7 +52,7 @@ export default function RSVPPage() {
           </h1>
 
           <p className="font-crimson text-lg sm:text-xl text-dark-taupe/85 max-w-md leading-relaxed">
-            We&apos;re so glad you&apos;re here. Please find your name below and let us know you&apos;ll be joining us.
+            Please find your name below and let us know if you&apos;ll be joining us.
           </p>
         </div>
 

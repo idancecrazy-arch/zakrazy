@@ -43,7 +43,7 @@ The Transfiguration altarpiece — bathed in warm candlelight — has witnessed 
 of faith, devotion, and love in the heart of Greenwich Village.
 `.trim()
 
-export const RSVP_DEADLINE_DISPLAY = 'July 15, 2026'
+export const RSVP_DEADLINE_DISPLAY = 'August 12, 2026'
 
 export const HOTELS = [
   {
