@@ -12,13 +12,10 @@ export default function TravelPage() {
       <div className="max-w-2xl mx-auto">
 
         {/* Header */}
-        <div className="flex flex-col items-center text-center gap-4 mb-14 sm:mb-20">
+        <div className="flex flex-col items-center text-center mb-14 sm:mb-20">
           <h1 className="font-italiana text-4xl sm:text-5xl text-dark-taupe tracking-wide leading-tight">
             Travel &amp; Accommodations
           </h1>
-          <p className="font-crimson text-lg text-dark-taupe/85 max-w-md leading-relaxed">
-            New York City in September is beautiful. Here&apos;s everything you need to plan your stay.
-          </p>
         </div>
 
         {/* Ceremony and Reception */}
@@ -120,14 +117,26 @@ export default function TravelPage() {
           </div>
 
           {HOTELS.map((hotel) => (
-            <div key={hotel.name} className="flex flex-col gap-3">
+            <div key={hotel.name} className="flex flex-col gap-3 pb-8 border-b border-pale-gold/30 last:border-b-0 last:pb-0">
               <p className="font-cormorant text-xl text-dark-taupe tracking-wide">{hotel.name}</p>
               <p className="font-work-sans text-[10px] tracking-[0.18em] uppercase text-gold-line">
                 {hotel.neighborhood}
               </p>
               <p className="font-crimson text-sm text-dark-taupe/70">{hotel.address}</p>
               <p className="font-crimson italic text-sm text-muted-rose">{hotel.distanceToCeremony}</p>
-              <p className="font-crimson text-base text-dark-taupe/85">{hotel.note}</p>
+              {'rates' in hotel && hotel.rates && (
+                <div className="flex flex-col gap-0.5">
+                  {hotel.rates.split('\n').map((line) => (
+                    <p key={line} className="font-crimson text-sm text-dark-taupe/85">{line}</p>
+                  ))}
+                </div>
+              )}
+              {'accessCode' in hotel && hotel.accessCode && (
+                <p className="font-crimson text-sm text-dark-taupe/70">
+                  Access code: <span className="font-work-sans tracking-widest text-dark-taupe">{hotel.accessCode}</span>
+                </p>
+              )}
+              <p className="font-crimson text-sm italic text-dark-taupe/60">{hotel.note}</p>
               {'bookingUrl' in hotel && hotel.bookingUrl && (
                 <a
                   href={hotel.bookingUrl}

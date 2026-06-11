@@ -47,12 +47,23 @@ export const RSVP_DEADLINE_DISPLAY = 'August 12, 2026'
 
 export const HOTELS = [
   {
-    name: 'Fairfield by Marriott Financial District',
-    address: '99 Washington St, New York, NY 10006',
+    name: 'Conrad New York Downtown',
+    address: '102 North End Ave, New York, NY 10282',
+    neighborhood: 'Battery Park City',
+    distanceToCeremony: '~3 miles to ceremony · ~1.5 miles to reception',
+    rates: '$429 · Deluxe Suite Two Doubles\n$449 · Hudson River View Suite',
+    note: 'We have arranged a group rate for guests. Booking is entirely optional — please feel free to stay wherever works best for you.',
+    bookingUrl: 'https://book.passkey.com/go/LiuZakrajsekWedding',
+    accessCode: 'LZWED26',
+  },
+  {
+    name: 'Moxy NYC Downtown',
+    address: '26 Ann St, New York, NY 10038',
     neighborhood: 'Financial District',
-    distanceToCeremony: '~2 miles to ceremony · ~0.7 miles to reception',
+    distanceToCeremony: '~2.5 miles to ceremony · ~0.5 miles to reception',
+    rates: '$319 · 1 Queen\n$349 · 2 Queen',
     note: 'We have arranged a group rate for guests. Booking is entirely optional — please feel free to stay wherever works best for you.',
     bookingUrl: 'https://www.marriott.com/event-reservations/reservation-link.mi?id=1780494830832&key=GRP&app=resvlink',
-    bookingInfo: 'Use the link below to access our group rate.',
+    accessCode: null,
   },
 ] as const
