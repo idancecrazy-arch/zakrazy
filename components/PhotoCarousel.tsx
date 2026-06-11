@@ -4,14 +4,15 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 
 const PHOTOS = [
-  { src: '/gallery-0208.jpg', alt: 'Christine & Michael' },
-  { src: '/gallery-0136.jpg', alt: 'Christine & Michael' },
-  { src: '/gallery-0274.jpg', alt: 'Christine & Michael' },
-  { src: '/gallery-0248.jpg', alt: 'Christine & Michael' },
   { src: '/gallery-0231.jpg', alt: 'Christine & Michael' },
+  { src: '/gallery-0248.jpg', alt: 'Christine & Michael' },
   { src: '/gallery-0305.jpg', alt: 'Christine & Michael' },
   { src: '/gallery-0180.jpg', alt: 'Christine & Michael' },
-  { src: '/gallery-0377.jpg', alt: 'Christine & Michael' },
+  { src: '/gallery-0234.jpg', alt: 'Christine & Michael' },
+  { src: '/gallery-0396.jpg', alt: 'Christine & Michael' },
+  { src: '/gallery-0235.jpg', alt: 'Christine & Michael' },
+  { src: '/gallery-0423.jpg', alt: 'Christine & Michael' },
+  { src: '/gallery-0031.jpg', alt: 'Christine & Michael' },
 ]
 
 export default function PhotoCarousel() {

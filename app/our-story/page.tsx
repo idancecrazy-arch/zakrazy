@@ -16,6 +16,7 @@ const MONTAGE = [
   { src: '/gallery-0208.jpg', tall: false },
   { src: '/gallery-0274.jpg', tall: true },
   { src: '/gallery-0031.jpg', tall: false },
+  { src: '/gallery-0124.jpg', tall: true },
   { src: '/gallery-0248.jpg', tall: false },
   { src: '/gallery-0231.jpg', tall: false },
   { src: '/gallery-0234.jpg', tall: false },

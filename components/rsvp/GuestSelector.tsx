@@ -37,11 +37,17 @@ export default function GuestSelector({ onSelect, onClear, selected, error }: Gu
       setLoading(true)
       try {
         const res = await fetch(`/api/rsvp/guests?search=${encodeURIComponent(query)}`)
+        if (!res.ok) {
+          setResults([])
+          setOpen(true)
+          return
+        }
         const data = await res.json() as { records?: GuestRecord[] }
         setResults(data.records ?? [])
         setOpen(true)
       } catch {
         setResults([])
+        setOpen(true)
       } finally {
         setLoading(false)
       }

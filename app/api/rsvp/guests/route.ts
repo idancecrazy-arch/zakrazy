@@ -14,8 +14,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Not configured' }, { status: 503 })
   }
 
+  const safeSearch = search.replace(/"/g, '').replace(/'/g, '')
   const formula = encodeURIComponent(
-    `SEARCH(LOWER("${search.replace(/"/g, '')}"), LOWER({Guest Name}))`,
+    `FIND(LOWER("${safeSearch}"), LOWER({Guest Name})) > 0`,
   )
   const fields = ['Guest Name', 'Plus One Allowed'].map((f) => `fields[]=${encodeURIComponent(f)}`).join('&')
   const url = `https://api.airtable.com/v0/${encodeURIComponent(airtableBase)}/${encodeURIComponent(airtableTable)}?filterByFormula=${formula}&${fields}&maxRecords=10`
