@@ -18,9 +18,9 @@ export async function GET(req: NextRequest) {
 
   const safeSearch = search.replace(/"/g, '').replace(/'/g, '')
   const formula = encodeURIComponent(
-    `FIND(LOWER("${safeSearch}"), LOWER({Guest Name})) > 0`,
+    `FIND(LOWER("${safeSearch}"), LOWER({Name})) > 0`,
   )
-  const fields = ['Guest Name', 'Plus One Allowed'].map((f) => `fields[]=${encodeURIComponent(f)}`).join('&')
+  const fields = ['Name', 'Plus One Allowed'].map((f) => `fields[]=${encodeURIComponent(f)}`).join('&')
   const url = `https://api.airtable.com/v0/${encodeURIComponent(airtableBase)}/${encodeURIComponent(airtableTable)}?filterByFormula=${formula}&${fields}&maxRecords=10`
 
   const res = await fetch(url, {
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
   const data = await res.json() as { records: { id: string; fields: Record<string, unknown> }[] }
   const records = (data.records ?? []).map((r) => ({
     id: r.id,
-    name: r.fields['Guest Name'] as string,
+    name: r.fields['Name'] as string,
     plusOneAllowed: Boolean(r.fields['Plus One Allowed']),
   }))
 
