@@ -7,6 +7,13 @@ const childSchema = z.object({
   highChair: z.boolean(),
 })
 
+const partyMemberSchema = z.object({
+  name: z.string().min(1),
+  attending: z.boolean(),
+  dietaryRestrictions: z.string().optional(),
+  welcomeReception: z.boolean().optional(),
+})
+
 const schema = z.object({
   guestName: z.string().min(1, 'Name is required'),
   attending: z.boolean(),
@@ -22,6 +29,7 @@ const schema = z.object({
   // Party
   plusOneName: z.string().optional(),
   children: z.array(childSchema).optional(),
+  partyMembers: z.array(partyMemberSchema).optional(),
   // Other
   dietaryRestrictions: z.string().optional(),
   welcomeReception: z.boolean().optional(),
@@ -91,6 +99,26 @@ export async function POST(req: NextRequest) {
     const errText = await res.text()
     console.error('Airtable RSVP post failed:', errText)
     return NextResponse.json({ error: 'Failed to save RSVP' }, { status: 502 })
+  }
+
+  // Create one record per additional party member
+  if (data.partyMembers && data.partyMembers.length > 0) {
+    const airtableUrl = `https://api.airtable.com/v0/${encodeURIComponent(airtableBase)}/${encodeURIComponent(airtableTable)}`
+    for (const member of data.partyMembers) {
+      const memberFields: Record<string, unknown> = {
+        'Guest Name': member.name,
+        'Primary Guest': data.guestName,
+        'RSVP Status': member.attending ? 'Accepted' : 'Declined',
+        'Submitted Timestamp': submittedAt,
+      }
+      if (member.dietaryRestrictions) memberFields['Dietary Restrictions'] = member.dietaryRestrictions
+      if (member.welcomeReception !== undefined) memberFields['Welcome Reception'] = member.welcomeReception
+      await fetch(airtableUrl, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${airtableKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: memberFields }),
+      })
+    }
   }
 
   return NextResponse.json({ success: true }, { status: 200 })

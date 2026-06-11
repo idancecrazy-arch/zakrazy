@@ -6,6 +6,7 @@ export interface GuestRecord {
   id: string
   name: string
   plusOneAllowed: boolean
+  partySize: number
 }
 
 interface GuestSelectorProps {

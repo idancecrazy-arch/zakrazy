@@ -14,13 +14,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Not configured' }, { status: 503 })
   }
 
-  console.log('Airtable lookup config — base:', airtableBase, 'table:', airtableTable)
-
   const safeSearch = search.replace(/"/g, '').replace(/'/g, '')
   const formula = encodeURIComponent(
     `FIND(LOWER("${safeSearch}"), LOWER({Name})) > 0`,
   )
-  const fields = ['Name', 'Plus One Allowed'].map((f) => `fields[]=${encodeURIComponent(f)}`).join('&')
+  const fields = ['Name', 'Plus One Allowed', 'Total Party Size'].map((f) => `fields[]=${encodeURIComponent(f)}`).join('&')
   const url = `https://api.airtable.com/v0/${encodeURIComponent(airtableBase)}/${encodeURIComponent(airtableTable)}?filterByFormula=${formula}&${fields}&maxRecords=10`
 
   const res = await fetch(url, {
@@ -39,6 +37,7 @@ export async function GET(req: NextRequest) {
     id: r.id,
     name: r.fields['Name'] as string,
     plusOneAllowed: Boolean(r.fields['Plus One Allowed']),
+    partySize: typeof r.fields['Total Party Size'] === 'number' ? r.fields['Total Party Size'] : 1,
   }))
 
   return NextResponse.json({ records })

@@ -71,16 +71,26 @@ export default function RSVPFlow() {
   const [children, setChildren] = useState<Child[]>([])
   const [dietary, setDietary] = useState('')
 
+  interface PartyMember { name: string; attending: boolean | null; dietary: string; welcomeReception: boolean | null }
+  const [partyMembers, setPartyMembers] = useState<PartyMember[]>([])
+
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [childErrors, setChildErrors] = useState<string[]>([])
+  const [memberErrors, setMemberErrors] = useState<string[]>([])
 
   const guestSelected = guest !== null
 
   const handleGuestSelect = (g: GuestRecord) => {
     setGuest(g)
     setPlusOneName('')
+    setPartyMembers(
+      g.partySize > 1
+        ? Array.from({ length: g.partySize - 1 }, () => ({ name: '', attending: null, dietary: '', welcomeReception: null }))
+        : []
+    )
     setErrors({})
+    setMemberErrors([])
   }
 
   const handleGuestClear = () => {
@@ -92,29 +102,41 @@ export default function RSVPFlow() {
     setHasChildren(false)
     setChildren([])
     setDietary('')
+    setPartyMembers([])
     setErrors({})
+    setMemberErrors([])
+  }
+
+  const updateMember = (i: number, patch: Partial<{ name: string; attending: boolean | null; dietary: string; welcomeReception: boolean | null }>) => {
+    setPartyMembers(prev => prev.map((m, idx) => idx === i ? { ...m, ...patch } : m))
   }
 
   const validate = () => {
     const e: Record<string, string> = {}
     const ce: string[] = []
+    const me: string[] = []
 
     if (!guest) e.guest = 'Please find your name to continue.'
     if (updateContact === null && guestSelected) e.updateContact = 'Please answer this question.'
     if (attending === null && guestSelected) e.attending = 'Please let us know if you\'ll be attending.'
 
     if (attending) {
-      if (guest?.plusOneAllowed && !plusOneName.trim()) e.plusOneName = 'Please enter your plus one\'s name.'
+      if (guest?.plusOneAllowed && partyMembers.length === 0 && !plusOneName.trim()) e.plusOneName = 'Please enter your plus one\'s name.'
       if (hasChildren) {
         children.forEach((c, i) => {
           if (!c.name.trim() || !c.age.trim()) ce[i] = 'Please complete name and age.'
         })
       }
+      partyMembers.forEach((m, i) => {
+        if (!m.name.trim()) me[i] = 'Please enter this guest\'s name.'
+        else if (m.attending === null) me[i] = 'Please indicate if this guest will attend.'
+      })
     }
 
     setErrors(e)
     setChildErrors(ce)
-    return Object.keys(e).length === 0 && ce.filter(Boolean).length === 0
+    setMemberErrors(me)
+    return Object.keys(e).length === 0 && ce.filter(Boolean).length === 0 && me.filter(Boolean).length === 0
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,8 +159,14 @@ export default function RSVPFlow() {
           city: updateContact ? city : undefined,
           state: updateContact ? state : undefined,
           zip: updateContact ? zip : undefined,
-          plusOneName: guest?.plusOneAllowed ? plusOneName.trim() : undefined,
+          plusOneName: guest?.plusOneAllowed && partyMembers.length === 0 ? plusOneName.trim() : undefined,
           children: hasChildren && children.length > 0 ? children : undefined,
+          partyMembers: partyMembers.length > 0 ? partyMembers.map(m => ({
+            name: m.name.trim(),
+            attending: m.attending ?? false,
+            dietaryRestrictions: m.dietary.trim() || undefined,
+            welcomeReception: m.welcomeReception ?? undefined,
+          })) : undefined,
           dietaryRestrictions: dietary.trim() || undefined,
           welcomeReception: attending ? (welcomeReception ?? undefined) : undefined,
         }),
@@ -358,8 +386,8 @@ export default function RSVPFlow() {
         </div>
       )}
 
-      {/* ── Party (attending only) ────────────────────────── */}
-      {attending === true && (
+      {/* ── Party (attending only, single guests only) ───── */}
+      {attending === true && partyMembers.length === 0 && (
         <div className="flex flex-col gap-5">
           <h2 className={sectionHeadingClass}>Your Party</h2>
           <PartyComposition
@@ -372,6 +400,81 @@ export default function RSVPFlow() {
             onChildrenChange={setChildren}
             errors={{ plusOneName: errors.plusOneName, children: childErrors }}
           />
+        </div>
+      )}
+
+      {/* ── Additional Party Members ─────────────────────── */}
+      {attending === true && partyMembers.length > 0 && (
+        <div className="flex flex-col gap-6">
+          <h2 className={sectionHeadingClass}>Your Party</h2>
+          <p className="font-crimson text-base text-dark-taupe/85">
+            Your reservation is for {(guest?.partySize ?? 1)} guests. Please RSVP for each person below.
+          </p>
+          {partyMembers.map((member, i) => (
+            <div key={i} className="flex flex-col gap-4 border border-pale-gold/40 p-5 bg-warm-cream/30">
+              <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-gold-line">
+                Guest {i + 2}
+              </p>
+              <Field label="Full Name" error={memberErrors[i]}>
+                <input
+                  type="text"
+                  value={member.name}
+                  onChange={(e) => updateMember(i, { name: e.target.value })}
+                  placeholder="First and last name"
+                  className={inputClass}
+                />
+              </Field>
+              <div className="flex flex-col gap-2">
+                <span className="font-work-sans text-xs tracking-[0.12em] uppercase text-dark-taupe/85 font-medium">Will they be attending?</span>
+                <div className="flex flex-col gap-2">
+                  {([{ value: true, label: 'Joyfully accepts' }, { value: false, label: 'Regretfully declines' }] as const).map(({ value, label }) => (
+                    <label key={label} className={checkboxLabel}>
+                      <input
+                        type="radio"
+                        name={`member-attending-${i}`}
+                        checked={member.attending === value}
+                        onChange={() => updateMember(i, { attending: value })}
+                        className="w-5 h-5 accent-gold-line cursor-pointer flex-shrink-0"
+                      />
+                      <span className="font-crimson text-base text-dark-taupe">{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              {member.attending === true && (
+                <>
+                  <div className="flex flex-col gap-2">
+                    <span className="font-work-sans text-xs tracking-[0.12em] uppercase text-dark-taupe/85 font-medium">
+                      Welcome Reception <span className="ml-2 normal-case tracking-normal font-crimson italic text-sm text-muted-rose">optional</span>
+                    </span>
+                    <div className="flex flex-col gap-2">
+                      {([{ value: true, label: 'Yes, I\'ll be there' }, { value: false, label: 'No, can\'t make it' }] as const).map(({ value, label }) => (
+                        <label key={label} className={checkboxLabel}>
+                          <input
+                            type="radio"
+                            name={`member-welcome-${i}`}
+                            checked={member.welcomeReception === value}
+                            onChange={() => updateMember(i, { welcomeReception: value })}
+                            className="w-5 h-5 accent-gold-line cursor-pointer flex-shrink-0"
+                          />
+                          <span className="font-crimson text-base text-dark-taupe">{label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <Field label="Dietary Restrictions" optional>
+                    <textarea
+                      value={member.dietary}
+                      onChange={(e) => updateMember(i, { dietary: e.target.value })}
+                      rows={2}
+                      placeholder="List any allergies or dietary restrictions…"
+                      className={`${inputClass} resize-none`}
+                    />
+                  </Field>
+                </>
+              )}
+            </div>
+          ))}
         </div>
       )}
 
