@@ -27,6 +27,8 @@ export async function GET(req: NextRequest) {
   })
 
   if (!res.ok) {
+    const errBody = await res.text().catch(() => '')
+    console.error('Airtable guest lookup failed:', res.status, errBody)
     return NextResponse.json({ error: 'Lookup failed' }, { status: 502 })
   }
 
