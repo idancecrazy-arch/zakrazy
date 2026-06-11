@@ -500,9 +500,7 @@ export default function RSVPFlow() {
       {/* ── Travel & Accommodations (attending only) ─────── */}
       {attending === true && (
         <div className="flex flex-col gap-4 bg-warm-cream/40 border border-pale-gold/30 p-5">
-          <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-gold-line">
-            Travel &amp; Accommodations
-          </p>
+          <h2 className={sectionHeadingClass}>Travel &amp; Accommodations</h2>
           <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
             September 12th is a busy weekend in NYC. Book flights and hotels early.
           </p>
@@ -528,10 +526,9 @@ export default function RSVPFlow() {
       {/* ── Dress Code (attending only) ───────────────────── */}
       {attending === true && (
         <div className="flex flex-col gap-3 bg-warm-cream/40 border border-pale-gold/30 p-5">
-          <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-gold-line">Dress Code</p>
-          <p className="font-cormorant text-xl text-dark-taupe tracking-wide">Formal Attire</p>
+          <h2 className={sectionHeadingClass}>Dress Code</h2>
           <p className="font-crimson text-base text-dark-taupe/80 leading-relaxed">
-            Tuxedos or dark suits for gentlemen; evening gowns or formal dresses for ladies. Everything is indoors.
+            Formal Attire: Suits and cocktail dresses.
           </p>
         </div>
       )}

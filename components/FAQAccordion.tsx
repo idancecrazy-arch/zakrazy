@@ -6,7 +6,7 @@ const FAQS = [
   {
     question: 'What is the dress code?',
     answer:
-      'Formal attire. Tuxedos or dark suits for gentlemen; evening gowns or formal dresses for ladies. Everything is indoors.',
+      'Formal Attire: Suits and cocktail dresses.',
   },
   {
     question: 'Is the ceremony and reception indoors?',
