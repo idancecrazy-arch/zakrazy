@@ -121,7 +121,7 @@ const inputClass = `
 `
 
 const sectionHeadingClass =
-  'font-italiana text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50'
+  'font-cormorant text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50'
 
 export default function DetailForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -156,7 +156,7 @@ export default function DetailForm() {
     return (
       <div className="flex flex-col items-center gap-8 text-center py-12 px-6">
         <div className="flex flex-col gap-3">
-          <h2 className="font-italiana text-4xl text-dark-taupe tracking-wide">
+          <h2 className="font-cormorant text-4xl text-dark-taupe tracking-wide">
             Thank you, {submittedName}!
           </h2>
           <p className="font-lora italic text-lg text-dark-taupe/85 max-w-md leading-relaxed">

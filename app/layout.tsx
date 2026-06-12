@@ -2,21 +2,41 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import {
   Cinzel_Decorative,
+  Cormorant_Garamond,
   Crimson_Pro,
   IM_Fell_English,
   Cinzel,
+  Great_Vibes,
 } from 'next/font/google'
 import './globals.css'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
 import { COUPLE, VENUE, SITE_URL } from '@/lib/constants'
 
+// Hero / couple-name display font
 const balzak = localFont({
   src: [
     { path: '../public/Balzak.woff', weight: '400', style: 'normal' },
     { path: '../public/Balzak.otf', weight: '400', style: 'normal' },
   ],
   variable: '--font-italiana',
+  display: 'swap',
+})
+
+// Readable serif for logistical section headers
+const cormorant = Cormorant_Garamond({
+  weight: ['300', '400', '500', '600'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+  variable: '--font-cormorant',
+  display: 'swap',
+})
+
+// Invitation script
+const greatVibes = Great_Vibes({
+  weight: ['400'],
+  subsets: ['latin'],
+  variable: '--font-great-vibes',
   display: 'swap',
 })
 
@@ -55,6 +75,8 @@ const cinzel = Cinzel({
 
 const fontVars = [
   balzak.variable,
+  cormorant.variable,
+  greatVibes.variable,
   cinzelDecorative.variable,
   crimsonPro.variable,
   imFellEnglish.variable,
@@ -64,14 +86,14 @@ const fontVars = [
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `Save the Date — ${COUPLE.displayNames} · September 12, 2026`,
+    default: `${COUPLE.displayNames} · September 12, 2026`,
     template: `%s — ${COUPLE.displayNames}`,
   },
-  description: `${COUPLE.displayNames} are getting married on September 12, 2026 at ${VENUE.shortName} in ${VENUE.neighborhood}, ${VENUE.city}. Save the date!`,
+  description: `${COUPLE.displayNames} are getting married on September 12, 2026 at ${VENUE.shortName} in ${VENUE.neighborhood}, ${VENUE.city}. Please RSVP!`,
   openGraph: {
     type: 'website',
     siteName: `${COUPLE.displayNames} Wedding`,
-    title: `Save the Date — ${COUPLE.displayNames} · September 12, 2026`,
+    title: `${COUPLE.displayNames} · September 12, 2026`,
     description: `Join us in celebrating the marriage of ${COUPLE.displayNames} on September 12, 2026 at ${VENUE.shortName}, Greenwich Village, New York.`,
   },
   icons: {
