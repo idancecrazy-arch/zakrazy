@@ -6,7 +6,7 @@ const FAQS = [
   {
     question: 'What is the dress code?',
     answer:
-      'Formal Attire: Suits and cocktail dresses.',
+      'Formal Attire: We kindly request guests wear suits and cocktail dresses comfortable for the season (September will hopefully be temperate and mild). Tuxes and gowns are welcome, and traditional attire is also encouraged!',
   },
   {
     question: 'Is the ceremony and reception indoors?',
@@ -16,22 +16,22 @@ const FAQS = [
   {
     question: 'How long is the ceremony?',
     answer:
-      'About 30 to 45 minutes. Please arrive a few minutes early.',
+      'It will be long! We\'re expecting the ceremony to end by 3pm, giving some time back to guests to wander and travel before cocktail hour starts at the Golden Unicorn at 5pm. Please arrive by 1:30pm to enjoy a selection of choral music arranged by our organist. We will start promptly at 2pm.',
   },
   {
     question: 'Are children welcome?',
     answer:
-      'Children are welcome. Note on your RSVP if children will be attending and if a high chair is needed.',
+      'Children are welcome at both the ceremony and reception. Please note on your RSVP if children will be attending and if a high chair or dietary restrictions are needed.',
   },
   {
     question: 'What kind of food will be served at the reception?',
     answer:
-      'Golden Unicorn serves a Chinese banquet dinner, family style. Note any dietary restrictions or allergies on your RSVP.',
+      'We will be sharing the menu closer to our wedding date. Golden Unicorn serves a Chinese banquet dinner, family style. Please note any dietary restrictions or allergies on your RSVP.',
   },
   {
     question: 'Any tips for getting to New York?',
     answer:
-      'September 12th is a busy weekend in NYC. Book flights and hotels early. Airports: JFK, LGA, and EWR. Amtrak is a great option if you\'re on the East Coast.',
+      'September 12th is a busy weekend in NYC. We encourage guests to book flights and hotels early. The best airports are: JFK (check for construction related traffic delays getting to and from this airport), LGA, and EWR. Amtrak is a great option if you\'re on the East Coast!',
   },
 ] as const
 
