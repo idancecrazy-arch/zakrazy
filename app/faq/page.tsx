@@ -1,6 +1,5 @@
 import { Metadata } from 'next'
 import FAQAccordion from '@/components/FAQAccordion'
-import FeatherDivider from '@/components/FeatherDivider'
 
 export const metadata: Metadata = {
   title: 'FAQ',
@@ -20,10 +19,6 @@ export default function FAQPage() {
           <h1 className="font-italiana text-4xl sm:text-5xl text-dark-taupe tracking-wide leading-tight">
             Frequently Asked Questions
           </h1>
-          <p className="font-crimson text-lg text-dark-taupe/85 max-w-md leading-relaxed">
-            Everything you need to know for a wonderful day.
-          </p>
-          <FeatherDivider />
         </div>
 
         {/* FAQ */}

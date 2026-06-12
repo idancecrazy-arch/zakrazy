@@ -35,9 +35,6 @@ export default function OurStoryPage() {
         <h1 className="font-italiana text-5xl sm:text-6xl text-dark-taupe tracking-wide leading-tight">
           Our<br />Story
         </h1>
-        <p className="font-lora italic text-lg text-deep-ivory leading-relaxed max-w-xs">
-          A few moments from the beginning.
-        </p>
       </div>
 
       {/* Montage grid */}

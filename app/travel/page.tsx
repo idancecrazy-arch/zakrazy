@@ -57,9 +57,6 @@ export default function TravelPage() {
                 {RECEPTION_VENUE.neighborhood}<br />
                 {RECEPTION_VENUE.city}, {RECEPTION_VENUE.state} {RECEPTION_VENUE.zip}
               </p>
-              <p className="font-crimson italic text-sm text-muted-rose">
-                Family-style dining · Indoors
-              </p>
               <a
                 href={RECEPTION_VENUE.googleMapsUrl}
                 target="_blank"
@@ -111,7 +108,7 @@ export default function TravelPage() {
               Book Early
             </p>
             <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
-              September 12th is a busy weekend in NYC. Book flights and accommodations early.
+              We highly recommend booking flights and hotels early. That weekend is the start of NYFW, which drives up travel prices significantly.
             </p>
           </div>
 

@@ -47,9 +47,6 @@ export default function CeremonyReceptionDetails() {
         <p className="font-crimson text-base text-dark-taupe/80">
           Cocktail hour starts at 5pm.
         </p>
-        <p className="font-crimson italic text-sm text-muted-rose">
-          Family-style dining · Everything is indoors
-        </p>
         <a
           href={RECEPTION_VENUE.googleMapsUrl}
           target="_blank"
