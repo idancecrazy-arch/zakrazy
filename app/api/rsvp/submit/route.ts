@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
   try {
     // Primary guest record
     const primaryFields: Record<string, unknown> = {
-      'Name': data.guestName,
+      'Guest Name': data.guestName,
       'RSVP Status': data.attending ? 'Accepted' : 'Declined',
       'Submitted Timestamp': submittedAt,
     }
@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
     if (data.partyMembers && data.partyMembers.length > 0) {
       for (const member of data.partyMembers) {
         const memberFields: Record<string, unknown> = {
-          'Name': member.name,
+          'Guest Name': member.name,
           'Primary Guest': data.guestName,
           'RSVP Status': member.attending ? 'Accepted' : 'Declined',
           'Submitted Timestamp': submittedAt,
