@@ -528,7 +528,7 @@ export default function RSVPFlow() {
         <div className="flex flex-col gap-3 bg-warm-cream/40 border border-pale-gold/30 p-5">
           <h2 className={sectionHeadingClass}>Dress Code</h2>
           <p className="font-crimson text-base text-dark-taupe/80 leading-relaxed">
-            Formal Attire: Suits and cocktail dresses.
+            Semi-formal Attire: Suits and cocktail dresses.
           </p>
         </div>
       )}

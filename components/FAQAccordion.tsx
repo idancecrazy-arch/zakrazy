@@ -6,7 +6,7 @@ const FAQS = [
   {
     question: 'What is the dress code?',
     answer:
-      'Formal Attire: We kindly request guests wear suits and cocktail dresses comfortable for the season (September will hopefully be temperate and mild). Tuxes and gowns are welcome, and traditional attire is also encouraged!',
+      'Semi-formal Attire: We kindly request guests wear suits and cocktail dresses comfortable for the season (September will hopefully be temperate and mild). Tuxes and gowns are welcome, and traditional attire is also encouraged!',
   },
   {
     question: 'Is the ceremony and reception indoors?',
