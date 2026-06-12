@@ -16,19 +16,40 @@ interface RSVPStats {
   dietaryList: string[]
 }
 
+interface Submission {
+  id: string
+  name: string
+  status: string
+  submittedAt?: string
+  createdTime: string
+  email?: string
+}
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<RSVPStats | null>(null)
+  const [submissions, setSubmissions] = useState<Submission[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
-    fetch('/api/admin/rsvp-stats')
-      .then((r) => {
-        if (!r.ok) throw new Error('Failed to load')
-        return r.json() as Promise<RSVPStats>
+    Promise.all([
+      fetch('/api/admin/rsvp-stats')
+        .then((r) => {
+          if (!r.ok) throw new Error('Failed to load stats')
+          return r.json() as Promise<RSVPStats>
+        }),
+      fetch('/api/admin/submission-logs')
+        .then((r) => {
+          if (!r.ok) throw new Error('Failed to load submissions')
+          return r.json() as Promise<{ submissions: Submission[] }>
+        })
+    ])
+      .then(([statsData, submissionsData]) => {
+        setStats(statsData)
+        setSubmissions(submissionsData.submissions)
       })
-      .then(setStats)
-      .catch(() => setError('Failed to load RSVP data. Please refresh.'))
+      .catch(() => setError('Failed to load data. Please refresh.'))
       .finally(() => setLoading(false))
   }, [])
 
@@ -140,6 +161,77 @@ export default function AdminDashboard() {
               </li>
             ))}
           </ul>
+        )}
+      </div>
+
+      {/* Recent submissions log */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between pb-2 border-b border-pale-gold/50">
+          <h2 className="font-cormorant text-2xl text-dark-taupe tracking-wide">
+            Recent Submissions ({submissions.length})
+          </h2>
+          <button
+            onClick={async () => {
+              setRefreshing(true)
+              try {
+                const res = await fetch('/api/admin/submission-logs')
+                if (res.ok) {
+                  const data = await res.json() as { submissions: Submission[] }
+                  setSubmissions(data.submissions)
+                }
+              } catch (e) {
+                console.error('Failed to refresh:', e)
+              } finally {
+                setRefreshing(false)
+              }
+            }}
+            disabled={refreshing}
+            className="font-work-sans text-[10px] tracking-[0.2em] uppercase px-3 py-1.5 border border-soft-gray/40 text-soft-gray hover:text-gold-line hover:border-gold-line transition-colors disabled:opacity-50 rounded"
+            title="Refresh submissions"
+          >
+            {refreshing ? 'Refreshing…' : '↻ Refresh'}
+          </button>
+        </div>
+        {submissions.length === 0 ? (
+          <p className="font-crimson italic text-base text-deep-ivory">No submissions yet.</p>
+        ) : (
+          <div className="border border-soft-gray/20 rounded overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-pale-gold/10 border-b border-soft-gray/20">
+                  <th className="text-left px-4 py-2 font-work-sans text-[10px] tracking-[0.2em] uppercase text-dark-taupe">Name</th>
+                  <th className="text-left px-4 py-2 font-work-sans text-[10px] tracking-[0.2em] uppercase text-dark-taupe">Status</th>
+                  <th className="text-left px-4 py-2 font-work-sans text-[10px] tracking-[0.2em] uppercase text-dark-taupe">Email</th>
+                  <th className="text-left px-4 py-2 font-work-sans text-[10px] tracking-[0.2em] uppercase text-dark-taupe">Submitted</th>
+                </tr>
+              </thead>
+              <tbody>
+                {submissions.map((sub) => (
+                  <tr key={sub.id} className="border-b border-soft-gray/10 hover:bg-warm-cream/30">
+                    <td className="px-4 py-3 font-crimson text-dark-taupe">{sub.name}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-flex px-2 py-1 text-[10px] font-work-sans tracking-wider uppercase rounded ${
+                        sub.status === 'Accepted' ? 'bg-dusty-lilac/20 text-dusty-lilac' :
+                        sub.status === 'Declined' ? 'bg-muted-rose/20 text-muted-rose' :
+                        'bg-soft-gray/20 text-soft-gray'
+                      }`}>
+                        {sub.status || 'Pending'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 font-crimson text-deep-ivory text-sm">{sub.email || '—'}</td>
+                    <td className="px-4 py-3 font-work-sans text-[11px] text-soft-gray">
+                      {sub.submittedAt ? new Date(sub.submittedAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      }) : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
