@@ -84,12 +84,15 @@ export default function RSVPFlow() {
   const handleGuestSelect = (g: GuestRecord) => {
     setGuest(g)
     setPlusOneName('')
+    setHasChildren(false)
+    setChildren([])
     setPartyMembers(
       g.partySize > 1
         ? Array.from({ length: g.partySize - 1 }, () => ({ name: '', attending: null, dietary: '', welcomeReception: null }))
         : []
     )
     setErrors({})
+    setChildErrors([])
     setMemberErrors([])
   }
 
@@ -121,7 +124,6 @@ export default function RSVPFlow() {
     if (attending === null && guestSelected) e.attending = 'Please let us know if you\'ll be attending.'
 
     if (attending) {
-      if (guest?.plusOneAllowed && partyMembers.length === 0 && !plusOneName.trim()) e.plusOneName = 'Please enter your plus one\'s name.'
       if (hasChildren) {
         children.forEach((c, i) => {
           if (!c.name.trim() || !c.age.trim()) ce[i] = 'Please complete name and age.'
@@ -364,7 +366,8 @@ export default function RSVPFlow() {
           <h2 className={sectionHeadingClass}>Welcome Reception</h2>
           <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
             We are hosting a casual welcome reception on <strong>Friday, September 11th</strong>.
-            Will you be joining us?
+            Will you be joining us?{' '}
+            <span className="font-lora italic text-muted-rose">optional</span>
           </p>
           <div className="flex flex-col gap-3" role="group" aria-label="Welcome reception">
             {[
@@ -475,6 +478,16 @@ export default function RSVPFlow() {
               )}
             </div>
           ))}
+          <PartyComposition
+            plusOneAllowed={false}
+            plusOneName=""
+            hasChildren={hasChildren}
+            children={children}
+            onPlusOneNameChange={setPlusOneName}
+            onChildrenToggle={setHasChildren}
+            onChildrenChange={setChildren}
+            errors={{ children: childErrors }}
+          />
         </div>
       )}
 
