@@ -24,6 +24,7 @@ export default function GuestSelector({ onSelect, onClear, selected, error }: Gu
   const [results, setResults] = useState<GuestRecord[]>([])
   const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
+  const [apiError, setApiError] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -40,14 +41,17 @@ export default function GuestSelector({ onSelect, onClear, selected, error }: Gu
         const res = await fetch(`/api/rsvp/guests?search=${encodeURIComponent(query)}`)
         if (!res.ok) {
           setResults([])
+          setApiError(true)
           setOpen(true)
           return
         }
+        setApiError(false)
         const data = await res.json() as { records?: GuestRecord[] }
         setResults(data.records ?? [])
         setOpen(true)
       } catch {
         setResults([])
+        setApiError(true)
         setOpen(true)
       } finally {
         setLoading(false)
@@ -97,7 +101,19 @@ export default function GuestSelector({ onSelect, onClear, selected, error }: Gu
           {loading && (
             <p className="font-crimson italic text-sm text-dark-taupe/60 px-4 py-3">Searching…</p>
           )}
-          {!loading && results.length === 0 && (
+          {!loading && apiError && (
+            <div className="px-4 py-4 flex flex-col gap-1">
+              <p className="font-crimson text-base text-dark-taupe/80">Something went wrong searching the guest list.</p>
+              <p className="font-crimson italic text-sm text-muted-rose">
+                Please try again or{' '}
+                <a href="mailto:christineandmichaelzak@gmail.com" className="underline hover:text-dark-taupe">
+                  contact us
+                </a>{' '}
+                for help.
+              </p>
+            </div>
+          )}
+          {!loading && !apiError && results.length === 0 && (
             <div className="px-4 py-4 flex flex-col gap-1">
               <p className="font-crimson text-base text-dark-taupe/80">No match found for &ldquo;{query}&rdquo;.</p>
               <p className="font-crimson italic text-sm text-muted-rose">
@@ -109,7 +125,7 @@ export default function GuestSelector({ onSelect, onClear, selected, error }: Gu
               </p>
             </div>
           )}
-          {!loading && results.map((guest) => (
+          {!loading && !apiError && results.map((guest) => (
             <button
               key={guest.id}
               type="button"
