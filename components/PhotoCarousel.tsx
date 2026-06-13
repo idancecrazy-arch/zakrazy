@@ -35,14 +35,14 @@ export default function PhotoCarousel() {
       {PHOTOS.map((photo, i) => (
         <div
           key={photo.src}
-          className="absolute inset-0 transition-opacity duration-700"
+          className="absolute inset-0 transition-opacity duration-700 bg-[#faf6f0]"
           style={{ opacity: i === current ? (fading ? 0 : 1) : 0 }}
         >
           <Image
             src={photo.src}
             alt={photo.alt}
             fill
-            className="object-cover object-center"
+            className="object-contain object-center"
             priority={i === 0}
           />
         </div>
