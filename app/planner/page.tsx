@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { Reorder, useDragControls } from 'framer-motion'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -1037,6 +1038,7 @@ function VendorsSection({
 // ── Main dashboard ─────────────────────────────────────────────────────────────
 
 export default function PlannerDashboard() {
+  const router = useRouter()
   const [deadlines, setDeadlines] = useState<Deadline[]>(INITIAL_DEADLINES)
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
   const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(INITIAL_BUDGET_ITEMS)
@@ -1090,13 +1092,9 @@ export default function PlannerDashboard() {
   const addVendor = () =>
     setVendors(p => [...p, { id: uid(), vendor: 'New Vendor', service: '', category: 'Other', contact: '', phone: '', email: '', budget: '', status: 'pending', notes: '' }])
 
-  const commitNewCategory = () => {
-    const trimmed = newCatValue.trim()
-    if (trimmed && !categories.includes(trimmed)) {
-      setCategoriesD(prev => [...prev, trimmed])
-    }
-    setNewCatValue('')
-    setAddingCategory(false)
+  const handleLogout = async () => {
+    await fetch('/api/planner-auth/logout', { method: 'POST' })
+    router.push('/planner/login')
   }
 
   const doneTasks = tasks.filter(t => t.status === 'done').length
