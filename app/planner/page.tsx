@@ -1090,14 +1090,7 @@ export default function PlannerDashboard() {
   const addVendor = () =>
     setVendors(p => [...p, { id: uid(), vendor: 'New Vendor', service: '', category: 'Other', contact: '', phone: '', email: '', budget: '', status: 'pending', notes: '' }])
 
-  const commitNewCategory = () => {
-    const trimmed = newCatValue.trim()
-    if (trimmed && !categories.includes(trimmed)) {
-      setCategoriesD(prev => [...prev, trimmed])
-    }
-    setNewCatValue('')
-    setAddingCategory(false)
-  }
+
 
   const doneTasks = tasks.filter(t => t.status === 'done').length
   const inProgress = tasks.filter(t => t.status === 'in-progress').length
