@@ -363,8 +363,11 @@ export default function RSVPFlow() {
         <div className="flex flex-col gap-5">
           <h2 className={sectionHeadingClass}>Welcome Reception</h2>
           <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
-            We are hosting a casual welcome reception on <strong>Friday, September 11th</strong>.
+            We are hosting a casual welcome reception on <strong>Friday, September 11th evening</strong>.
             Will you be joining us?
+          </p>
+          <p className="font-crimson italic text-sm text-dark-taupe/70">
+            More details to follow.
           </p>
           <div className="flex flex-col gap-3" role="group" aria-label="Welcome reception">
             {[
