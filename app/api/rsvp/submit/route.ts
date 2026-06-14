@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
   try {
     // Primary guest record
     const primaryFields: Record<string, unknown> = {
-      'Name': data.guestName,
+      'Guest Name': data.guestName,
       'RSVP Status': data.attending ? 'Accepted' : 'Declined',
       'Submitted Timestamp': submittedAt,
     }
@@ -95,27 +95,18 @@ export async function POST(req: NextRequest) {
       if (data.address1) primaryFields['Address'] = [data.address1, data.address2, data.city, data.state, data.zip].filter(Boolean).join(', ')
     }
     if (data.attending) {
+      if (data.plusOneName) primaryFields['Plus One Name'] = data.plusOneName
       if (data.children && data.children.length > 0) primaryFields['Children'] = JSON.stringify(data.children)
       if (data.dietaryRestrictions) primaryFields['Dietary Restrictions'] = data.dietaryRestrictions
       if (data.welcomeReception !== undefined) primaryFields['Welcome Reception'] = data.welcomeReception
     }
     await createRecord(airtableBase, airtableTable, airtableKey, primaryFields)
 
-    // Plus-one as its own record
-    if (data.attending && data.plusOneName) {
-      await createRecord(airtableBase, airtableTable, airtableKey, {
-        'Name': data.plusOneName,
-        'Primary Guest': data.guestName,
-        'RSVP Status': 'Accepted',
-        'Submitted Timestamp': submittedAt,
-      })
-    }
-
     // One record per additional party member
     if (data.partyMembers && data.partyMembers.length > 0) {
       for (const member of data.partyMembers) {
         const memberFields: Record<string, unknown> = {
-          'Name': member.name,
+          'Guest Name': member.name,
           'Primary Guest': data.guestName,
           'RSVP Status': member.attending ? 'Accepted' : 'Declined',
           'Submitted Timestamp': submittedAt,
@@ -125,7 +116,8 @@ export async function POST(req: NextRequest) {
         await createRecord(airtableBase, airtableTable, airtableKey, memberFields)
       }
     }
-  } catch {
+  } catch (err) {
+    console.error('RSVP save failed:', err)
     return NextResponse.json({ error: 'Failed to save RSVP' }, { status: 502 })
   }
 
