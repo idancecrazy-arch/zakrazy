@@ -226,115 +226,8 @@ export default function RSVPFlow() {
         />
       </div>
 
-      {/* ── Contact Info ─────────────────────────────────── */}
-      {guestSelected && (
-        <div className="flex flex-col gap-5">
-          <h2 className={sectionHeadingClass}>Contact Information</h2>
-          <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
-            Do you need to update your email, phone, or mailing address?
-          </p>
-          <div className="flex flex-col gap-3" role="group" aria-label="Contact update">
-            {[
-              { value: false, label: 'No, my info is up to date' },
-              { value: true, label: 'Yes, I\'d like to update my details' },
-            ].map(({ value, label }) => (
-              <label key={label} className={checkboxLabel}>
-                <input
-                  type="radio"
-                  name="updateContact"
-                  checked={updateContact === value}
-                  onChange={() => setUpdateContact(value)}
-                  className="w-5 h-5 accent-gold-line cursor-pointer flex-shrink-0"
-                />
-                <span className="font-crimson text-base sm:text-lg text-dark-taupe">{label}</span>
-              </label>
-            ))}
-          </div>
-          {errors.updateContact && (
-            <p className="font-crimson italic text-sm text-muted-rose">{errors.updateContact}</p>
-          )}
-
-          {updateContact === true && (
-            <div className="flex flex-col gap-5 pt-2">
-              <Field label="Email Address" optional>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  autoComplete="email"
-                  className={inputClass}
-                />
-              </Field>
-              <Field label="Phone Number" optional>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+1 (212) 555-0100"
-                  autoComplete="tel"
-                  className={inputClass}
-                />
-              </Field>
-              <Field label="Street Address" optional>
-                <input
-                  type="text"
-                  value={address1}
-                  onChange={(e) => setAddress1(e.target.value)}
-                  placeholder="123 Main Street"
-                  autoComplete="address-line1"
-                  className={inputClass}
-                />
-              </Field>
-              <Field label="Apt / Suite" optional>
-                <input
-                  type="text"
-                  value={address2}
-                  onChange={(e) => setAddress2(e.target.value)}
-                  placeholder="Apt 4B"
-                  autoComplete="address-line2"
-                  className={inputClass}
-                />
-              </Field>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <Field label="City" optional>
-                  <input
-                    type="text"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="New York"
-                    autoComplete="address-level2"
-                    className={inputClass}
-                  />
-                </Field>
-                <Field label="State" optional>
-                  <input
-                    type="text"
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    placeholder="NY"
-                    autoComplete="address-level1"
-                    className={inputClass}
-                  />
-                </Field>
-                <Field label="ZIP" optional>
-                  <input
-                    type="text"
-                    value={zip}
-                    onChange={(e) => setZip(e.target.value)}
-                    placeholder="10001"
-                    autoComplete="postal-code"
-                    className={`${inputClass} col-span-2 sm:col-span-1`}
-                  />
-                </Field>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* ── Attending ────────────────────────────────────── */}
-      {guestSelected && updateContact !== null && (
+      {guestSelected && (
         <div className="flex flex-col gap-5">
           <h2 className={sectionHeadingClass}>Will You Be Attending?</h2>
           <div className="flex flex-col gap-3" role="group" aria-label="Attendance">
@@ -529,7 +422,7 @@ export default function RSVPFlow() {
       )}
 
       {/* ── Event Details ─────────────────────────────────── */}
-      {guestSelected && updateContact !== null && attending !== null && (
+      {guestSelected && attending !== null && (
         <div className="flex flex-col gap-5">
           <h2 className={sectionHeadingClass}>Event Details</h2>
           <CeremonyReceptionDetails />
@@ -546,6 +439,113 @@ export default function RSVPFlow() {
         </div>
       )}
 
+      {/* ── Contact Info ─────────────────────────────────── */}
+      {guestSelected && attending !== null && (
+        <div className="flex flex-col gap-5">
+          <h2 className={sectionHeadingClass}>Contact Information</h2>
+          <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
+            Do you need to update your email, phone, or mailing address?
+          </p>
+          <div className="flex flex-col gap-3" role="group" aria-label="Contact update">
+            {[
+              { value: false, label: 'No, my info is up to date' },
+              { value: true, label: 'Yes, I\'d like to update my details' },
+            ].map(({ value, label }) => (
+              <label key={label} className={checkboxLabel}>
+                <input
+                  type="radio"
+                  name="updateContact"
+                  checked={updateContact === value}
+                  onChange={() => setUpdateContact(value)}
+                  className="w-5 h-5 accent-gold-line cursor-pointer flex-shrink-0"
+                />
+                <span className="font-crimson text-base sm:text-lg text-dark-taupe">{label}</span>
+              </label>
+            ))}
+          </div>
+          {errors.updateContact && (
+            <p className="font-crimson italic text-sm text-muted-rose">{errors.updateContact}</p>
+          )}
+
+          {updateContact === true && (
+            <div className="flex flex-col gap-5 pt-2">
+              <Field label="Email Address" optional>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  autoComplete="email"
+                  className={inputClass}
+                />
+              </Field>
+              <Field label="Phone Number" optional>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+1 (212) 555-0100"
+                  autoComplete="tel"
+                  className={inputClass}
+                />
+              </Field>
+              <Field label="Street Address" optional>
+                <input
+                  type="text"
+                  value={address1}
+                  onChange={(e) => setAddress1(e.target.value)}
+                  placeholder="123 Main Street"
+                  autoComplete="address-line1"
+                  className={inputClass}
+                />
+              </Field>
+              <Field label="Apt / Suite" optional>
+                <input
+                  type="text"
+                  value={address2}
+                  onChange={(e) => setAddress2(e.target.value)}
+                  placeholder="Apt 4B"
+                  autoComplete="address-line2"
+                  className={inputClass}
+                />
+              </Field>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <Field label="City" optional>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="New York"
+                    autoComplete="address-level2"
+                    className={inputClass}
+                  />
+                </Field>
+                <Field label="State" optional>
+                  <input
+                    type="text"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    placeholder="NY"
+                    autoComplete="address-level1"
+                    className={inputClass}
+                  />
+                </Field>
+                <Field label="ZIP" optional>
+                  <input
+                    type="text"
+                    value={zip}
+                    onChange={(e) => setZip(e.target.value)}
+                    placeholder="10001"
+                    autoComplete="postal-code"
+                    className={`${inputClass} col-span-2 sm:col-span-1`}
+                  />
+                </Field>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Error ────────────────────────────────────────── */}
       {status === 'error' && (
         <p className="font-crimson italic text-muted-rose text-sm text-center">
@@ -557,7 +557,7 @@ export default function RSVPFlow() {
       )}
 
       {/* ── Submit ───────────────────────────────────────── */}
-      {guestSelected && updateContact !== null && attending !== null && (
+      {guestSelected && attending !== null && (
         <div className="flex justify-center pt-2">
           <button
             type="submit"

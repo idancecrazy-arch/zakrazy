@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { CONTACT_EMAIL } from '@/lib/constants'
+import CalendarDownload from '@/components/rsvp/CalendarDownload'
 
 export const metadata: Metadata = {
   title: 'Thank You',
@@ -76,6 +77,9 @@ export default async function ThankYouPage({ searchParams }: Props) {
             We&apos;ve noted your interest in hotel accommodations.
           </p>
         )}
+
+        {/* Calendar downloads */}
+        {attending && <CalendarDownload />}
 
         {/* Contact info */}
         <div className="flex flex-col gap-2">
