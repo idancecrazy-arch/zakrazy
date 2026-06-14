@@ -120,7 +120,6 @@ export default function RSVPFlow() {
     const me: string[] = []
 
     if (!guest) e.guest = 'Please find your name to continue.'
-    if (updateContact === null && guestSelected) e.updateContact = 'Please answer this question.'
     if (attending === null && guestSelected) e.attending = 'Please let us know if you\'ll be attending.'
 
     if (attending) {
@@ -163,7 +162,7 @@ export default function RSVPFlow() {
           zip: updateContact ? zip : undefined,
           plusOneName: guest?.plusOneAllowed && partyMembers.length === 0 ? plusOneName.trim() : undefined,
           children: hasChildren && children.length > 0 ? children : undefined,
-          partyMembers: partyMembers.length > 0 ? partyMembers.map(m => ({
+          partyMembers: attending && partyMembers.length > 0 ? partyMembers.map(m => ({
             name: m.name.trim(),
             attending: m.attending ?? false,
             dietaryRestrictions: m.dietary.trim() || undefined,

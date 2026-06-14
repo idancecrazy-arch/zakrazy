@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
 
     const submissions = (data.records ?? []).map((r) => ({
       id: r.id,
-      name: r.fields['Name'] as string,
+      name: r.fields['Guest Name'] as string,
       status: r.fields['RSVP Status'] as string,
       submittedAt: r.fields['Submitted Timestamp'] as string | undefined,
       createdTime: r.createdTime,

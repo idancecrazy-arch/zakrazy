@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   const airtableKey = process.env.AIRTABLE_API_KEY
   const airtableBase = process.env.AIRTABLE_BASE_ID
-  const airtableTable = process.env.AIRTABLE_GUEST_TABLE ?? 'Guest List'
+  const airtableTable = process.env.AIRTABLE_RSVP_TABLE ?? 'table_2'
 
   if (!airtableKey || !airtableBase) {
     return NextResponse.json({ error: 'Airtable not configured' }, { status: 503 })
@@ -24,12 +24,12 @@ export async function GET(req: NextRequest) {
     const url = new URL(
       `https://api.airtable.com/v0/${encodeURIComponent(airtableBase)}/${encodeURIComponent(airtableTable)}`,
     )
-    url.searchParams.set('fields[]', 'Guest Name')
-    url.searchParams.set('fields[]', 'RSVP Status')
-    url.searchParams.set('fields[]', 'Plus One Name')
-    url.searchParams.set('fields[]', 'Children')
-    url.searchParams.set('fields[]', 'Dietary Restrictions')
-    url.searchParams.set('fields[]', 'Hotel Interest')
+    url.searchParams.append('fields[]', 'Guest Name')
+    url.searchParams.append('fields[]', 'RSVP Status')
+    url.searchParams.append('fields[]', 'Plus One Name')
+    url.searchParams.append('fields[]', 'Children')
+    url.searchParams.append('fields[]', 'Dietary Restrictions')
+    url.searchParams.append('fields[]', 'Hotel Interest')
     if (offset) url.searchParams.set('offset', offset)
 
     const res = await fetch(url.toString(), {

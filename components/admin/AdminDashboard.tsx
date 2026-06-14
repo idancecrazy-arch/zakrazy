@@ -249,9 +249,6 @@ export default function AdminDashboard() {
         >
           Download CSV
         </a>
-        <p className="font-crimson italic text-xs text-deep-ivory">
-          Note: The CSV export uses the Submissions table. Ensure ADMIN_SECRET is set for the export endpoint.
-        </p>
       </div>
     </div>
   )
