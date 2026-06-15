@@ -34,6 +34,7 @@ type BudgetItem = {
   item: string
   cost: string
   paid: boolean
+  dueDate?: string
 }
 
 type GuestScenario = {
@@ -60,6 +61,20 @@ type Vendor = {
 
 let _seq = 0
 const uid = () => `${Date.now()}-${++_seq}`
+
+// Returns [low, high] numeric values from a cost string like "$20,300–$23,500"
+function parseCostRange(cost: string): [number, number] {
+  const nums = cost.replace(/[$,]/g, '').match(/\d+/g)
+  if (!nums || nums.length === 0) return [0, 0]
+  const low = parseInt(nums[0], 10)
+  const high = parseInt(nums[nums.length - 1], 10)
+  return [low, high]
+}
+
+function formatRange(low: number, high: number): string {
+  if (low === high) return '$' + low.toLocaleString()
+  return '$' + low.toLocaleString() + '–$' + high.toLocaleString()
+}
 
 // ── Initial Data ───────────────────────────────────────────────────────────────
 
@@ -692,6 +707,108 @@ function TasksSection({
   )
 }
 
+// ── Payment schedule ───────────────────────────────────────────────────────────
+
+function PaymentSchedule({
+  items, onUpdateItem,
+}: {
+  items: BudgetItem[]
+  onUpdateItem: (id: string, patch: Partial<BudgetItem>) => void
+}) {
+  const pending = items.filter(i => !i.paid)
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const scheduled = pending
+    .filter(i => i.dueDate)
+    .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime())
+
+  const unscheduled = pending.filter(i => !i.dueDate)
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory">
+          Payment Schedule
+        </h3>
+        <p className="font-crimson italic text-xs text-soft-gray/60">
+          Tap date to edit
+        </p>
+      </div>
+
+      {pending.length === 0 ? (
+        <p className="font-crimson italic text-sm text-soft-gray/50 text-center py-4">All payments complete!</p>
+      ) : (
+        <div className="space-y-6">
+          {scheduled.length > 0 && (
+            <div className="relative">
+              <div className="absolute left-3 top-2 bottom-2 w-px bg-soft-gray/25" />
+              <div className="flex flex-col gap-3 pl-10">
+                {scheduled.map(item => {
+                  const d = new Date(item.dueDate!)
+                  const isPast = d < today
+                  const isUrgent = !isPast && (d.getTime() - today.getTime()) < 30 * 24 * 60 * 60 * 1000
+                  return (
+                    <div key={item.id} className="relative">
+                      <div className={`absolute -left-7 top-3 w-3 h-3 rounded-full ring-2 ring-ivory ${
+                        isPast ? 'bg-muted-rose' : isUrgent ? 'bg-gold-line' : 'bg-pale-gold'
+                      }`} />
+                      <div className={`border rounded-lg px-4 py-3 ${
+                        isPast ? 'border-muted-rose/30 bg-muted-rose/5' :
+                        isUrgent ? 'border-gold-line/40 bg-pale-gold/10' :
+                        'border-soft-gray/20 bg-warm-cream'
+                      }`}>
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <EditableText
+                              value={item.dueDate!}
+                              onChange={v => onUpdateItem(item.id, { dueDate: v || undefined })}
+                              className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray block mb-0.5"
+                            />
+                            <p className="font-crimson text-base text-dark-taupe truncate">{item.item}</p>
+                          </div>
+                          <p className="font-crimson text-sm text-deep-ivory flex-shrink-0">{item.cost}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {unscheduled.length > 0 && (
+            <div>
+              {scheduled.length > 0 && (
+                <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray/40 mb-2">
+                  No Date Set
+                </p>
+              )}
+              <div className="flex flex-col gap-2">
+                {unscheduled.map(item => (
+                  <div key={item.id} className="border border-soft-gray/15 rounded-lg px-4 py-3 bg-warm-cream/50 flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <EditableText
+                        value={item.dueDate ?? ''}
+                        onChange={v => onUpdateItem(item.id, { dueDate: v || undefined })}
+                        placeholder="set due date…"
+                        className="font-work-sans text-[9px] tracking-[0.15em] uppercase text-soft-gray/50 block mb-0.5"
+                      />
+                      <p className="font-crimson text-base text-dark-taupe truncate">{item.item}</p>
+                    </div>
+                    <p className="font-crimson text-sm text-deep-ivory flex-shrink-0">{item.cost}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Budget section ─────────────────────────────────────────────────────────────
 
 function BudgetSection({
@@ -711,11 +828,40 @@ function BudgetSection({
   const paidItems = items.filter(i => i.paid)
   const pendingItems = items.filter(i => !i.paid)
 
+  const paidTotal = paidItems.reduce((sum, i) => {
+    const [low] = parseCostRange(i.cost)
+    return sum + low
+  }, 0)
+
+  const [remainingLow, remainingHigh] = pendingItems.reduce<[number, number]>(([lo, hi], i) => {
+    const [l, h] = parseCostRange(i.cost)
+    return [lo + l, hi + h]
+  }, [0, 0])
+
+  const totalLow = paidTotal + remainingLow
+  const totalHigh = paidTotal + remainingHigh
+
   return (
     <section>
       <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-line mb-5">
         Budget Tracker
       </h2>
+
+      {/* Totals banner */}
+      <div className="grid grid-cols-3 gap-3 mb-7 bg-warm-cream border border-soft-gray/20 rounded-lg p-4">
+        <div>
+          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Paid</p>
+          <p className="font-crimson text-xl sm:text-2xl text-gold-line leading-none">{formatRange(paidTotal, paidTotal)}</p>
+        </div>
+        <div>
+          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Remaining</p>
+          <p className="font-crimson text-xl sm:text-2xl text-muted-rose leading-none">{formatRange(remainingLow, remainingHigh)}</p>
+        </div>
+        <div>
+          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Total Estimate</p>
+          <p className="font-crimson text-xl sm:text-2xl text-dark-taupe leading-none">{formatRange(totalLow, totalHigh)}</p>
+        </div>
+      </div>
 
       <div className="grid sm:grid-cols-2 gap-5 mb-8">
         {/* Paid column */}
@@ -732,6 +878,13 @@ function BudgetSection({
           <div className="border border-soft-gray/20 rounded overflow-hidden">
             {paidItems.map((item, i) => (
               <div key={item.id} className={`flex items-center gap-2 px-3 py-2.5 group/bi ${i % 2 === 0 ? 'bg-ivory' : 'bg-warm-cream'}`}>
+                <button
+                  onClick={() => onUpdateItem(item.id, { paid: false })}
+                  className="text-gold-line/60 hover:text-soft-gray transition-colors flex-shrink-0 text-xs w-5 h-5 flex items-center justify-center"
+                  title="Unmark paid"
+                >
+                  ✓
+                </button>
                 <EditableText
                   value={item.item}
                   onChange={v => onUpdateItem(item.id, { item: v })}
@@ -742,13 +895,6 @@ function BudgetSection({
                   onChange={v => onUpdateItem(item.id, { cost: v })}
                   className="font-crimson text-sm text-deep-ivory text-right flex-shrink-0"
                 />
-                <button
-                  onClick={() => onUpdateItem(item.id, { paid: false })}
-                  className="text-gold-line hover:text-soft-gray transition-colors flex-shrink-0 text-xs w-5 h-5 flex items-center justify-center"
-                  title="Move to pending"
-                >
-                  ✓
-                </button>
                 <button
                   onClick={() => onDeleteItem(item.id)}
                   className="text-soft-gray/25 hover:text-muted-rose transition-colors text-base flex-shrink-0 w-5 h-5 flex items-center justify-center opacity-0 group-hover/bi:opacity-100"
@@ -778,6 +924,13 @@ function BudgetSection({
           <div className="border border-soft-gray/20 rounded overflow-hidden">
             {pendingItems.map((item, i) => (
               <div key={item.id} className={`flex items-center gap-2 px-3 py-2.5 group/bi ${i % 2 === 0 ? 'bg-ivory' : 'bg-warm-cream'}`}>
+                <button
+                  onClick={() => onUpdateItem(item.id, { paid: true })}
+                  className="text-soft-gray/30 hover:text-gold-line transition-colors flex-shrink-0 text-xs w-5 h-5 flex items-center justify-center"
+                  title="Mark as paid"
+                >
+                  ✓
+                </button>
                 <EditableText
                   value={item.item}
                   onChange={v => onUpdateItem(item.id, { item: v })}
@@ -788,13 +941,6 @@ function BudgetSection({
                   onChange={v => onUpdateItem(item.id, { cost: v })}
                   className="font-crimson text-sm text-deep-ivory text-right flex-shrink-0"
                 />
-                <button
-                  onClick={() => onUpdateItem(item.id, { paid: true })}
-                  className="text-soft-gray/40 hover:text-gold-line transition-colors flex-shrink-0 text-xs w-5 h-5 flex items-center justify-center"
-                  title="Mark as paid"
-                >
-                  ○
-                </button>
                 <button
                   onClick={() => onDeleteItem(item.id)}
                   className="text-soft-gray/25 hover:text-muted-rose transition-colors text-base flex-shrink-0 w-5 h-5 flex items-center justify-center opacity-0 group-hover/bi:opacity-100"
@@ -809,6 +955,11 @@ function BudgetSection({
             )}
           </div>
         </div>
+      </div>
+
+      {/* Payment schedule */}
+      <div className="mb-8">
+        <PaymentSchedule items={items} onUpdateItem={onUpdateItem} />
       </div>
 
       {/* Reception scenarios */}
