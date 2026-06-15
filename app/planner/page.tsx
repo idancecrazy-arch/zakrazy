@@ -226,18 +226,22 @@ function EditableText({
   const cancel = () => { setEditing(false); setDraft(value) }
 
   if (editing) {
+    // Wrap in a span that carries the flex/grid positioning (className) so the
+    // input's w-full is scoped to that span rather than the entire row/container.
     return (
-      <input
-        autoFocus
-        value={draft}
-        onChange={e => setDraft(e.target.value)}
-        onBlur={save}
-        onKeyDown={e => {
-          if (e.key === 'Enter') { e.preventDefault(); save() }
-          if (e.key === 'Escape') cancel()
-        }}
-        className={`${className} bg-warm-cream border-b border-gold-line outline-none w-full min-w-0`}
-      />
+      <span className={className}>
+        <input
+          autoFocus
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onBlur={save}
+          onKeyDown={e => {
+            if (e.key === 'Enter') { e.preventDefault(); save() }
+            if (e.key === 'Escape') cancel()
+          }}
+          className="bg-warm-cream border-b border-gold-line outline-none w-full min-w-0 block"
+        />
+      </span>
     )
   }
 
