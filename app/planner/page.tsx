@@ -1444,44 +1444,54 @@ export default function PlannerDashboard() {
         </div>
 
         {/* Active section */}
-        {activeSection === 'timeline' && (
-          <TimelineSection
-            deadlines={deadlines}
-            onUpdate={updateDeadline}
-            onDelete={deleteDeadline}
-            onAdd={addDeadline}
-            onAddBullet={addBullet}
-            onUpdateBullet={updateBullet}
-            onDeleteBullet={deleteBullet}
-          />
-        )}
-        {activeSection === 'tasks' && (
-          <TasksSection
-            tasks={tasks}
-            onUpdate={updateTask}
-            onDelete={deleteTask}
-            onAdd={addTask}
-          />
-        )}
-        {activeSection === 'budget' && (
-          <BudgetSection
-            items={budgetItems}
-            scenarios={scenarios}
-            onUpdateItem={updateBudgetItem}
-            onDeleteItem={deleteBudgetItem}
-            onAddItem={addBudgetItem}
-            onUpdateScenario={updateScenario}
-            onDeleteScenario={deleteScenario}
-            onAddScenario={addScenario}
-          />
-        )}
-        {activeSection === 'vendors' && (
-          <VendorsSection
-            vendors={vendors}
-            onUpdate={updateVendor}
-            onDelete={deleteVendor}
-            onAdd={addVendor}
-          />
+        {!initialized ? (
+          <div className="flex items-center justify-center py-20">
+            <p className="font-work-sans text-[9px] tracking-[0.3em] uppercase text-soft-gray/50 animate-pulse">
+              Loading…
+            </p>
+          </div>
+        ) : (
+          <>
+            {activeSection === 'timeline' && (
+              <TimelineSection
+                deadlines={deadlines}
+                onUpdate={updateDeadline}
+                onDelete={deleteDeadline}
+                onAdd={addDeadline}
+                onAddBullet={addBullet}
+                onUpdateBullet={updateBullet}
+                onDeleteBullet={deleteBullet}
+              />
+            )}
+            {activeSection === 'tasks' && (
+              <TasksSection
+                tasks={tasks}
+                onUpdate={updateTask}
+                onDelete={deleteTask}
+                onAdd={addTask}
+              />
+            )}
+            {activeSection === 'budget' && (
+              <BudgetSection
+                items={budgetItems}
+                scenarios={scenarios}
+                onUpdateItem={updateBudgetItem}
+                onDeleteItem={deleteBudgetItem}
+                onAddItem={addBudgetItem}
+                onUpdateScenario={updateScenario}
+                onDeleteScenario={deleteScenario}
+                onAddScenario={addScenario}
+              />
+            )}
+            {activeSection === 'vendors' && (
+              <VendorsSection
+                vendors={vendors}
+                onUpdate={updateVendor}
+                onDelete={deleteVendor}
+                onAdd={addVendor}
+              />
+            )}
+          </>
         )}
 
         <div className="mt-10 pt-5 border-t border-soft-gray/20 text-center">
