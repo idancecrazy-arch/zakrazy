@@ -178,19 +178,20 @@ const INITIAL_TASKS: Task[] = [
 ]
 
 const INITIAL_BUDGET_ITEMS: BudgetItem[] = [
-  { id: 'bi1',  item: 'Marriage class',               cost: '$195',            paid: true },
-  { id: 'bi2',  item: 'Wedding dress',                cost: '$3,380',          paid: true },
-  { id: 'bi3',  item: 'Website',                      cost: '$100',            paid: true },
-  { id: 'bi4',  item: 'Church ceremony fee',          cost: '$2,500',          paid: true },
-  { id: 'bi5',  item: 'Reception deposit',            cost: '$500',            paid: true },
-  { id: 'bi6',  item: 'Save the Date',                cost: '$0',              paid: true },
-  { id: 'bi7',  item: 'Marriage prep class',          cost: '$200',            paid: false },
-  { id: 'bi8',  item: 'Reception (remaining balance)',cost: '$20,300–$23,500', paid: false },
-  { id: 'bi9',  item: 'Photography (6 hrs)',          cost: '$3,000',          paid: false },
-  { id: 'bi10', item: 'DJ',                           cost: '$3,000',          paid: false },
-  { id: 'bi11', item: 'Florals',                      cost: '$3,000',          paid: false },
-  { id: 'bi12', item: 'Lion dancers',                 cost: '$1,000',          paid: false },
-  { id: 'bi13', item: 'Ceremony music – Jin Krista',  cost: '$2,000',          paid: false },
+  { id: 'bi1',  item: 'Marriage class',                         cost: '$195',              paid: true },
+  { id: 'bi2',  item: 'Wedding dress',                          cost: '$3,380',            paid: true },
+  { id: 'bi3',  item: 'Website',                                cost: '$100',              paid: true },
+  { id: 'bi4',  item: 'Church ceremony fee',                    cost: '$2,500',            paid: true },
+  { id: 'bi5',  item: 'Reception deposit',                      cost: '$500',              paid: true },
+  { id: 'bi6',  item: 'Save the Date',                          cost: '$0',                paid: true },
+  { id: 'bi7',  item: 'Marriage prep class',                    cost: '$200',              paid: false },
+  { id: 'bi8',  item: 'Reception (remaining balance)',          cost: '$20,300–$23,500',   paid: false },
+  { id: 'bi14', item: 'Urban Peony Events (Day-of Coordinator)',cost: '$1,750',            paid: false, dueDate: '2026-08-12' },
+  { id: 'bi9',  item: 'Stephen Elkins (Photography)',           cost: '$500',              paid: false, dueDate: '2026-08-13' },
+  { id: 'bi11', item: 'Floweret LLC (Florals)',                 cost: '$1,653.54',         paid: false, dueDate: '2026-08-13' },
+  { id: 'bi10', item: 'Mama Juke (Band)',                       cost: '$2,200',            paid: false, dueDate: '2026-09-12' },
+  { id: 'bi12', item: 'Chinese Freemasons (Lion Dance)',        cost: '$700',              paid: false, dueDate: '2026-09-12' },
+  { id: 'bi13', item: 'Ceremony music – Jin Krista',            cost: '$2,000',            paid: false },
 ]
 
 const INITIAL_SCENARIOS: GuestScenario[] = [
@@ -226,18 +227,22 @@ function EditableText({
   const cancel = () => { setEditing(false); setDraft(value) }
 
   if (editing) {
+    // Wrap in a span that carries the flex/grid positioning (className) so the
+    // input's w-full is scoped to that span rather than the entire row/container.
     return (
-      <input
-        autoFocus
-        value={draft}
-        onChange={e => setDraft(e.target.value)}
-        onBlur={save}
-        onKeyDown={e => {
-          if (e.key === 'Enter') { e.preventDefault(); save() }
-          if (e.key === 'Escape') cancel()
-        }}
-        className={`${className} bg-warm-cream border-b border-gold-line outline-none w-full min-w-0`}
-      />
+      <span className={className}>
+        <input
+          autoFocus
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onBlur={save}
+          onKeyDown={e => {
+            if (e.key === 'Enter') { e.preventDefault(); save() }
+            if (e.key === 'Escape') cancel()
+          }}
+          className="bg-warm-cream border-b border-gold-line outline-none w-full min-w-0 block"
+        />
+      </span>
     )
   }
 
@@ -695,22 +700,33 @@ function TasksSection({
 
 // ── Payment schedule ───────────────────────────────────────────────────────────
 
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December']
+
 function PaymentSchedule({
-  items, onUpdateItem,
+  items, onUpdateItem, onDeleteItem, onAddItem,
 }: {
   items: BudgetItem[]
   onUpdateItem: (id: string, patch: Partial<BudgetItem>) => void
+  onDeleteItem: (id: string) => void
+  onAddItem: (paid: boolean) => void
 }) {
   const pending = items.filter(i => !i.paid)
-
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  const scheduled = pending
-    .filter(i => i.dueDate)
-    .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime())
-
-  const unscheduled = pending.filter(i => !i.dueDate)
+  // Group scheduled items by YYYY-MM
+  const byMonth: Record<string, BudgetItem[]> = {}
+  const unscheduled: BudgetItem[] = []
+  for (const item of pending) {
+    if (item.dueDate) {
+      const key = item.dueDate.slice(0, 7) // "YYYY-MM"
+      if (!byMonth[key]) byMonth[key] = []
+      byMonth[key].push(item)
+    } else {
+      unscheduled.push(item)
+    }
+  }
+  const sortedMonths = Object.keys(byMonth).sort()
 
   return (
     <div>
@@ -718,72 +734,137 @@ function PaymentSchedule({
         <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory">
           Payment Schedule
         </h3>
-        <p className="font-crimson italic text-xs text-soft-gray/60">
-          Tap date to edit
-        </p>
+        <button
+          onClick={() => onAddItem(false)}
+          className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-soft-gray/60 hover:text-gold-line transition-colors"
+        >
+          + add payment
+        </button>
       </div>
 
       {pending.length === 0 ? (
         <p className="font-crimson italic text-sm text-soft-gray/50 text-center py-4">All payments complete!</p>
       ) : (
         <div className="space-y-6">
-          {scheduled.length > 0 && (
-            <div className="relative">
-              <div className="absolute left-3 top-2 bottom-2 w-px bg-soft-gray/25" />
-              <div className="flex flex-col gap-3 pl-10">
-                {scheduled.map(item => {
-                  const d = new Date(item.dueDate!)
-                  const isPast = d < today
-                  const isUrgent = !isPast && (d.getTime() - today.getTime()) < 30 * 24 * 60 * 60 * 1000
-                  return (
-                    <div key={item.id} className="relative">
-                      <div className={`absolute -left-7 top-3 w-3 h-3 rounded-full ring-2 ring-ivory ${
-                        isPast ? 'bg-muted-rose' : isUrgent ? 'bg-gold-line' : 'bg-pale-gold'
-                      }`} />
-                      <div className={`border rounded-lg px-4 py-3 ${
-                        isPast ? 'border-muted-rose/30 bg-muted-rose/5' :
-                        isUrgent ? 'border-gold-line/40 bg-pale-gold/10' :
-                        'border-soft-gray/20 bg-warm-cream'
-                      }`}>
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="min-w-0">
+          {sortedMonths.map(monthKey => {
+            const [yr, mo] = monthKey.split('-').map(Number)
+            const monthItems = byMonth[monthKey].sort((a, b) =>
+              new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime()
+            )
+            return (
+              <div key={monthKey}>
+                {/* Month header */}
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-gold-line">
+                    {MONTH_NAMES[mo - 1]} {yr}
+                  </span>
+                  <div className="flex-1 h-px bg-gold-line/20" />
+                </div>
+
+                {/* Calendar-style grid for this month */}
+                <div className="grid gap-2">
+                  {monthItems.map(item => {
+                    const d = new Date(item.dueDate! + 'T12:00:00')
+                    const day = d.getDate()
+                    const dayName = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]
+                    const isPast = d < today
+                    const isUrgent = !isPast && (d.getTime() - today.getTime()) < 30 * 24 * 60 * 60 * 1000
+                    const accentColor = isPast ? 'bg-muted-rose/80' : isUrgent ? 'bg-gold-line' : 'bg-pale-gold/60'
+                    const borderColor = isPast ? 'border-muted-rose/25' : isUrgent ? 'border-gold-line/35' : 'border-soft-gray/20'
+
+                    return (
+                      <div key={item.id} className={`flex items-stretch border rounded-lg overflow-hidden ${borderColor}`}>
+                        {/* Date block */}
+                        <div className={`flex flex-col items-center justify-center px-3 py-2 min-w-[52px] ${accentColor}`}>
+                          <span className="font-work-sans text-[8px] tracking-widest uppercase text-ivory/70">{dayName}</span>
+                          <span className="font-crimson text-2xl leading-none text-ivory font-semibold">{day}</span>
+                        </div>
+                        {/* Content */}
+                        <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 bg-warm-cream min-w-0">
+                          <div className="flex-1 min-w-0">
                             <EditableText
-                              value={item.dueDate!}
-                              onChange={v => onUpdateItem(item.id, { dueDate: v || undefined })}
-                              className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray block mb-0.5"
+                              value={item.item}
+                              onChange={v => onUpdateItem(item.id, { item: v })}
+                              className="font-crimson text-base text-dark-taupe block"
                             />
-                            <p className="font-crimson text-base text-dark-taupe truncate">{item.item}</p>
+                            <label className="block mt-0.5">
+                              <input
+                                type="date"
+                                value={item.dueDate ?? ''}
+                                onChange={e => onUpdateItem(item.id, { dueDate: e.target.value || undefined })}
+                                className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-soft-gray/50 bg-transparent border-none outline-none cursor-pointer"
+                              />
+                            </label>
                           </div>
-                          <p className="font-crimson text-sm text-deep-ivory flex-shrink-0">{item.cost}</p>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <EditableText
+                              value={item.cost}
+                              onChange={v => onUpdateItem(item.id, { cost: v })}
+                              className="font-crimson text-sm text-deep-ivory"
+                            />
+                            <button
+                              onClick={() => onDeleteItem(item.id)}
+                              className="text-soft-gray/40 hover:text-muted-rose transition-colors text-lg w-5 h-5 flex items-center justify-center"
+                              aria-label="Delete payment"
+                            >
+                              ×
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            )
+          })}
 
           {unscheduled.length > 0 && (
             <div>
-              {scheduled.length > 0 && (
-                <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray/40 mb-2">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-soft-gray/50">
                   No Date Set
-                </p>
-              )}
+                </span>
+                <div className="flex-1 h-px bg-soft-gray/15" />
+              </div>
               <div className="flex flex-col gap-2">
                 {unscheduled.map(item => (
-                  <div key={item.id} className="border border-soft-gray/15 rounded-lg px-4 py-3 bg-warm-cream/50 flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <EditableText
-                        value={item.dueDate ?? ''}
-                        onChange={v => onUpdateItem(item.id, { dueDate: v || undefined })}
-                        placeholder="set due date…"
-                        className="font-work-sans text-[9px] tracking-[0.15em] uppercase text-soft-gray/50 block mb-0.5"
-                      />
-                      <p className="font-crimson text-base text-dark-taupe truncate">{item.item}</p>
+                  <div key={item.id} className="flex items-stretch border border-soft-gray/15 rounded-lg overflow-hidden">
+                    <div className="flex flex-col items-center justify-center px-3 py-2 min-w-[52px] bg-soft-gray/10">
+                      <span className="font-work-sans text-[8px] tracking-widest uppercase text-soft-gray/40">—</span>
+                      <span className="font-crimson text-2xl leading-none text-soft-gray/30 font-semibold">?</span>
                     </div>
-                    <p className="font-crimson text-sm text-deep-ivory flex-shrink-0">{item.cost}</p>
+                    <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 bg-warm-cream/50 min-w-0">
+                      <div className="flex-1 min-w-0">
+                        <EditableText
+                          value={item.item}
+                          onChange={v => onUpdateItem(item.id, { item: v })}
+                          className="font-crimson text-base text-dark-taupe block"
+                        />
+                        <label className="block mt-0.5">
+                          <input
+                            type="date"
+                            value={item.dueDate ?? ''}
+                            onChange={e => onUpdateItem(item.id, { dueDate: e.target.value || undefined })}
+                            className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-soft-gray/50 bg-transparent border-none outline-none cursor-pointer"
+                          />
+                        </label>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <EditableText
+                          value={item.cost}
+                          onChange={v => onUpdateItem(item.id, { cost: v })}
+                          className="font-crimson text-sm text-deep-ivory"
+                        />
+                        <button
+                          onClick={() => onDeleteItem(item.id)}
+                          className="text-soft-gray/40 hover:text-muted-rose transition-colors text-lg w-5 h-5 flex items-center justify-center"
+                          aria-label="Delete payment"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -945,7 +1026,7 @@ function BudgetSection({
 
       {/* Payment schedule */}
       <div className="mb-8">
-        <PaymentSchedule items={items} onUpdateItem={onUpdateItem} />
+        <PaymentSchedule items={items} onUpdateItem={onUpdateItem} onDeleteItem={onDeleteItem} onAddItem={onAddItem} />
       </div>
 
       {/* Reception scenarios */}
@@ -1260,12 +1341,34 @@ export default function PlannerDashboard() {
   const setScenariosD  = (v: Parameters<typeof setScenarios>[0])  => { dirtyRef.current = true; setScenarios(v)  }
   const setVendorsD    = (v: Parameters<typeof setVendors>[0])    => { dirtyRef.current = true; setVendors(v)    }
 
+  // Known due dates to backfill when loading old Redis data that lacks them
+  const DUE_DATE_PATCH: Record<string, string> = {
+    'bi14': '2026-08-12',
+    'bi9':  '2026-08-13',
+    'bi11': '2026-08-13',
+    'bi10': '2026-09-12',
+    'bi12': '2026-09-12',
+  }
+
   function applyData(data: Record<string, unknown>) {
     if (data.deadlines)   setDeadlines(data.deadlines as Deadline[])
     if (data.tasks)       setTasks(data.tasks as Task[])
-    if (data.budgetItems) setBudgetItems(data.budgetItems as BudgetItem[])
+    if (data.budgetItems) {
+      const items = (data.budgetItems as BudgetItem[]).map(item => ({
+        ...item,
+        // Back-fill due dates for vendor payment items if Redis data lacks them
+        dueDate: item.dueDate ?? DUE_DATE_PATCH[item.id],
+      }))
+      setBudgetItems(items)
+    }
     if (data.vendors)     setVendors(data.vendors as Vendor[])
-    if (data.scenarios)   setScenarios(data.scenarios as GuestScenario[])
+    if (data.scenarios)   setScenarios(
+      // Migrate old field name `guests` → `numGuests`
+      (data.scenarios as Record<string, unknown>[]).map(sc => ({
+        ...sc,
+        numGuests: (sc.numGuests ?? sc.guests ?? 100) as number,
+      })) as GuestScenario[]
+    )
     if (data._savedAt)    lastSavedAtRef.current = data._savedAt as number
   }
 
@@ -1459,44 +1562,54 @@ export default function PlannerDashboard() {
         </div>
 
         {/* Active section */}
-        {activeSection === 'timeline' && (
-          <TimelineSection
-            deadlines={deadlines}
-            onUpdate={updateDeadline}
-            onDelete={deleteDeadline}
-            onAdd={addDeadline}
-            onAddBullet={addBullet}
-            onUpdateBullet={updateBullet}
-            onDeleteBullet={deleteBullet}
-          />
-        )}
-        {activeSection === 'tasks' && (
-          <TasksSection
-            tasks={tasks}
-            onUpdate={updateTask}
-            onDelete={deleteTask}
-            onAdd={addTask}
-          />
-        )}
-        {activeSection === 'budget' && (
-          <BudgetSection
-            items={budgetItems}
-            scenarios={scenarios}
-            onUpdateItem={updateBudgetItem}
-            onDeleteItem={deleteBudgetItem}
-            onAddItem={addBudgetItem}
-            onUpdateScenario={updateScenario}
-            onDeleteScenario={deleteScenario}
-            onAddScenario={addScenario}
-          />
-        )}
-        {activeSection === 'vendors' && (
-          <VendorsSection
-            vendors={vendors}
-            onUpdate={updateVendor}
-            onDelete={deleteVendor}
-            onAdd={addVendor}
-          />
+        {!initialized ? (
+          <div className="flex items-center justify-center py-20">
+            <p className="font-work-sans text-[9px] tracking-[0.3em] uppercase text-soft-gray/50 animate-pulse">
+              Loading…
+            </p>
+          </div>
+        ) : (
+          <>
+            {activeSection === 'timeline' && (
+              <TimelineSection
+                deadlines={deadlines}
+                onUpdate={updateDeadline}
+                onDelete={deleteDeadline}
+                onAdd={addDeadline}
+                onAddBullet={addBullet}
+                onUpdateBullet={updateBullet}
+                onDeleteBullet={deleteBullet}
+              />
+            )}
+            {activeSection === 'tasks' && (
+              <TasksSection
+                tasks={tasks}
+                onUpdate={updateTask}
+                onDelete={deleteTask}
+                onAdd={addTask}
+              />
+            )}
+            {activeSection === 'budget' && (
+              <BudgetSection
+                items={budgetItems}
+                scenarios={scenarios}
+                onUpdateItem={updateBudgetItem}
+                onDeleteItem={deleteBudgetItem}
+                onAddItem={addBudgetItem}
+                onUpdateScenario={updateScenario}
+                onDeleteScenario={deleteScenario}
+                onAddScenario={addScenario}
+              />
+            )}
+            {activeSection === 'vendors' && (
+              <VendorsSection
+                vendors={vendors}
+                onUpdate={updateVendor}
+                onDelete={deleteVendor}
+                onAdd={addVendor}
+              />
+            )}
+          </>
         )}
 
         <div className="mt-10 pt-5 border-t border-soft-gray/20 text-center">
