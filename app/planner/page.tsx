@@ -700,10 +700,12 @@ function TasksSection({
 // ── Payment schedule ───────────────────────────────────────────────────────────
 
 function PaymentSchedule({
-  items, onUpdateItem,
+  items, onUpdateItem, onDeleteItem, onAddItem,
 }: {
   items: BudgetItem[]
   onUpdateItem: (id: string, patch: Partial<BudgetItem>) => void
+  onDeleteItem: (id: string) => void
+  onAddItem: (paid: boolean) => void
 }) {
   const pending = items.filter(i => !i.paid)
 
@@ -716,15 +718,54 @@ function PaymentSchedule({
 
   const unscheduled = pending.filter(i => !i.dueDate)
 
+  function PaymentRow({ item, cardClass }: { item: BudgetItem; cardClass: string }) {
+    return (
+      <div className={`group/ps border rounded-lg px-4 py-3 ${cardClass}`}>
+        <div className="flex items-start gap-2">
+          <div className="flex-1 min-w-0">
+            <EditableText
+              value={item.dueDate ?? ''}
+              onChange={v => onUpdateItem(item.id, { dueDate: v || undefined })}
+              placeholder="set due date…"
+              className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray block mb-1"
+            />
+            <EditableText
+              value={item.item}
+              onChange={v => onUpdateItem(item.id, { item: v })}
+              className="font-crimson text-base text-dark-taupe block"
+            />
+          </div>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <EditableText
+              value={item.cost}
+              onChange={v => onUpdateItem(item.id, { cost: v })}
+              className="font-crimson text-sm text-deep-ivory"
+            />
+            <button
+              onClick={() => onDeleteItem(item.id)}
+              className="text-soft-gray/25 hover:text-muted-rose transition-colors text-base w-5 h-5 flex items-center justify-center opacity-0 group-hover/ps:opacity-100"
+              aria-label="Delete payment"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory">
           Payment Schedule
         </h3>
-        <p className="font-crimson italic text-xs text-soft-gray/60">
-          Tap date to edit
-        </p>
+        <button
+          onClick={() => onAddItem(false)}
+          className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-soft-gray/60 hover:text-gold-line transition-colors"
+        >
+          + add payment
+        </button>
       </div>
 
       {pending.length === 0 ? (
@@ -739,28 +780,17 @@ function PaymentSchedule({
                   const d = new Date(item.dueDate!)
                   const isPast = d < today
                   const isUrgent = !isPast && (d.getTime() - today.getTime()) < 30 * 24 * 60 * 60 * 1000
+                  const cardClass = isPast
+                    ? 'border-muted-rose/30 bg-muted-rose/5'
+                    : isUrgent
+                    ? 'border-gold-line/40 bg-pale-gold/10'
+                    : 'border-soft-gray/20 bg-warm-cream'
                   return (
                     <div key={item.id} className="relative">
                       <div className={`absolute -left-7 top-3 w-3 h-3 rounded-full ring-2 ring-ivory ${
                         isPast ? 'bg-muted-rose' : isUrgent ? 'bg-gold-line' : 'bg-pale-gold'
                       }`} />
-                      <div className={`border rounded-lg px-4 py-3 ${
-                        isPast ? 'border-muted-rose/30 bg-muted-rose/5' :
-                        isUrgent ? 'border-gold-line/40 bg-pale-gold/10' :
-                        'border-soft-gray/20 bg-warm-cream'
-                      }`}>
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="min-w-0">
-                            <EditableText
-                              value={item.dueDate!}
-                              onChange={v => onUpdateItem(item.id, { dueDate: v || undefined })}
-                              className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray block mb-0.5"
-                            />
-                            <p className="font-crimson text-base text-dark-taupe truncate">{item.item}</p>
-                          </div>
-                          <p className="font-crimson text-sm text-deep-ivory flex-shrink-0">{item.cost}</p>
-                        </div>
-                      </div>
+                      <PaymentRow item={item} cardClass={cardClass} />
                     </div>
                   )
                 })}
@@ -777,18 +807,7 @@ function PaymentSchedule({
               )}
               <div className="flex flex-col gap-2">
                 {unscheduled.map(item => (
-                  <div key={item.id} className="border border-soft-gray/15 rounded-lg px-4 py-3 bg-warm-cream/50 flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <EditableText
-                        value={item.dueDate ?? ''}
-                        onChange={v => onUpdateItem(item.id, { dueDate: v || undefined })}
-                        placeholder="set due date…"
-                        className="font-work-sans text-[9px] tracking-[0.15em] uppercase text-soft-gray/50 block mb-0.5"
-                      />
-                      <p className="font-crimson text-base text-dark-taupe truncate">{item.item}</p>
-                    </div>
-                    <p className="font-crimson text-sm text-deep-ivory flex-shrink-0">{item.cost}</p>
-                  </div>
+                  <PaymentRow key={item.id} item={item} cardClass="border-soft-gray/15 bg-warm-cream/50" />
                 ))}
               </div>
             </div>
@@ -949,7 +968,7 @@ function BudgetSection({
 
       {/* Payment schedule */}
       <div className="mb-8">
-        <PaymentSchedule items={items} onUpdateItem={onUpdateItem} />
+        <PaymentSchedule items={items} onUpdateItem={onUpdateItem} onDeleteItem={onDeleteItem} onAddItem={onAddItem} />
       </div>
 
       {/* Reception scenarios */}
@@ -1254,7 +1273,13 @@ export default function PlannerDashboard() {
     if (data.tasks)       setTasks(data.tasks as Task[])
     if (data.budgetItems) setBudgetItems(data.budgetItems as BudgetItem[])
     if (data.vendors)     setVendors(data.vendors as Vendor[])
-    if (data.scenarios)   setScenarios(data.scenarios as GuestScenario[])
+    if (data.scenarios)   setScenarios(
+      // Migrate old field name `guests` → `numGuests`
+      (data.scenarios as Record<string, unknown>[]).map(sc => ({
+        ...sc,
+        numGuests: (sc.numGuests ?? sc.guests ?? 100) as number,
+      })) as GuestScenario[]
+    )
     if (data._savedAt)    lastSavedAtRef.current = data._savedAt as number
   }
 
