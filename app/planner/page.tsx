@@ -1317,6 +1317,16 @@ function VendorsSection({
 
 // ── Main dashboard ─────────────────────────────────────────────────────────────
 
+function loadStored<T>(key: string, fallback: T): T {
+  if (typeof window === 'undefined') return fallback
+  try {
+    const raw = localStorage.getItem(key)
+    return raw ? (JSON.parse(raw) as T) : fallback
+  } catch {
+    return fallback
+  }
+}
+
 export default function PlannerDashboard() {
   const router = useRouter()
   const [deadlines, setDeadlines] = useState<Deadline[]>(INITIAL_DEADLINES)
@@ -1327,6 +1337,11 @@ export default function PlannerDashboard() {
   const [vendors, setVendors] = useState<Vendor[]>(INITIAL_VENDORS)
   const [activeSection, setActiveSection] = useState<'timeline' | 'tasks' | 'budget' | 'vendors'>('timeline')
 
+  useEffect(() => { localStorage.setItem('planner-deadlines', JSON.stringify(deadlines)) }, [deadlines])
+  useEffect(() => { localStorage.setItem('planner-tasks', JSON.stringify(tasks)) }, [tasks])
+  useEffect(() => { localStorage.setItem('planner-budget', JSON.stringify(budgetItems)) }, [budgetItems])
+  useEffect(() => { localStorage.setItem('planner-scenarios', JSON.stringify(scenarios)) }, [scenarios])
+  useEffect(() => { localStorage.setItem('planner-vendors', JSON.stringify(vendors)) }, [vendors])
   // ── Persistence ────────────────────────────────────────────────────────────
   const [initialized, setInitialized] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
