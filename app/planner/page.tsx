@@ -55,6 +55,7 @@ type Vendor = {
   budget: string
   status: VendorStatus
   notes: string
+  contract?: { name: string; url: string }
 }
 
 // ── Utilities ──────────────────────────────────────────────────────────────────
@@ -198,14 +199,14 @@ const INITIAL_SCENARIOS: GuestScenario[] = [
 ]
 
 const INITIAL_VENDORS: Vendor[] = [
-  { id: 'v1', vendor: 'Jin Krista',          service: 'Ceremony Music',         category: 'Music',         contact: 'TBD', phone: '', email: '', budget: '$2,000',           status: 'confirmed',     notes: '' },
-  { id: 'v2', vendor: 'Golden Unicorn',      service: 'Reception Venue',        category: 'Venue',         contact: 'TBD', phone: '', email: '', budget: '$20,800–$24,000',  status: 'deposit-paid',  notes: '' },
-  { id: 'v3', vendor: 'Photographer',        service: 'Photography (6–8 hrs)',  category: 'Photography',   contact: 'TBD', phone: '', email: '', budget: '$3,000–$4,000',    status: 'pending',       notes: '' },
-  { id: 'v4', vendor: 'DJ',                  service: 'Reception Entertainment',category: 'Music',         contact: 'TBD', phone: '', email: '', budget: '$3,000',           status: 'pending',       notes: '' },
-  { id: 'v5', vendor: 'Florist',             service: 'Florals & Arrangements', category: 'Florals',       contact: 'TBD', phone: '', email: '', budget: '$3,000',           status: 'pending',       notes: '' },
-  { id: 'v6', vendor: 'Lion Dancers',        service: 'Cultural Entertainment', category: 'Entertainment', contact: 'TBD', phone: '', email: '', budget: '$1,000',           status: 'pending',       notes: '' },
-  { id: 'v7', vendor: "St. Joseph's Church", service: 'Ceremony Venue',         category: 'Venue',         contact: 'TBD', phone: '', email: '', budget: '$2,500 (paid)',    status: 'confirmed',     notes: '' },
-  { id: 'v8', vendor: 'Wedding Planner',     service: 'Overall Coordination',   category: 'Planning',      contact: 'TBD', phone: '', email: '', budget: 'TBD',             status: 'in-discussion', notes: '' },
+  { id: 'v1', vendor: 'Jin Krista',                        service: 'Ceremony Music',          category: 'Music',         contact: '',              phone: '', email: '', budget: '$2,000',                            status: 'confirmed',    notes: '' },
+  { id: 'v2', vendor: 'Golden Unicorn',                    service: 'Reception Venue',         category: 'Venue',         contact: '',              phone: '', email: '', budget: '$20,800–$24,000',                   status: 'deposit-paid', notes: '' },
+  { id: 'v3', vendor: 'Stephen Elkins',                    service: 'Photography',             category: 'Photography',   contact: 'Stephen Elkins',phone: '', email: '', budget: '$500 remaining / $1,000 total',     status: 'deposit-paid', notes: 'Due: Aug 13, 2026 · Payment: check, Venmo, Zelle, or PayPal' },
+  { id: 'v4', vendor: 'Mama Juke',                         service: 'Live Band',               category: 'Music',         contact: '',              phone: '', email: '', budget: '$2,200 remaining / $2,750 total',   status: 'deposit-paid', notes: 'Due: Sep 12, 2026 (before performance) · Payment: check, cash, or Zelle' },
+  { id: 'v5', vendor: 'Floweret LLC',                      service: 'Florals & Arrangements',  category: 'Florals',       contact: '',              phone: '', email: '', budget: '$1,653.54 remaining / $2,204.72 total', status: 'deposit-paid', notes: 'Due: Aug 13, 2026 · Last day to make design changes' },
+  { id: 'v6', vendor: 'Chinese Freemasons Athletic Club',  service: 'Lion Dance',              category: 'Entertainment', contact: '',              phone: '', email: '', budget: '$700 remaining / $1,400 total',     status: 'deposit-paid', notes: 'Due: Sep 12, 2026' },
+  { id: 'v7', vendor: "St. Joseph's Church",               service: 'Ceremony Venue',          category: 'Venue',         contact: '',              phone: '', email: '', budget: '$2,500 (paid)',                      status: 'confirmed',    notes: '' },
+  { id: 'v8', vendor: 'Urban Peony Events',                service: 'Day-of Coordinator',      category: 'Planning',      contact: 'Jennifer Chang',phone: '', email: '', budget: '$1,750 remaining / $3,500 total',   status: 'deposit-paid', notes: 'Due: Aug 12, 2026 · Payment via Zelle' },
 ]
 
 // ── Shared: Inline editable text ───────────────────────────────────────────────
@@ -1168,6 +1169,43 @@ function VendorsSection({
                       <div className="sm:col-span-2">
                         <VendorField label="Notes">
                           <EditableText value={v.notes} onChange={val => onUpdate(v.id, { notes: val })} className="font-crimson text-sm text-dark-taupe" placeholder="add notes…" />
+                        </VendorField>
+                      </div>
+                      <div className="sm:col-span-2">
+                        <VendorField label="Contract">
+                          {v.contract ? (
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <a
+                                href={v.contract.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-crimson text-sm text-gold-line underline underline-offset-2 truncate max-w-xs"
+                              >
+                                📄 {v.contract.name}
+                              </a>
+                              <button
+                                onClick={() => onUpdate(v.id, { contract: undefined })}
+                                className="text-soft-gray/40 hover:text-muted-rose transition-colors text-base w-5 h-5 flex items-center justify-center flex-shrink-0"
+                                aria-label="Remove contract"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ) : (
+                            <label className="mt-0.5 cursor-pointer inline-flex items-center gap-1.5 font-work-sans text-[9px] tracking-[0.15em] uppercase text-soft-gray/60 hover:text-gold-line transition-colors border border-dashed border-soft-gray/30 hover:border-gold-line/50 rounded px-2.5 py-1.5">
+                              + upload contract
+                              <input
+                                type="file"
+                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                className="sr-only"
+                                onChange={e => {
+                                  const file = e.target.files?.[0]
+                                  if (file) onUpdate(v.id, { contract: { name: file.name, url: URL.createObjectURL(file) } })
+                                  e.target.value = ''
+                                }}
+                              />
+                            </label>
+                          )}
                         </VendorField>
                       </div>
                     </div>
