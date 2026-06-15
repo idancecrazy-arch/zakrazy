@@ -1,45 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
-// ── Admin CSV export ──────────────────────────────────────────────────
-// GET /api/admin/export-rsvp
-//
-// Fetches all RSVP submissions from Airtable and returns them as a
-// downloadable CSV file.
-//
-// Required env vars:
-//   AIRTABLE_API_KEY, AIRTABLE_BASE_ID, ADMIN_SECRET
-// Optional:
-//   AIRTABLE_TABLE_NAME  (default: "Submissions")
-
-// Field names match the Airtable table columns exactly (camelCase).
-// "Submitted At" comes from Airtable's createdTime record metadata.
 const AIRTABLE_FIELDS = [
-  'fullName',
-  'email',
-  'address1',
-  'address2',
-  'city',
-  'state',
-  'zip',
-  'country',
-  'kidsAttending',
-  'hotelBlockInterest',
-  'notes',
+  'Guest Name',
+  'RSVP Status',
+  'Email',
+  'Phone',
+  'Address',
+  'Plus One Name',
+  'Children',
+  'Dietary Restrictions',
+  'Welcome Reception',
 ] as const
 
 const CSV_HEADERS = [
   'Submitted At',
-  'Full Name',
+  'Guest Name',
+  'RSVP Status',
   'Email',
-  'Address 1',
-  'Address 2',
-  'City',
-  'State',
-  'ZIP',
-  'Country',
-  'Kids Attending',
-  'Hotel Block Interest',
-  'Notes',
+  'Phone',
+  'Address',
+  'Plus One Name',
+  'Children',
+  'Dietary Restrictions',
+  'Welcome Reception',
 ]
 
 function escapeCSV(value: unknown): string {
@@ -51,28 +35,20 @@ function escapeCSV(value: unknown): string {
 }
 
 export async function GET(req: NextRequest) {
-  const adminSecret = process.env.ADMIN_SECRET
-  if (!adminSecret) {
-    return NextResponse.json({ error: 'Admin access not configured' }, { status: 503 })
-  }
-  const provided = req.nextUrl.searchParams.get('secret')
-  if (provided !== adminSecret) {
+  const cookieStore = await cookies()
+  const auth = cookieStore.get('planner-auth')
+  if (auth?.value !== 'granted') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   const airtableKey = process.env.AIRTABLE_API_KEY
   const airtableBase = process.env.AIRTABLE_BASE_ID
-  const airtableTable = process.env.AIRTABLE_TABLE_NAME ?? 'Submissions'
+  const airtableTable = process.env.AIRTABLE_RSVP_TABLE ?? 'table_2'
 
   if (!airtableKey || !airtableBase) {
-    return NextResponse.json(
-      { error: 'Airtable not configured — set AIRTABLE_API_KEY and AIRTABLE_BASE_ID' },
-      { status: 503 },
-    )
+    return NextResponse.json({ error: 'Airtable not configured' }, { status: 503 })
   }
 
-  // Fetch all records from Airtable (handles pagination).
-  // Sorted client-side by createdTime (always in the API response metadata).
   const records: { createdTime: string; fields: Record<string, unknown> }[] = []
   let offset: string | undefined
 
@@ -89,10 +65,7 @@ export async function GET(req: NextRequest) {
     if (!res.ok) {
       const err = await res.text()
       console.error('Airtable fetch failed:', err)
-      return NextResponse.json(
-        { error: `Airtable error: ${res.status}` },
-        { status: 502 },
-      )
+      return NextResponse.json({ error: `Airtable error: ${res.status}` }, { status: 502 })
     }
 
     const data = (await res.json()) as {
@@ -106,10 +79,8 @@ export async function GET(req: NextRequest) {
     offset = data.offset
   } while (offset)
 
-  // Sort chronologically using createdTime from the API response metadata
   records.sort((a, b) => a.createdTime.localeCompare(b.createdTime))
 
-  // Build CSV — first column is createdTime, rest are table fields
   const header = CSV_HEADERS.map(escapeCSV).join(',')
   const rows = records.map(({ createdTime, fields }) =>
     [createdTime, ...AIRTABLE_FIELDS.map((f) => fields[f])].map(escapeCSV).join(','),
