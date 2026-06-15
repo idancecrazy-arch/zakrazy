@@ -1037,14 +1037,30 @@ function VendorsSection({
 
 // ── Main dashboard ─────────────────────────────────────────────────────────────
 
+function loadStored<T>(key: string, fallback: T): T {
+  if (typeof window === 'undefined') return fallback
+  try {
+    const raw = localStorage.getItem(key)
+    return raw ? (JSON.parse(raw) as T) : fallback
+  } catch {
+    return fallback
+  }
+}
+
 export default function PlannerDashboard() {
   const router = useRouter()
-  const [deadlines, setDeadlines] = useState<Deadline[]>(INITIAL_DEADLINES)
-  const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
-  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(INITIAL_BUDGET_ITEMS)
-  const [scenarios, setScenarios] = useState<GuestScenario[]>(INITIAL_SCENARIOS)
-  const [vendors, setVendors] = useState<Vendor[]>(INITIAL_VENDORS)
+  const [deadlines, setDeadlines] = useState<Deadline[]>(() => loadStored('planner-deadlines', INITIAL_DEADLINES))
+  const [tasks, setTasks] = useState<Task[]>(() => loadStored('planner-tasks', INITIAL_TASKS))
+  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(() => loadStored('planner-budget', INITIAL_BUDGET_ITEMS))
+  const [scenarios, setScenarios] = useState<GuestScenario[]>(() => loadStored('planner-scenarios', INITIAL_SCENARIOS))
+  const [vendors, setVendors] = useState<Vendor[]>(() => loadStored('planner-vendors', INITIAL_VENDORS))
   const [activeSection, setActiveSection] = useState<'timeline' | 'tasks' | 'budget' | 'vendors'>('timeline')
+
+  useEffect(() => { localStorage.setItem('planner-deadlines', JSON.stringify(deadlines)) }, [deadlines])
+  useEffect(() => { localStorage.setItem('planner-tasks', JSON.stringify(tasks)) }, [tasks])
+  useEffect(() => { localStorage.setItem('planner-budget', JSON.stringify(budgetItems)) }, [budgetItems])
+  useEffect(() => { localStorage.setItem('planner-scenarios', JSON.stringify(scenarios)) }, [scenarios])
+  useEffect(() => { localStorage.setItem('planner-vendors', JSON.stringify(vendors)) }, [vendors])
 
   // Deadline handlers
   const updateDeadline = (id: string, patch: Partial<Deadline>) =>
