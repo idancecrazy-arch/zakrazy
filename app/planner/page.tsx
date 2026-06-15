@@ -714,11 +714,13 @@ function PaymentSchedule({
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  // Group scheduled items by YYYY-MM
+  const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
+
+  // Group scheduled items by YYYY-MM — only count ISO-format dates as scheduled
   const byMonth: Record<string, BudgetItem[]> = {}
   const unscheduled: BudgetItem[] = []
   for (const item of pending) {
-    if (item.dueDate) {
+    if (item.dueDate && ISO_DATE.test(item.dueDate)) {
       const key = item.dueDate.slice(0, 7) // "YYYY-MM"
       if (!byMonth[key]) byMonth[key] = []
       byMonth[key].push(item)
@@ -1341,7 +1343,7 @@ export default function PlannerDashboard() {
   const setScenariosD  = (v: Parameters<typeof setScenarios>[0])  => { dirtyRef.current = true; setScenarios(v)  }
   const setVendorsD    = (v: Parameters<typeof setVendors>[0])    => { dirtyRef.current = true; setVendors(v)    }
 
-  // Known due dates to backfill when loading old Redis data that lacks them
+  // Force-set ISO due dates for known vendor payments, overriding any old text-format dates
   const DUE_DATE_PATCH: Record<string, string> = {
     'bi14': '2026-08-12',
     'bi9':  '2026-08-13',
@@ -1356,8 +1358,8 @@ export default function PlannerDashboard() {
     if (data.budgetItems) {
       const items = (data.budgetItems as BudgetItem[]).map(item => ({
         ...item,
-        // Back-fill due dates for vendor payment items if Redis data lacks them
-        dueDate: item.dueDate ?? DUE_DATE_PATCH[item.id],
+        // Patch takes priority — overrides old text-format dates like "Aug 13, 2026"
+        dueDate: DUE_DATE_PATCH[item.id] ?? item.dueDate,
       }))
       setBudgetItems(items)
     }
