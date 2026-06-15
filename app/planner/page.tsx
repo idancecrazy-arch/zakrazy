@@ -519,13 +519,12 @@ function TaskRow({
               onChange={v => onUpdate(task.id, { category: v })}
             />
 
-            {task.dueLabel && (
-              <EditableText
-                value={task.dueLabel}
-                onChange={v => onUpdate(task.id, { dueLabel: v })}
-                className="font-work-sans text-[9px] tracking-wider uppercase text-muted-rose/80"
-              />
-            )}
+            <EditableText
+              value={task.dueLabel}
+              onChange={v => onUpdate(task.id, { dueLabel: v })}
+              placeholder="+ due date"
+              className="font-work-sans text-[9px] tracking-wider uppercase text-muted-rose/80"
+            />
 
             <EditableText
               value={task.assignee}
@@ -538,17 +537,6 @@ function TaskRow({
           {/* Expanded details */}
           {showDetails && (
             <div className="mt-2 space-y-1.5 pl-0">
-              {!task.dueLabel && (
-                <div className="flex items-center gap-2">
-                  <span className="font-work-sans text-[9px] uppercase tracking-wide text-soft-gray/60 flex-shrink-0">Due:</span>
-                  <EditableText
-                    value={task.dueLabel}
-                    onChange={v => onUpdate(task.id, { dueLabel: v })}
-                    placeholder="add due date…"
-                    className="font-crimson text-xs text-deep-ivory"
-                  />
-                </div>
-              )}
               <div className="flex items-start gap-2">
                 <span className="font-work-sans text-[9px] uppercase tracking-wide text-soft-gray/60 flex-shrink-0 pt-0.5">Notes:</span>
                 <EditableText
@@ -561,9 +549,6 @@ function TaskRow({
             </div>
           )}
         </div>
-        {task.notes && (
-          <p className="font-crimson text-xs text-soft-gray mt-1 italic">{task.notes}</p>
-        )}
       </div>
     </div>
   )
@@ -1098,23 +1083,33 @@ function VendorsSection({
               const statusLabel = VENDOR_STATUS_OPTIONS.find(o => o.value === v.status)?.label ?? v.status
               return (
                 <div key={v.id} className="border border-soft-gray/20 rounded-lg bg-warm-cream group/vendor overflow-hidden">
-                  {/* Summary row */}
+                  {/* Summary row — all fields editable inline */}
                   <div className="flex items-center gap-2 px-4 py-3">
-                    <button
-                      onClick={() => setExpandedId(isExpanded ? null : v.id)}
-                      className="flex-1 min-w-0 flex items-center gap-2 text-left"
-                      aria-expanded={isExpanded}
-                    >
-                      <span className="font-crimson text-base font-semibold text-dark-taupe truncate">
-                        {v.vendor || 'New Vendor'}
-                      </span>
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-work-sans tracking-wider uppercase flex-shrink-0 ${VENDOR_STATUS_PILL[v.status]}`}>
-                        {statusLabel}
-                      </span>
-                    </button>
-                    <span className="font-crimson text-sm text-deep-ivory flex-shrink-0 hidden sm:block">
-                      {v.budget}
-                    </span>
+                    <div className="flex-1 min-w-0 flex flex-wrap items-center gap-2">
+                      <EditableText
+                        value={v.vendor}
+                        onChange={val => onUpdate(v.id, { vendor: val })}
+                        className="font-crimson text-base font-semibold text-dark-taupe"
+                        placeholder="Vendor name…"
+                      />
+                      <select
+                        value={v.status}
+                        onChange={e => onUpdate(v.id, { status: e.target.value as VendorStatus })}
+                        className={`flex-shrink-0 appearance-none cursor-pointer px-2 py-0.5 rounded-full text-[9px] font-work-sans tracking-wider uppercase focus:outline-none ${VENDOR_STATUS_PILL[v.status]}`}
+                      >
+                        {VENDOR_STATUS_OPTIONS.map(o => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="hidden sm:block flex-shrink-0">
+                      <EditableText
+                        value={v.budget}
+                        onChange={val => onUpdate(v.id, { budget: val })}
+                        className="font-crimson text-sm text-deep-ivory"
+                        placeholder="budget…"
+                      />
+                    </div>
                     <button
                       onClick={() => setExpandedId(isExpanded ? null : v.id)}
                       className="text-soft-gray/40 hover:text-deep-ivory transition-colors w-7 h-7 flex items-center justify-center text-[10px] flex-shrink-0"
