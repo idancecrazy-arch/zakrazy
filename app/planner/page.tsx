@@ -194,6 +194,14 @@ const INITIAL_BUDGET_ITEMS: BudgetItem[] = [
   { id: 'bi13', item: 'Ceremony music – Jin Krista',            cost: '$2,000',            paid: false },
 ]
 
+const INITIAL_SCHEDULE_ITEMS: BudgetItem[] = [
+  { id: 'ps1', item: 'Urban Peony Events (Day-of Coordinator)', cost: '$1,750',    paid: false, dueDate: '2026-08-12' },
+  { id: 'ps2', item: 'Stephen Elkins (Photography)',            cost: '$500',      paid: false, dueDate: '2026-08-13' },
+  { id: 'ps3', item: 'Floweret LLC (Florals)',                  cost: '$1,653.54', paid: false, dueDate: '2026-08-13' },
+  { id: 'ps4', item: 'Mama Juke (Band)',                        cost: '$2,200',    paid: false, dueDate: '2026-09-12' },
+  { id: 'ps5', item: 'Chinese Freemasons (Lion Dance)',         cost: '$700',      paid: false, dueDate: '2026-09-12' },
+]
+
 const INITIAL_SCENARIOS: GuestScenario[] = [
   { id: 'gs1', numGuests: 100, costPerTable: 1600, seatsPerTable: 8 },
   { id: 'gs2', numGuests: 120, costPerTable: 1600, seatsPerTable: 8 },
@@ -708,7 +716,7 @@ function PaymentSchedule({
   items: BudgetItem[]
   onUpdateItem: (id: string, patch: Partial<BudgetItem>) => void
   onDeleteItem: (id: string) => void
-  onAddItem: (paid: boolean) => void
+  onAddItem: () => void
 }) {
   const pending = items.filter(i => !i.paid)
   const today = new Date()
@@ -737,7 +745,7 @@ function PaymentSchedule({
           Payment Schedule
         </h3>
         <button
-          onClick={() => onAddItem(false)}
+          onClick={() => onAddItem()}
           className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-soft-gray/60 hover:text-gold-line transition-colors"
         >
           + add payment
@@ -881,15 +889,20 @@ function PaymentSchedule({
 // ── Budget section ─────────────────────────────────────────────────────────────
 
 function BudgetSection({
-  items, scenarios,
+  items, scheduleItems, scenarios,
   onUpdateItem, onDeleteItem, onAddItem,
+  onUpdateScheduleItem, onDeleteScheduleItem, onAddScheduleItem,
   onUpdateScenario, onDeleteScenario, onAddScenario,
 }: {
   items: BudgetItem[]
+  scheduleItems: BudgetItem[]
   scenarios: GuestScenario[]
   onUpdateItem: (id: string, patch: Partial<BudgetItem>) => void
   onDeleteItem: (id: string) => void
   onAddItem: (paid: boolean) => void
+  onUpdateScheduleItem: (id: string, patch: Partial<BudgetItem>) => void
+  onDeleteScheduleItem: (id: string) => void
+  onAddScheduleItem: () => void
   onUpdateScenario: (id: string, patch: Partial<GuestScenario>) => void
   onDeleteScenario: (id: string) => void
   onAddScenario: () => void
@@ -1028,7 +1041,7 @@ function BudgetSection({
 
       {/* Payment schedule */}
       <div className="mb-8">
-        <PaymentSchedule items={items} onUpdateItem={onUpdateItem} onDeleteItem={onDeleteItem} onAddItem={onAddItem} />
+        <PaymentSchedule items={scheduleItems} onUpdateItem={onUpdateScheduleItem} onDeleteItem={onDeleteScheduleItem} onAddItem={onAddScheduleItem} />
       </div>
 
       {/* Reception scenarios */}
@@ -1316,11 +1329,12 @@ function loadStored<T>(key: string, fallback: T): T {
 
 export default function PlannerDashboard() {
   const router = useRouter()
-  const [deadlines, setDeadlines] = useState<Deadline[]>(() => loadStored('planner-deadlines', INITIAL_DEADLINES))
-  const [tasks, setTasks] = useState<Task[]>(() => loadStored('planner-tasks', INITIAL_TASKS))
-  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(() => loadStored('planner-budget', INITIAL_BUDGET_ITEMS))
-  const [scenarios, setScenarios] = useState<GuestScenario[]>(() => loadStored('planner-scenarios', INITIAL_SCENARIOS))
-  const [vendors, setVendors] = useState<Vendor[]>(() => loadStored('planner-vendors', INITIAL_VENDORS))
+  const [deadlines, setDeadlines] = useState<Deadline[]>(INITIAL_DEADLINES)
+  const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS)
+  const [budgetItems, setBudgetItems] = useState<BudgetItem[]>(INITIAL_BUDGET_ITEMS)
+  const [scheduleItems, setScheduleItems] = useState<BudgetItem[]>(INITIAL_SCHEDULE_ITEMS)
+  const [scenarios, setScenarios] = useState<GuestScenario[]>(INITIAL_SCENARIOS)
+  const [vendors, setVendors] = useState<Vendor[]>(INITIAL_VENDORS)
   const [activeSection, setActiveSection] = useState<'timeline' | 'tasks' | 'budget' | 'vendors'>('timeline')
 
   useEffect(() => { localStorage.setItem('planner-deadlines', JSON.stringify(deadlines)) }, [deadlines])
@@ -1337,11 +1351,12 @@ export default function PlannerDashboard() {
   const lastSavedAtRef = useRef<number>(0)
 
   // Dirty-marking setters — mark a change as user-initiated before updating state
-  const setDeadlinesD  = (v: Parameters<typeof setDeadlines>[0])  => { dirtyRef.current = true; setDeadlines(v)  }
-  const setTasksD      = (v: Parameters<typeof setTasks>[0])      => { dirtyRef.current = true; setTasks(v)      }
-  const setBudgetD     = (v: Parameters<typeof setBudgetItems>[0]) => { dirtyRef.current = true; setBudgetItems(v) }
-  const setScenariosD  = (v: Parameters<typeof setScenarios>[0])  => { dirtyRef.current = true; setScenarios(v)  }
-  const setVendorsD    = (v: Parameters<typeof setVendors>[0])    => { dirtyRef.current = true; setVendors(v)    }
+  const setDeadlinesD   = (v: Parameters<typeof setDeadlines>[0])     => { dirtyRef.current = true; setDeadlines(v)     }
+  const setTasksD       = (v: Parameters<typeof setTasks>[0])         => { dirtyRef.current = true; setTasks(v)         }
+  const setBudgetD      = (v: Parameters<typeof setBudgetItems>[0])   => { dirtyRef.current = true; setBudgetItems(v)   }
+  const setScheduleD    = (v: Parameters<typeof setScheduleItems>[0]) => { dirtyRef.current = true; setScheduleItems(v) }
+  const setScenariosD   = (v: Parameters<typeof setScenarios>[0])     => { dirtyRef.current = true; setScenarios(v)     }
+  const setVendorsD     = (v: Parameters<typeof setVendors>[0])       => { dirtyRef.current = true; setVendors(v)       }
 
   // Force-set ISO due dates for known vendor payments, overriding any old text-format dates
   const DUE_DATE_PATCH: Record<string, string> = {
@@ -1353,25 +1368,19 @@ export default function PlannerDashboard() {
   }
 
   function applyData(data: Record<string, unknown>) {
-    if (data.deadlines)   setDeadlines(data.deadlines as Deadline[])
-    if (data.tasks)       setTasks(data.tasks as Task[])
-    if (data.budgetItems) {
-      const items = (data.budgetItems as BudgetItem[]).map(item => ({
-        ...item,
-        // Patch takes priority — overrides old text-format dates like "Aug 13, 2026"
-        dueDate: DUE_DATE_PATCH[item.id] ?? item.dueDate,
-      }))
-      setBudgetItems(items)
-    }
-    if (data.vendors)     setVendors(data.vendors as Vendor[])
-    if (data.scenarios)   setScenarios(
+    if (data.deadlines)      setDeadlines(data.deadlines as Deadline[])
+    if (data.tasks)          setTasks(data.tasks as Task[])
+    if (data.budgetItems)    setBudgetItems(data.budgetItems as BudgetItem[])
+    if (data.scheduleItems)  setScheduleItems(data.scheduleItems as BudgetItem[])
+    if (data.vendors)        setVendors(data.vendors as Vendor[])
+    if (data.scenarios)      setScenarios(
       // Migrate old field name `guests` → `numGuests`
       (data.scenarios as Record<string, unknown>[]).map(sc => ({
         ...sc,
         numGuests: (sc.numGuests ?? sc.guests ?? 100) as number,
       })) as GuestScenario[]
     )
-    if (data._savedAt)    lastSavedAtRef.current = data._savedAt as number
+    if (data._savedAt)       lastSavedAtRef.current = data._savedAt as number
   }
 
   // Load saved state from Redis on mount; surface missing-KV warning
@@ -1398,7 +1407,7 @@ export default function PlannerDashboard() {
         const res = await fetch('/api/planner-state', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ deadlines, tasks, budgetItems, vendors, scenarios, _savedAt: savedAt }),
+          body: JSON.stringify({ deadlines, tasks, budgetItems, scheduleItems, vendors, scenarios, _savedAt: savedAt }),
         })
         const json = await res.json()
         if (json.kvMissing) { setKvMissing(true); setSaveStatus('error'); return }
@@ -1409,7 +1418,7 @@ export default function PlannerDashboard() {
         setSaveStatus('error')
       }
     }, 600)
-  }, [initialized, deadlines, tasks, budgetItems, vendors, scenarios])
+  }, [initialized, deadlines, tasks, budgetItems, scheduleItems, vendors, scenarios])
 
   // Poll every 8 s — pick up changes saved from another device/tab
   useEffect(() => {
@@ -1458,6 +1467,14 @@ export default function PlannerDashboard() {
     setBudgetD(p => p.filter(i => i.id !== id))
   const addBudgetItem = (paid: boolean) =>
     setBudgetD(p => [...p, { id: uid(), item: 'New item', cost: '$0', paid }])
+
+  // Payment schedule handlers (separate from budget table)
+  const updateScheduleItem = (id: string, patch: Partial<BudgetItem>) =>
+    setScheduleD(p => p.map(i => i.id === id ? { ...i, ...patch } : i))
+  const deleteScheduleItem = (id: string) =>
+    setScheduleD(p => p.filter(i => i.id !== id))
+  const addScheduleItem = () =>
+    setScheduleD(p => [...p, { id: uid(), item: 'New payment', cost: '$0', paid: false }])
 
   // Scenario handlers
   const updateScenario = (id: string, patch: Partial<GuestScenario>) =>
@@ -1594,10 +1611,14 @@ export default function PlannerDashboard() {
             {activeSection === 'budget' && (
               <BudgetSection
                 items={budgetItems}
+                scheduleItems={scheduleItems}
                 scenarios={scenarios}
                 onUpdateItem={updateBudgetItem}
                 onDeleteItem={deleteBudgetItem}
                 onAddItem={addBudgetItem}
+                onUpdateScheduleItem={updateScheduleItem}
+                onDeleteScheduleItem={deleteScheduleItem}
+                onAddScheduleItem={addScheduleItem}
                 onUpdateScenario={updateScenario}
                 onDeleteScenario={deleteScenario}
                 onAddScenario={addScenario}
