@@ -1235,51 +1235,101 @@ export default function PlannerDashboard() {
   const [vendors, setVendors] = useState<Vendor[]>(INITIAL_VENDORS)
   const [activeSection, setActiveSection] = useState<'timeline' | 'tasks' | 'budget' | 'vendors'>('timeline')
 
+  // ── Persistence ────────────────────────────────────────────────────────────
+  const [initialized, setInitialized] = useState(false)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const dirtyRef = useRef(false)
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Dirty-marking setters — mark a change as user-initiated before updating state
+  const setDeadlinesD  = (v: Parameters<typeof setDeadlines>[0])  => { dirtyRef.current = true; setDeadlines(v)  }
+  const setTasksD      = (v: Parameters<typeof setTasks>[0])      => { dirtyRef.current = true; setTasks(v)      }
+  const setBudgetD     = (v: Parameters<typeof setBudgetItems>[0]) => { dirtyRef.current = true; setBudgetItems(v) }
+  const setScenariosD  = (v: Parameters<typeof setScenarios>[0])  => { dirtyRef.current = true; setScenarios(v)  }
+  const setVendorsD    = (v: Parameters<typeof setVendors>[0])    => { dirtyRef.current = true; setVendors(v)    }
+
+  // Load saved state from Redis on mount; fall back to defaults silently
+  useEffect(() => {
+    fetch('/api/planner-state')
+      .then(r => r.json())
+      .then(({ data }) => {
+        if (!data) return
+        if (data.deadlines)   setDeadlines(data.deadlines)
+        if (data.tasks)       setTasks(data.tasks)
+        if (data.budgetItems) setBudgetItems(data.budgetItems)
+        if (data.vendors)     setVendors(data.vendors)
+        if (data.scenarios)   setScenarios(data.scenarios)
+      })
+      .catch(() => {})
+      .finally(() => setInitialized(true))
+  }, [])
+
+  // Debounced auto-save on any user-initiated state change
+  useEffect(() => {
+    if (!initialized || !dirtyRef.current) return
+    setSaveStatus('saving')
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    saveTimerRef.current = setTimeout(async () => {
+      dirtyRef.current = false
+      try {
+        await fetch('/api/planner-state', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deadlines, tasks, budgetItems, vendors, scenarios }),
+        })
+        setSaveStatus('saved')
+        setTimeout(() => setSaveStatus('idle'), 2000)
+      } catch {
+        setSaveStatus('error')
+      }
+    }, 600)
+  }, [initialized, deadlines, tasks, budgetItems, vendors, scenarios])
+
   // Deadline handlers
   const updateDeadline = (id: string, patch: Partial<Deadline>) =>
-    setDeadlines(p => p.map(d => d.id === id ? { ...d, ...patch } : d))
+    setDeadlinesD(p => p.map(d => d.id === id ? { ...d, ...patch } : d))
   const deleteDeadline = (id: string) =>
-    setDeadlines(p => p.filter(d => d.id !== id))
+    setDeadlinesD(p => p.filter(d => d.id !== id))
   const addDeadline = () =>
-    setDeadlines(p => [...p, { id: uid(), date: 'New Date', label: 'UPCOMING', urgency: 'upcoming', title: 'New Milestone', bullets: [{ id: uid(), text: 'Add details here' }] }])
+    setDeadlinesD(p => [...p, { id: uid(), date: 'New Date', label: 'UPCOMING', urgency: 'upcoming', title: 'New Milestone', bullets: [{ id: uid(), text: 'Add details here' }] }])
   const addBullet = (dlId: string) =>
-    setDeadlines(p => p.map(d => d.id === dlId ? { ...d, bullets: [...d.bullets, { id: uid(), text: 'New item' }] } : d))
+    setDeadlinesD(p => p.map(d => d.id === dlId ? { ...d, bullets: [...d.bullets, { id: uid(), text: 'New item' }] } : d))
   const updateBullet = (dlId: string, bId: string, text: string) =>
-    setDeadlines(p => p.map(d => d.id === dlId ? { ...d, bullets: d.bullets.map(b => b.id === bId ? { ...b, text } : b) } : d))
+    setDeadlinesD(p => p.map(d => d.id === dlId ? { ...d, bullets: d.bullets.map(b => b.id === bId ? { ...b, text } : b) } : d))
   const deleteBullet = (dlId: string, bId: string) =>
-    setDeadlines(p => p.map(d => d.id === dlId ? { ...d, bullets: d.bullets.filter(b => b.id !== bId) } : d))
+    setDeadlinesD(p => p.map(d => d.id === dlId ? { ...d, bullets: d.bullets.filter(b => b.id !== bId) } : d))
 
   // Task handlers
   const updateTask = (id: string, patch: Partial<Task>) =>
-    setTasks(p => p.map(t => t.id === id ? { ...t, ...patch } : t))
+    setTasksD(p => p.map(t => t.id === id ? { ...t, ...patch } : t))
   const deleteTask = (id: string) =>
-    setTasks(p => p.filter(t => t.id !== id))
+    setTasksD(p => p.filter(t => t.id !== id))
   const addTask = (category?: string) =>
-    setTasks(p => [...p, { id: uid(), title: 'New task', category: category ?? 'Other', status: 'pending', assignee: '', dueLabel: '', notes: '' }])
+    setTasksD(p => [...p, { id: uid(), title: 'New task', category: category ?? 'Other', status: 'pending', assignee: '', dueLabel: '', notes: '' }])
 
   // Budget handlers
   const updateBudgetItem = (id: string, patch: Partial<BudgetItem>) =>
-    setBudgetItems(p => p.map(i => i.id === id ? { ...i, ...patch } : i))
+    setBudgetD(p => p.map(i => i.id === id ? { ...i, ...patch } : i))
   const deleteBudgetItem = (id: string) =>
-    setBudgetItems(p => p.filter(i => i.id !== id))
+    setBudgetD(p => p.filter(i => i.id !== id))
   const addBudgetItem = (paid: boolean) =>
-    setBudgetItems(p => [...p, { id: uid(), item: 'New item', cost: '$0', paid }])
+    setBudgetD(p => [...p, { id: uid(), item: 'New item', cost: '$0', paid }])
 
   // Scenario handlers
   const updateScenario = (id: string, patch: Partial<GuestScenario>) =>
-    setScenarios(p => p.map(s => s.id === id ? { ...s, ...patch } : s))
+    setScenariosD(p => p.map(s => s.id === id ? { ...s, ...patch } : s))
   const deleteScenario = (id: string) =>
-    setScenarios(p => p.filter(s => s.id !== id))
+    setScenariosD(p => p.filter(s => s.id !== id))
   const addScenario = () =>
-    setScenarios(p => [...p, { id: uid(), numGuests: 100, costPerTable: 1600, seatsPerTable: 8 }])
+    setScenariosD(p => [...p, { id: uid(), numGuests: 100, costPerTable: 1600, seatsPerTable: 8 }])
 
   // Vendor handlers
   const updateVendor = (id: string, patch: Partial<Vendor>) =>
-    setVendors(p => p.map(v => v.id === id ? { ...v, ...patch } : v))
+    setVendorsD(p => p.map(v => v.id === id ? { ...v, ...patch } : v))
   const deleteVendor = (id: string) =>
-    setVendors(p => p.filter(v => v.id !== id))
+    setVendorsD(p => p.filter(v => v.id !== id))
   const addVendor = () =>
-    setVendors(p => [...p, { id: uid(), vendor: 'New Vendor', service: '', category: 'Other', contact: '', phone: '', email: '', budget: '', status: 'pending', notes: '' }])
+    setVendorsD(p => [...p, { id: uid(), vendor: 'New Vendor', service: '', category: 'Other', contact: '', phone: '', email: '', budget: '', status: 'pending', notes: '' }])
 
   const handleLogout = async () => {
     await fetch('/api/planner-auth/logout', { method: 'POST' })
@@ -1325,12 +1375,23 @@ export default function PlannerDashboard() {
             ))}
           </nav>
 
-          <button
-            onClick={handleLogout}
-            className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray hover:text-muted-rose transition-colors flex-shrink-0 min-h-[44px] flex items-center"
-          >
-            Exit
-          </button>
+          <div className="flex items-center gap-3 flex-shrink-0">
+            {saveStatus === 'saving' && (
+              <span className="font-work-sans text-[9px] text-soft-gray/60 hidden sm:inline">saving…</span>
+            )}
+            {saveStatus === 'saved' && (
+              <span className="font-work-sans text-[9px] text-gold-line/70 hidden sm:inline">saved ✓</span>
+            )}
+            {saveStatus === 'error' && (
+              <span className="font-work-sans text-[9px] text-muted-rose hidden sm:inline">save failed</span>
+            )}
+            <button
+              onClick={handleLogout}
+              className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray hover:text-muted-rose transition-colors min-h-[44px] flex items-center"
+            >
+              Exit
+            </button>
+          </div>
         </div>
       </header>
 
