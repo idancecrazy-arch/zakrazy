@@ -1238,8 +1238,10 @@ export default function PlannerDashboard() {
   // ── Persistence ────────────────────────────────────────────────────────────
   const [initialized, setInitialized] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [kvMissing, setKvMissing] = useState(false)
   const dirtyRef = useRef(false)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastSavedAtRef = useRef<number>(0)
 
   // Dirty-marking setters — mark a change as user-initiated before updating state
   const setDeadlinesD  = (v: Parameters<typeof setDeadlines>[0])  => { dirtyRef.current = true; setDeadlines(v)  }
@@ -1248,17 +1250,22 @@ export default function PlannerDashboard() {
   const setScenariosD  = (v: Parameters<typeof setScenarios>[0])  => { dirtyRef.current = true; setScenarios(v)  }
   const setVendorsD    = (v: Parameters<typeof setVendors>[0])    => { dirtyRef.current = true; setVendors(v)    }
 
-  // Load saved state from Redis on mount; fall back to defaults silently
+  function applyData(data: Record<string, unknown>) {
+    if (data.deadlines)   setDeadlines(data.deadlines as Deadline[])
+    if (data.tasks)       setTasks(data.tasks as Task[])
+    if (data.budgetItems) setBudgetItems(data.budgetItems as BudgetItem[])
+    if (data.vendors)     setVendors(data.vendors as Vendor[])
+    if (data.scenarios)   setScenarios(data.scenarios as GuestScenario[])
+    if (data._savedAt)    lastSavedAtRef.current = data._savedAt as number
+  }
+
+  // Load saved state from Redis on mount; surface missing-KV warning
   useEffect(() => {
     fetch('/api/planner-state')
       .then(r => r.json())
-      .then(({ data }) => {
-        if (!data) return
-        if (data.deadlines)   setDeadlines(data.deadlines)
-        if (data.tasks)       setTasks(data.tasks)
-        if (data.budgetItems) setBudgetItems(data.budgetItems)
-        if (data.vendors)     setVendors(data.vendors)
-        if (data.scenarios)   setScenarios(data.scenarios)
+      .then((json) => {
+        if (json.kvMissing) { setKvMissing(true); return }
+        if (json.data) applyData(json.data)
       })
       .catch(() => {})
       .finally(() => setInitialized(true))
@@ -1271,12 +1278,16 @@ export default function PlannerDashboard() {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
     saveTimerRef.current = setTimeout(async () => {
       dirtyRef.current = false
+      const savedAt = Date.now()
       try {
-        await fetch('/api/planner-state', {
+        const res = await fetch('/api/planner-state', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ deadlines, tasks, budgetItems, vendors, scenarios }),
+          body: JSON.stringify({ deadlines, tasks, budgetItems, vendors, scenarios, _savedAt: savedAt }),
         })
+        const json = await res.json()
+        if (json.kvMissing) { setKvMissing(true); setSaveStatus('error'); return }
+        lastSavedAtRef.current = savedAt
         setSaveStatus('saved')
         setTimeout(() => setSaveStatus('idle'), 2000)
       } catch {
@@ -1284,6 +1295,24 @@ export default function PlannerDashboard() {
       }
     }, 600)
   }, [initialized, deadlines, tasks, budgetItems, vendors, scenarios])
+
+  // Poll every 8 s — pick up changes saved from another device/tab
+  useEffect(() => {
+    if (!initialized) return
+    const interval = setInterval(async () => {
+      if (saveTimerRef.current || dirtyRef.current) return // our own save in flight
+      try {
+        const res = await fetch('/api/planner-state')
+        const json = await res.json()
+        if (!json.data || json.kvMissing) return
+        const serverAt = (json.data._savedAt as number) ?? 0
+        if (serverAt > lastSavedAtRef.current) {
+          applyData(json.data) // newer data from another device — apply silently
+        }
+      } catch { /* ignore */ }
+    }, 8000)
+    return () => clearInterval(interval)
+  }, [initialized])
 
   // Deadline handlers
   const updateDeadline = (id: string, patch: Partial<Deadline>) =>
@@ -1394,6 +1423,14 @@ export default function PlannerDashboard() {
           </div>
         </div>
       </header>
+
+      {kvMissing && (
+        <div className="bg-muted-rose/10 border-b border-muted-rose/30 px-4 sm:px-6 py-2 text-center">
+          <p className="font-work-sans text-[9px] tracking-[0.15em] uppercase text-muted-rose">
+            ⚠ Redis not configured — edits are not being saved. Add REDIS_URL to your Vercel environment variables.
+          </p>
+        </div>
+      )}
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 sm:py-7">
         {/* Stats strip */}
