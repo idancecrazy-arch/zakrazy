@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import Image from 'next/image'
+import SecretGallery from '@/components/SecretGallery'
 
 export const metadata: Metadata = {
   title: 'Our Story',
@@ -53,6 +54,9 @@ export default function OurStoryPage() {
           </div>
         ))}
       </div>
+
+      {/* Hidden footer to the engagement shoot — click to unlock candids */}
+      <SecretGallery />
 
     </div>
   )
