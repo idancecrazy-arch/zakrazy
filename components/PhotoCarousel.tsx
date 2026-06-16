@@ -13,6 +13,7 @@ const PHOTOS = [
   { src: '/gallery-0235.jpg', alt: 'Christine & Michael' },
   { src: '/gallery-0423.jpg', alt: 'Christine & Michael' },
   { src: '/gallery-0031.jpg', alt: 'Christine & Michael' },
+  { src: '/gallery-0214.jpg', alt: 'Christine & Michael' },
 ]
 
 export default function PhotoCarousel() {

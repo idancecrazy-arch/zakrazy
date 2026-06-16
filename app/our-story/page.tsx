@@ -24,6 +24,8 @@ const MONTAGE = [
   { src: '/gallery-0305.jpg', tall: false },
   { src: '/gallery-0396.jpg', tall: false },
   { src: '/gallery-0423.jpg', tall: false },
+  { src: '/gallery-0184.jpg', tall: true },
+  { src: '/gallery-0214.jpg', tall: false },
 ]
 
 export default function OurStoryPage() {
