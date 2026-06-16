@@ -52,7 +52,7 @@ export default function FAQAccordion() {
               {faq.question}
             </span>
             <span
-              className={`flex-shrink-0 mt-0.5 text-gold-line transition-transform duration-300 font-work-sans text-lg ${openIndex === i ? 'rotate-45' : ''}`}
+              className={`flex-shrink-0 mt-0.5 text-gold-deep transition-transform duration-300 font-work-sans text-lg ${openIndex === i ? 'rotate-45' : ''}`}
               aria-hidden="true"
             >
               +
@@ -61,7 +61,7 @@ export default function FAQAccordion() {
           <div
             className={`overflow-hidden transition-all duration-300 ease-in-out ${openIndex === i ? 'max-h-96 pb-5' : 'max-h-0'}`}
           >
-            <p className="font-crimson text-base text-dark-taupe/80 leading-relaxed">
+            <p className="font-crimson text-base text-dark-taupe/90 leading-relaxed">
               {faq.answer}
             </p>
           </div>

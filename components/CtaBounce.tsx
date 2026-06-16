@@ -15,8 +15,8 @@ export default function CtaBounce() {
       href="/rsvp"
       onClick={() => setBouncing(false)}
       className={`
-        font-work-sans text-[12px] tracking-[0.25em] uppercase
-        px-10 py-5 bg-gold-line text-ivory
+        font-work-sans text-[13px] tracking-[0.25em] uppercase
+        px-10 py-5 bg-gold-deep text-ivory
         hover:bg-dark-taupe hover:-translate-y-0.5 hover:shadow-md
         transition-all duration-300
         ${bouncing ? 'animate-subtle-bounce' : ''}

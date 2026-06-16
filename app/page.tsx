@@ -41,8 +41,8 @@ export default function HomePage() {
 
         {/* Invitation text — sits above the couple */}
         <div className="relative flex flex-col items-center text-center" style={{ marginTop: '-15vh', gap: '0.5rem' }}>
-          <p className="font-cormorant text-white/70 tracking-[0.28em] uppercase"
-            style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}>
+          <p className="font-cormorant text-white/90 tracking-[0.28em] uppercase"
+            style={{ fontSize: 'clamp(0.95rem, 2vw, 1.1rem)' }}>
             Together with their families
           </p>
           <h1
@@ -69,15 +69,15 @@ export default function HomePage() {
         </p>
 
         <div className="flex flex-col items-center gap-1">
-          <p className="font-work-sans text-sm tracking-[0.2em] uppercase text-dark-taupe/70">
-            <span className="text-gold-line">Ceremony</span>
+          <p className="font-work-sans text-sm tracking-[0.2em] uppercase text-dark-taupe/90">
+            <span className="text-gold-deep">Ceremony</span>
             &ensp;·&ensp;{VENUE.shortName}&ensp;·&ensp;{VENUE.neighborhood}
           </p>
-          <p className="font-work-sans text-sm tracking-[0.2em] uppercase text-dark-taupe/70">
-            <span className="text-gold-line">Reception</span>
+          <p className="font-work-sans text-sm tracking-[0.2em] uppercase text-dark-taupe/90">
+            <span className="text-gold-deep">Reception</span>
             &ensp;·&ensp;{RECEPTION_VENUE.shortName}&ensp;·&ensp;{RECEPTION_VENUE.neighborhood}
           </p>
-          <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-dark-taupe/70 mt-1">
+          <p className="font-work-sans text-base font-bold tracking-[0.25em] uppercase text-dark-taupe/90 mt-1">
             {VENUE.city}, {VENUE.state}
           </p>
         </div>
@@ -95,7 +95,7 @@ export default function HomePage() {
       <section className="bg-ivory py-16 px-6 border-t border-pale-gold/30">
         <div className="max-w-3xl mx-auto flex flex-col items-center gap-6 text-center">
           <CountdownTimer />
-          <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray">
+          <p className="font-work-sans text-[12px] tracking-[0.3em] uppercase text-ink-muted">
             Until the Celebration
           </p>
         </div>
@@ -109,8 +109,8 @@ export default function HomePage() {
         <Link
           href="/rsvp"
           className="
-            font-work-sans text-[12px] tracking-[0.25em] uppercase
-            px-10 py-5 bg-gold-line text-ivory
+            font-work-sans text-[13px] tracking-[0.25em] uppercase
+            px-10 py-5 bg-gold-deep text-ivory
             hover:bg-dark-taupe hover:-translate-y-0.5 hover:shadow-md
             transition-all duration-300
           "

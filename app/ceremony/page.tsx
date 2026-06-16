@@ -18,7 +18,7 @@ export default function CeremonyPage() {
 
         {/* Header */}
         <div className="flex flex-col items-center text-center gap-6 mb-16">
-          <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray">
+          <p className="font-work-sans text-[12px] tracking-[0.3em] uppercase text-ink-muted">
             The Wedding Ceremony
           </p>
           <h1 className="font-italiana text-5xl sm:text-6xl text-dark-taupe tracking-wide leading-tight">
@@ -43,10 +43,10 @@ export default function CeremonyPage() {
             target="_blank"
             rel="noopener noreferrer"
             className="
-              font-work-sans text-[10px] tracking-[0.2em] uppercase
-              text-muted-rose hover:text-dusty-lilac
+              font-work-sans text-[12px] tracking-[0.2em] uppercase
+              text-rose-deep hover:text-dusty-lilac
               transition-colors duration-300
-              pb-px border-b border-muted-rose/40 hover:border-dusty-lilac/40
+              pb-px border-b border-rose-deep/40 hover:border-dusty-lilac/40
             "
           >
             View on Google Maps
@@ -67,7 +67,7 @@ export default function CeremonyPage() {
             className="bg-warm-cream"
           />
           {/* Fallback: static link shown if map doesn't load */}
-          <p className="text-center py-3 font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray">
+          <p className="text-center py-3 font-work-sans text-[11px] tracking-[0.2em] uppercase text-ink-muted">
             371 Sixth Avenue · Greenwich Village · New York, NY 10014
           </p>
         </div>
@@ -102,7 +102,7 @@ export default function CeremonyPage() {
               key={label}
               className="bg-ivory p-8 flex flex-col gap-2"
             >
-              <p className="font-work-sans text-[9px] tracking-[0.3em] uppercase text-soft-gray">
+              <p className="font-work-sans text-[11px] tracking-[0.3em] uppercase text-ink-muted">
                 {label}
               </p>
               <p
@@ -122,7 +122,7 @@ export default function CeremonyPage() {
               alt="St. Joseph's Church, Greenwich Village"
             />
           </div>
-          <p className="text-center py-3 font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray">
+          <p className="text-center py-3 font-work-sans text-[11px] tracking-[0.2em] uppercase text-ink-muted">
             St. Joseph&apos;s Church · Built 1833 · Greek Revival
           </p>
         </div>
@@ -151,7 +151,7 @@ export default function CeremonyPage() {
               take in the beauty of this extraordinary space before the
               procession begins. Ushers will be on hand to assist.
             </p>
-            <p className="font-crimson italic text-base text-muted-rose leading-relaxed">
+            <p className="font-crimson italic text-base text-rose-deep leading-relaxed">
               Photography guidelines will be posted here closer to the wedding.
             </p>
           </div>

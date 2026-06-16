@@ -57,12 +57,12 @@ const RECEPTION_ICS = makeICS({
 })
 
 const btnClass =
-  'flex-1 font-work-sans text-[11px] tracking-[0.15em] uppercase px-6 py-3.5 min-h-[48px] border border-gold-line text-dark-taupe hover:bg-blush transition-colors duration-200 text-center'
+  'flex-1 font-work-sans text-[12px] tracking-[0.15em] uppercase px-6 py-3.5 min-h-[48px] border border-gold-line text-dark-taupe hover:bg-blush transition-colors duration-200 text-center'
 
 export default function CalendarDownload() {
   return (
     <div className="flex flex-col gap-3 w-full">
-      <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray text-center">
+      <p className="font-work-sans text-[12px] tracking-[0.2em] uppercase text-ink-muted text-center">
         Add to Calendar
       </p>
       <div className="flex flex-col sm:flex-row gap-3">

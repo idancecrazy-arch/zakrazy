@@ -17,7 +17,7 @@ interface GuestSelectorProps {
 }
 
 const inputClass =
-  'w-full bg-ivory border border-gold-line/60 px-4 py-3.5 min-h-[48px] font-crimson text-base sm:text-lg text-dark-taupe placeholder:text-soft-gray focus:border-gold-line focus:outline-none transition-colors duration-200'
+  'w-full bg-ivory border border-gold-line/60 px-4 py-3.5 min-h-[48px] font-crimson text-base sm:text-lg text-dark-taupe placeholder:text-ink-muted focus:border-gold-line focus:outline-none transition-colors duration-200'
 
 export default function GuestSelector({ onSelect, onClear, selected, error }: GuestSelectorProps) {
   const [query, setQuery] = useState('')
@@ -76,7 +76,7 @@ export default function GuestSelector({ onSelect, onClear, selected, error }: Gu
         <button
           type="button"
           onClick={() => { onClear(); setQuery('') }}
-          className="font-work-sans text-[10px] tracking-[0.15em] uppercase text-muted-rose hover:text-dark-taupe transition-colors duration-200 flex-shrink-0"
+          className="font-work-sans text-[12px] tracking-[0.15em] uppercase text-rose-deep hover:text-dark-taupe transition-colors duration-200 flex-shrink-0"
         >
           Change
         </button>
@@ -94,17 +94,17 @@ export default function GuestSelector({ onSelect, onClear, selected, error }: Gu
         autoComplete="off"
         className={inputClass}
       />
-      {error && <p className="font-crimson italic text-sm text-muted-rose">{error}</p>}
+      {error && <p className="font-crimson italic text-sm text-rose-deep">{error}</p>}
 
       {open && (
         <div className="absolute top-full left-0 right-0 z-20 bg-warm-cream border border-pale-gold/60 shadow-md mt-0.5 max-h-56 overflow-y-auto">
           {loading && (
-            <p className="font-crimson italic text-sm text-dark-taupe/60 px-4 py-3">Searching…</p>
+            <p className="font-crimson italic text-sm text-dark-taupe/90 px-4 py-3">Searching…</p>
           )}
           {!loading && apiError && (
             <div className="px-4 py-4 flex flex-col gap-1">
-              <p className="font-crimson text-base text-dark-taupe/80">Something went wrong searching the guest list.</p>
-              <p className="font-crimson italic text-sm text-muted-rose">
+              <p className="font-crimson text-base text-dark-taupe/90">Something went wrong searching the guest list.</p>
+              <p className="font-crimson italic text-sm text-rose-deep">
                 Please try again or{' '}
                 <a href="mailto:christineandmichaelzak@gmail.com" className="underline hover:text-dark-taupe">
                   contact us
@@ -115,8 +115,8 @@ export default function GuestSelector({ onSelect, onClear, selected, error }: Gu
           )}
           {!loading && !apiError && results.length === 0 && (
             <div className="px-4 py-4 flex flex-col gap-1">
-              <p className="font-crimson text-base text-dark-taupe/80">No match found for &ldquo;{query}&rdquo;.</p>
-              <p className="font-crimson italic text-sm text-muted-rose">
+              <p className="font-crimson text-base text-dark-taupe/90">No match found for &ldquo;{query}&rdquo;.</p>
+              <p className="font-crimson italic text-sm text-rose-deep">
                 Please double-check your spelling or{' '}
                 <a href="mailto:christineandmichaelzak@gmail.com" className="underline hover:text-dark-taupe">
                   contact us
