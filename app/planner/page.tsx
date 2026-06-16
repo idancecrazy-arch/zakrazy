@@ -77,6 +77,17 @@ function formatRange(low: number, high: number): string {
   return '$' + low.toLocaleString() + '–$' + high.toLocaleString()
 }
 
+// Ensure dueDate is always stored as YYYY-MM-DD with a 4-digit year.
+// Some mobile browsers return 2-digit years (e.g. "26-08-12" instead of "2026-08-12").
+function normalizeDate(d: string | undefined): string | undefined {
+  if (!d) return undefined
+  // Already full ISO YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d
+  // 2-digit year: "26-08-12" → "2026-08-12"
+  if (/^\d{2}-\d{2}-\d{2}$/.test(d)) return `20${d}`
+  return d
+}
+
 // ── Initial Data ───────────────────────────────────────────────────────────────
 
 const INITIAL_DEADLINES: Deadline[] = [
@@ -757,7 +768,8 @@ function PaymentSchedule({
       ) : (
         <div className="space-y-6">
           {sortedMonths.map(monthKey => {
-            const [yr, mo] = monthKey.split('-').map(Number)
+            const [rawYr, mo] = monthKey.split('-').map(Number)
+            const yr = rawYr < 100 ? rawYr + 2000 : rawYr
             const monthItems = byMonth[monthKey].sort((a, b) =>
               new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime()
             )
@@ -801,7 +813,7 @@ function PaymentSchedule({
                               <input
                                 type="date"
                                 value={item.dueDate ?? ''}
-                                onChange={e => onUpdateItem(item.id, { dueDate: e.target.value || undefined })}
+                                onChange={e => onUpdateItem(item.id, { dueDate: normalizeDate(e.target.value) })}
                                 className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-soft-gray/50 bg-transparent border-none outline-none cursor-pointer"
                               />
                             </label>
@@ -855,7 +867,7 @@ function PaymentSchedule({
                           <input
                             type="date"
                             value={item.dueDate ?? ''}
-                            onChange={e => onUpdateItem(item.id, { dueDate: e.target.value || undefined })}
+                            onChange={e => onUpdateItem(item.id, { dueDate: normalizeDate(e.target.value) })}
                             className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-soft-gray/50 bg-transparent border-none outline-none cursor-pointer"
                           />
                         </label>
@@ -1371,7 +1383,9 @@ export default function PlannerDashboard() {
     if (data.deadlines)      setDeadlines(data.deadlines as Deadline[])
     if (data.tasks)          setTasks(data.tasks as Task[])
     if (data.budgetItems)    setBudgetItems(data.budgetItems as BudgetItem[])
-    if (data.scheduleItems)  setScheduleItems(data.scheduleItems as BudgetItem[])
+    if (data.scheduleItems)  setScheduleItems(
+      (data.scheduleItems as BudgetItem[]).map(i => ({ ...i, dueDate: normalizeDate(i.dueDate) }))
+    )
     if (data.vendors)        setVendors(data.vendors as Vendor[])
     if (data.scenarios)      setScenarios(
       // Migrate old field name `guests` → `numGuests`
