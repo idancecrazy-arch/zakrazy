@@ -94,12 +94,13 @@ export async function POST(req: NextRequest) {
       if (data.phone) primaryFields['Phone'] = data.phone
       if (data.address1) primaryFields['Address'] = [data.address1, data.address2, data.city, data.state, data.zip].filter(Boolean).join(', ')
     }
-    if (data.attending) {
-      if (data.plusOneName) primaryFields['Plus One Name'] = data.plusOneName
-      if (data.children && data.children.length > 0) primaryFields['Children'] = JSON.stringify(data.children)
-      if (data.dietaryRestrictions) primaryFields['Dietary Restrictions'] = data.dietaryRestrictions
-      if (data.welcomeReception !== undefined) primaryFields['Welcome Reception'] = data.welcomeReception
-    }
+    // Party-level details are gated by the client (only sent when someone in
+    // the party is attending), so save whatever is present — even if the
+    // primary guest themselves declined while another party member accepted.
+    if (data.plusOneName) primaryFields['Plus One Name'] = data.plusOneName
+    if (data.children && data.children.length > 0) primaryFields['Children'] = JSON.stringify(data.children)
+    if (data.dietaryRestrictions) primaryFields['Dietary Restrictions'] = data.dietaryRestrictions
+    if (data.welcomeReception !== undefined) primaryFields['Welcome Reception'] = data.welcomeReception
     await createRecord(airtableBase, airtableTable, airtableKey, primaryFields)
 
     // One record per additional party member

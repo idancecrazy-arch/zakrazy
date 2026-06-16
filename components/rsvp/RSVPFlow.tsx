@@ -6,6 +6,7 @@ import Link from 'next/link'
 import GuestSelector, { type GuestRecord } from './GuestSelector'
 import PartyComposition, { type Child } from './PartyComposition'
 import CeremonyReceptionDetails from './CeremonyReceptionDetails'
+import { parseGuestNames, isPlaceholderName } from '@/lib/guestNames'
 
 const sectionHeadingClass =
   'font-cormorant text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50'
@@ -44,6 +45,45 @@ function Field({
   )
 }
 
+interface PartyMember {
+  name: string
+  attending: boolean | null
+  /** True when the name was parsed from the guest record (read-only). */
+  known: boolean
+}
+
+function AttendanceRadios({
+  index,
+  value,
+  onChange,
+  label,
+}: {
+  index: number
+  value: boolean | null
+  onChange: (v: boolean) => void
+  label: string
+}) {
+  return (
+    <div className="flex flex-col gap-3" role="group" aria-label={label}>
+      {[
+        { value: true, label: 'Joyfully accepts' },
+        { value: false, label: 'Regretfully declines' },
+      ].map((opt) => (
+        <label key={opt.label} className={checkboxLabel}>
+          <input
+            type="radio"
+            name={`attending-${index}`}
+            checked={value === opt.value}
+            onChange={() => onChange(opt.value)}
+            className="w-5 h-5 accent-gold-line cursor-pointer flex-shrink-0"
+          />
+          <span className="font-crimson text-base sm:text-lg text-dark-taupe">{opt.label}</span>
+        </label>
+      ))}
+    </div>
+  )
+}
+
 function isPastDeadline() {
   const deadline = process.env.NEXT_PUBLIC_RSVP_DEADLINE
   if (!deadline) return false
@@ -64,14 +104,11 @@ export default function RSVPFlow() {
   const [state, setState] = useState('')
   const [zip, setZip] = useState('')
 
-  const [attending, setAttending] = useState<boolean | null>(null)
   const [welcomeReception, setWelcomeReception] = useState<boolean | null>(null)
-  const [plusOneName, setPlusOneName] = useState('')
   const [hasChildren, setHasChildren] = useState(false)
   const [children, setChildren] = useState<Child[]>([])
   const [dietary, setDietary] = useState('')
 
-  interface PartyMember { name: string; attending: boolean | null; dietary: string; welcomeReception: boolean | null }
   const [partyMembers, setPartyMembers] = useState<PartyMember[]>([])
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
@@ -80,17 +117,23 @@ export default function RSVPFlow() {
   const [memberErrors, setMemberErrors] = useState<string[]>([])
 
   const guestSelected = guest !== null
+  const isMultiParty = partyMembers.length > 1
+  const anyAttending = partyMembers.some((m) => m.attending === true)
+  const allAnswered = partyMembers.length > 0 && partyMembers.every((m) => m.attending !== null)
 
   const handleGuestSelect = (g: GuestRecord) => {
+    const names = parseGuestNames(g.name, g.partySize)
+    setPartyMembers(
+      names.map((n) => {
+        const placeholder = isPlaceholderName(n)
+        return { name: placeholder ? '' : n.trim(), attending: null, known: !placeholder }
+      }),
+    )
     setGuest(g)
-    setPlusOneName('')
+    setWelcomeReception(null)
     setHasChildren(false)
     setChildren([])
-    setPartyMembers(
-      g.partySize > 1
-        ? Array.from({ length: g.partySize - 1 }, () => ({ name: '', attending: null, dietary: '', welcomeReception: null }))
-        : []
-    )
+    setDietary('')
     setErrors({})
     setChildErrors([])
     setMemberErrors([])
@@ -99,19 +142,18 @@ export default function RSVPFlow() {
   const handleGuestClear = () => {
     setGuest(null)
     setUpdateContact(null)
-    setAttending(null)
     setWelcomeReception(null)
-    setPlusOneName('')
     setHasChildren(false)
     setChildren([])
     setDietary('')
     setPartyMembers([])
     setErrors({})
+    setChildErrors([])
     setMemberErrors([])
   }
 
-  const updateMember = (i: number, patch: Partial<{ name: string; attending: boolean | null; dietary: string; welcomeReception: boolean | null }>) => {
-    setPartyMembers(prev => prev.map((m, idx) => idx === i ? { ...m, ...patch } : m))
+  const updateMember = (i: number, patch: Partial<PartyMember>) => {
+    setPartyMembers((prev) => prev.map((m, idx) => (idx === i ? { ...m, ...patch } : m)))
   }
 
   const validate = () => {
@@ -120,17 +162,20 @@ export default function RSVPFlow() {
     const me: string[] = []
 
     if (!guest) e.guest = 'Please find your name to continue.'
-    if (attending === null && guestSelected) e.attending = 'Please let us know if you\'ll be attending.'
 
-    if (attending) {
-      if (hasChildren) {
-        children.forEach((c, i) => {
-          if (!c.name.trim() || !c.age.trim()) ce[i] = 'Please complete name and age.'
-        })
+    partyMembers.forEach((m, i) => {
+      if (m.attending === null) {
+        me[i] = isMultiParty
+          ? 'Please indicate if this guest will attend.'
+          : 'Please let us know if you\'ll be attending.'
+      } else if (!m.known && m.attending === true && !m.name.trim()) {
+        me[i] = 'Please enter this guest\'s name.'
       }
-      partyMembers.forEach((m, i) => {
-        if (!m.name.trim()) me[i] = 'Please enter this guest\'s name.'
-        else if (m.attending === null) me[i] = 'Please indicate if this guest will attend.'
+    })
+
+    if (anyAttending && hasChildren) {
+      children.forEach((c, i) => {
+        if (!c.name.trim() || !c.age.trim()) ce[i] = 'Please complete name and age.'
       })
     }
 
@@ -145,13 +190,20 @@ export default function RSVPFlow() {
     if (!validate()) return
     setStatus('loading')
 
+    const members = partyMembers.map((m) => ({
+      name: m.name.trim() || 'Guest',
+      attending: m.attending ?? false,
+    }))
+    const primary = members[0]
+    const additional = members.slice(1)
+
     try {
       const res = await fetch('/api/rsvp/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          guestName: guest!.name,
-          attending,
+          guestName: primary.name,
+          attending: primary.attending,
           updateContact: updateContact ?? false,
           email: updateContact ? email : undefined,
           phone: updateContact ? phone : undefined,
@@ -160,26 +212,21 @@ export default function RSVPFlow() {
           city: updateContact ? city : undefined,
           state: updateContact ? state : undefined,
           zip: updateContact ? zip : undefined,
-          plusOneName: guest?.plusOneAllowed && partyMembers.length === 0 ? plusOneName.trim() : undefined,
-          children: hasChildren && children.length > 0 ? children : undefined,
-          partyMembers: attending && partyMembers.length > 0 ? partyMembers.map(m => ({
-            name: m.name.trim(),
-            attending: m.attending ?? false,
-            dietaryRestrictions: m.dietary.trim() || undefined,
-            welcomeReception: m.welcomeReception ?? undefined,
-          })) : undefined,
-          dietaryRestrictions: dietary.trim() || undefined,
-          welcomeReception: attending ? (welcomeReception ?? undefined) : undefined,
+          children: anyAttending && hasChildren && children.length > 0 ? children : undefined,
+          partyMembers: additional.length > 0 ? additional : undefined,
+          dietaryRestrictions: anyAttending ? dietary.trim() || undefined : undefined,
+          welcomeReception: anyAttending ? welcomeReception ?? undefined : undefined,
         }),
       })
 
       if (!res.ok) throw new Error('Submit failed')
 
       const params = new URLSearchParams({
-        name: guest!.name.split(' ')[0],
-        attending: attending ? '1' : '0',
+        name: primary.name.split(' ')[0],
+        attending: anyAttending ? '1' : '0',
       })
-      if (attending && guest?.plusOneAllowed && plusOneName.trim()) params.set('plusOne', plusOneName.trim())
+      const extraGuest = additional.find((m) => m.attending && m.name && m.name !== 'Guest')
+      if (anyAttending && extraGuest) params.set('plusOne', extraGuest.name)
 
       router.push(`/rsvp/thank-you?${params.toString()}`)
     } catch {
@@ -225,35 +272,71 @@ export default function RSVPFlow() {
         />
       </div>
 
-      {/* ── Attending ────────────────────────────────────── */}
-      {guestSelected && (
+      {/* ── Attendance: single guest ─────────────────────── */}
+      {guestSelected && !isMultiParty && (
         <div className="flex flex-col gap-5">
           <h2 className={sectionHeadingClass}>Will You Be Attending?</h2>
-          <div className="flex flex-col gap-3" role="group" aria-label="Attendance">
-            {[
-              { value: true, label: 'Joyfully accepts' },
-              { value: false, label: 'Regretfully declines' },
-            ].map(({ value, label }) => (
-              <label key={label} className={checkboxLabel}>
-                <input
-                  type="radio"
-                  name="attending"
-                  checked={attending === value}
-                  onChange={() => setAttending(value)}
-                  className="w-5 h-5 accent-gold-line cursor-pointer flex-shrink-0"
-                />
-                <span className="font-crimson text-base sm:text-lg text-dark-taupe">{label}</span>
-              </label>
-            ))}
-          </div>
-          {errors.attending && (
-            <p className="font-crimson italic text-sm text-muted-rose">{errors.attending}</p>
+          {!partyMembers[0].known && (
+            <Field label="Full Name" error={memberErrors[0]}>
+              <input
+                type="text"
+                value={partyMembers[0].name}
+                onChange={(ev) => updateMember(0, { name: ev.target.value })}
+                placeholder="First and last name"
+                className={inputClass}
+              />
+            </Field>
+          )}
+          <AttendanceRadios
+            index={0}
+            value={partyMembers[0].attending}
+            onChange={(v) => updateMember(0, { attending: v })}
+            label="Attendance"
+          />
+          {memberErrors[0] && partyMembers[0].known && (
+            <p className="font-crimson italic text-sm text-muted-rose">{memberErrors[0]}</p>
           )}
         </div>
       )}
 
-      {/* ── Welcome Reception (attending only) ───────────── */}
-      {attending === true && (
+      {/* ── Attendance: full party ───────────────────────── */}
+      {guestSelected && isMultiParty && (
+        <div className="flex flex-col gap-6">
+          <h2 className={sectionHeadingClass}>Your Party</h2>
+          <p className="font-crimson text-base text-dark-taupe/85">
+            Your reservation is for {guest?.partySize ?? partyMembers.length} guests. Please RSVP for each person below.
+          </p>
+          {partyMembers.map((member, i) => (
+            <div key={i} className="flex flex-col gap-4 border border-pale-gold/40 p-5 bg-warm-cream/30">
+              {member.known ? (
+                <p className="font-cormorant text-xl sm:text-2xl text-dark-taupe">{member.name}</p>
+              ) : (
+                <Field label="Full Name" error={memberErrors[i]}>
+                  <input
+                    type="text"
+                    value={member.name}
+                    onChange={(ev) => updateMember(i, { name: ev.target.value })}
+                    placeholder="First and last name"
+                    className={inputClass}
+                  />
+                </Field>
+              )}
+              <AttendanceRadios
+                index={i}
+                value={member.attending}
+                onChange={(v) => updateMember(i, { attending: v })}
+                label={`Attendance for ${member.known ? member.name : `guest ${i + 1}`}`}
+              />
+              {memberErrors[i] && member.known && (
+                <p className="font-crimson italic text-sm text-muted-rose">{memberErrors[i]}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Welcome Reception (party-level) ──────────────── */}
+      {anyAttending && (
         <div className="flex flex-col gap-5">
           <h2 className={sectionHeadingClass}>Welcome Reception</h2>
           <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
@@ -283,110 +366,22 @@ export default function RSVPFlow() {
         </div>
       )}
 
-      {/* ── Party (attending only, single guests only) ───── */}
-      {attending === true && partyMembers.length === 0 && (
-        <div className="flex flex-col gap-5">
-          <h2 className={sectionHeadingClass}>Your Party</h2>
-          <PartyComposition
-            plusOneAllowed={guest?.plusOneAllowed ?? false}
-            plusOneName={plusOneName}
-            hasChildren={hasChildren}
-            children={children}
-            onPlusOneNameChange={setPlusOneName}
-            onChildrenToggle={setHasChildren}
-            onChildrenChange={setChildren}
-            errors={{ plusOneName: errors.plusOneName, children: childErrors }}
-          />
-        </div>
-      )}
-
-      {/* ── Additional Party Members ─────────────────────── */}
-      {attending === true && partyMembers.length > 0 && (
-        <div className="flex flex-col gap-6">
-          <h2 className={sectionHeadingClass}>Your Party</h2>
-          <p className="font-crimson text-base text-dark-taupe/85">
-            Your reservation is for {(guest?.partySize ?? 1)} guests. Please RSVP for each person below.
-          </p>
-          {partyMembers.map((member, i) => (
-            <div key={i} className="flex flex-col gap-4 border border-pale-gold/40 p-5 bg-warm-cream/30">
-              <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-gold-line">
-                Guest {i + 2}
-              </p>
-              <Field label="Full Name" error={memberErrors[i]}>
-                <input
-                  type="text"
-                  value={member.name}
-                  onChange={(e) => updateMember(i, { name: e.target.value })}
-                  placeholder="First and last name"
-                  className={inputClass}
-                />
-              </Field>
-              <div className="flex flex-col gap-2">
-                <span className="font-work-sans text-xs tracking-[0.12em] uppercase text-dark-taupe/85 font-medium">Will they be attending?</span>
-                <div className="flex flex-col gap-2">
-                  {([{ value: true, label: 'Joyfully accepts' }, { value: false, label: 'Regretfully declines' }] as const).map(({ value, label }) => (
-                    <label key={label} className={checkboxLabel}>
-                      <input
-                        type="radio"
-                        name={`member-attending-${i}`}
-                        checked={member.attending === value}
-                        onChange={() => updateMember(i, { attending: value })}
-                        className="w-5 h-5 accent-gold-line cursor-pointer flex-shrink-0"
-                      />
-                      <span className="font-crimson text-base text-dark-taupe">{label}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-              {member.attending === true && (
-                <>
-                  <div className="flex flex-col gap-2">
-                    <span className="font-work-sans text-xs tracking-[0.12em] uppercase text-dark-taupe/85 font-medium">
-                      Welcome Reception <span className="ml-2 normal-case tracking-normal font-crimson italic text-sm text-muted-rose">optional</span>
-                    </span>
-                    <div className="flex flex-col gap-2">
-                      {([{ value: true, label: 'Yes, I\'ll be there' }, { value: false, label: 'No, can\'t make it' }] as const).map(({ value, label }) => (
-                        <label key={label} className={checkboxLabel}>
-                          <input
-                            type="radio"
-                            name={`member-welcome-${i}`}
-                            checked={member.welcomeReception === value}
-                            onChange={() => updateMember(i, { welcomeReception: value })}
-                            className="w-5 h-5 accent-gold-line cursor-pointer flex-shrink-0"
-                          />
-                          <span className="font-crimson text-base text-dark-taupe">{label}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                  <Field label="Dietary Restrictions" optional>
-                    <textarea
-                      value={member.dietary}
-                      onChange={(e) => updateMember(i, { dietary: e.target.value })}
-                      rows={2}
-                      placeholder="List any allergies or dietary restrictions…"
-                      className={`${inputClass} resize-none`}
-                    />
-                  </Field>
-                </>
-              )}
-            </div>
-          ))}
-          <PartyComposition
-            plusOneAllowed={false}
-            plusOneName=""
-            hasChildren={hasChildren}
-            children={children}
-            onPlusOneNameChange={setPlusOneName}
-            onChildrenToggle={setHasChildren}
-            onChildrenChange={setChildren}
-            errors={{ children: childErrors }}
-          />
-        </div>
+      {/* ── Children (party-level) ───────────────────────── */}
+      {anyAttending && (
+        <PartyComposition
+          plusOneAllowed={false}
+          plusOneName=""
+          hasChildren={hasChildren}
+          children={children}
+          onPlusOneNameChange={() => {}}
+          onChildrenToggle={setHasChildren}
+          onChildrenChange={setChildren}
+          errors={{ children: childErrors }}
+        />
       )}
 
       {/* ── Dietary (attending only) ─────────────────────── */}
-      {attending === true && (
+      {anyAttending && (
         <div className="flex flex-col gap-5">
           <h2 className={sectionHeadingClass}>Dietary Information</h2>
           <p className="font-crimson italic text-sm text-deep-ivory">
@@ -405,7 +400,7 @@ export default function RSVPFlow() {
       )}
 
       {/* ── Travel & Accommodations (attending only) ─────── */}
-      {attending === true && (
+      {anyAttending && (
         <div className="flex flex-col gap-4 bg-warm-cream/40 border border-pale-gold/30 p-5">
           <h2 className={sectionHeadingClass}>Travel &amp; Accommodations</h2>
           <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
@@ -423,7 +418,7 @@ export default function RSVPFlow() {
       )}
 
       {/* ── Event Details ─────────────────────────────────── */}
-      {guestSelected && attending !== null && (
+      {guestSelected && allAnswered && (
         <div className="flex flex-col gap-5">
           <h2 className={sectionHeadingClass}>Event Details</h2>
           <CeremonyReceptionDetails />
@@ -431,7 +426,7 @@ export default function RSVPFlow() {
       )}
 
       {/* ── Dress Code (attending only) ───────────────────── */}
-      {attending === true && (
+      {anyAttending && (
         <div className="flex flex-col gap-3 bg-warm-cream/40 border border-pale-gold/30 p-5">
           <h2 className={sectionHeadingClass}>Dress Code</h2>
           <p className="font-crimson text-base text-dark-taupe/80 leading-relaxed">
@@ -441,7 +436,7 @@ export default function RSVPFlow() {
       )}
 
       {/* ── Contact Info ─────────────────────────────────── */}
-      {guestSelected && attending !== null && (
+      {guestSelected && allAnswered && (
         <div className="flex flex-col gap-5">
           <h2 className={sectionHeadingClass}>Contact Information</h2>
           <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
@@ -558,7 +553,7 @@ export default function RSVPFlow() {
       )}
 
       {/* ── Submit ───────────────────────────────────────── */}
-      {guestSelected && attending !== null && (
+      {guestSelected && allAnswered && (
         <div className="flex justify-center pt-2">
           <button
             type="submit"
