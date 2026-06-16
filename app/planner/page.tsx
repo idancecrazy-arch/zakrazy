@@ -88,6 +88,20 @@ function normalizeDate(d: string | undefined): string | undefined {
   return d
 }
 
+// Returns a sortable MMDD number so tasks/deadlines with matching dates can be linked.
+// Handles both short ("Jun 12", "Aug 22") and long ("June 12, 2026") forms.
+function parseMonthDay(str: string): number | null {
+  const MAP: Record<string, number> = {
+    jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
+    jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
+  }
+  const m = str.toLowerCase().match(/([a-z]+)\s+(\d+)/)
+  if (!m) return null
+  const month = MAP[m[1].slice(0, 3)]
+  if (!month) return null
+  return month * 100 + parseInt(m[2], 10)
+}
+
 // ── Initial Data ───────────────────────────────────────────────────────────────
 
 const INITIAL_DEADLINES: Deadline[] = [
@@ -346,19 +360,96 @@ const URGENCY_OPTIONS: { value: DeadlineUrgency; label: string }[] = [
 
 // ── Timeline section ───────────────────────────────────────────────────────────
 
+// Compact task row rendered inside timeline deadline cards
+function TaskMiniRow({
+  task,
+  onUpdate,
+}: {
+  task: Task
+  onUpdate: (id: string, patch: Partial<Task>) => void
+}) {
+  const CYCLE: Record<TaskStatus, TaskStatus> = {
+    pending: 'in-progress', 'in-progress': 'done', done: 'pending',
+  }
+  return (
+    <div className={`flex items-center gap-2 py-1.5 border-b border-soft-gray/10 last:border-0 ${task.status === 'done' ? 'opacity-50' : ''}`}>
+      <button
+        onClick={() => onUpdate(task.id, { status: CYCLE[task.status] })}
+        className="flex-shrink-0 w-4 h-4 rounded border border-gold-line/40 flex items-center justify-center hover:border-gold-line transition-colors"
+        aria-label={`Status: ${task.status}`}
+      >
+        {task.status === 'done' && (
+          <svg width="9" height="7" viewBox="0 0 9 7" fill="none" aria-hidden="true">
+            <path d="M1 3.5L3.5 6L8 1" stroke="#C3AF82" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
+        {task.status === 'in-progress' && (
+          <div className="w-1.5 h-1.5 rounded-full bg-dusty-lilac" />
+        )}
+      </button>
+      <span className={`font-crimson text-sm text-dark-taupe leading-snug flex-1 ${task.status === 'done' ? 'line-through' : ''}`}>
+        {task.title}
+      </span>
+      {task.category && (
+        <span className="font-work-sans text-[8px] tracking-wider uppercase text-soft-gray/50 flex-shrink-0 hidden sm:inline">
+          {task.category}
+        </span>
+      )}
+      {task.assignee && (
+        <span className="font-work-sans text-[8px] text-deep-ivory/50 flex-shrink-0">{task.assignee}</span>
+      )}
+    </div>
+  )
+}
+
 function TimelineSection({
-  deadlines,
+  deadlines, tasks,
   onUpdate, onDelete, onAdd,
   onAddBullet, onUpdateBullet, onDeleteBullet,
+  onUpdateTask,
 }: {
   deadlines: Deadline[]
+  tasks: Task[]
   onUpdate: (id: string, patch: Partial<Deadline>) => void
   onDelete: (id: string) => void
   onAdd: () => void
   onAddBullet: (dlId: string) => void
   onUpdateBullet: (dlId: string, bId: string, text: string) => void
   onDeleteBullet: (dlId: string, bId: string) => void
+  onUpdateTask: (id: string, patch: Partial<Task>) => void
 }) {
+  // Index tasks by MMDD so we can match them to deadline dates
+  const tasksByKey = new Map<number, Task[]>()
+  for (const task of tasks) {
+    if (!task.dueLabel) continue
+    const key = parseMonthDay(task.dueLabel)
+    if (key === null) continue
+    if (!tasksByKey.has(key)) tasksByKey.set(key, [])
+    tasksByKey.get(key)!.push(task)
+  }
+
+  type DeadlineEntry = { kind: 'deadline'; deadline: Deadline; sortKey: number; tasks: Task[] }
+  type ClusterEntry  = { kind: 'cluster';  dueLabel: string;  sortKey: number; tasks: Task[] }
+  type TimelineEntry = DeadlineEntry | ClusterEntry
+
+  const coveredKeys = new Set<number>()
+  const deadlineEntries: DeadlineEntry[] = deadlines.map(dl => {
+    const key = parseMonthDay(dl.date) ?? 0
+    const matched = tasksByKey.get(key) ?? []
+    if (key) coveredKeys.add(key)
+    return { kind: 'deadline', deadline: dl, sortKey: key, tasks: matched }
+  })
+
+  // Tasks with a due date not covered by any deadline → standalone cluster cards
+  const clusterEntries: ClusterEntry[] = []
+  for (const [key, clusterTasks] of tasksByKey.entries()) {
+    if (coveredKeys.has(key)) continue
+    clusterEntries.push({ kind: 'cluster', dueLabel: clusterTasks[0].dueLabel, sortKey: key, tasks: clusterTasks })
+  }
+
+  const allEntries: TimelineEntry[] = [...deadlineEntries, ...clusterEntries]
+    .sort((a, b) => a.sortKey - b.sortKey)
+
   return (
     <section>
       <div className="flex items-center justify-between mb-5">
@@ -376,80 +467,115 @@ function TimelineSection({
       <div className="relative">
         <div className="absolute left-3 top-0 bottom-0 w-px bg-soft-gray/30" />
         <div className="flex flex-col gap-5 pl-10">
-          {deadlines.map(dl => {
-            const s = URGENCY_STYLES[dl.urgency]
-            return (
-              <div key={dl.id} className="relative">
-                <div className={`absolute -left-7 top-2 w-3 h-3 rounded-full ${s.dot} ring-2 ring-ivory flex-shrink-0`} />
-                <div className={`border rounded-lg p-4 ${s.card}`}>
-                  {/* Date / label / urgency / delete row */}
-                  <div className="flex items-start justify-between gap-2 mb-2 flex-wrap">
-                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 flex-1 min-w-0">
-                      <EditableText
-                        value={dl.date}
-                        onChange={v => onUpdate(dl.id, { date: v })}
-                        className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray"
-                      />
-                      <EditableText
-                        value={dl.label}
-                        onChange={v => onUpdate(dl.id, { label: v })}
-                        className={`font-work-sans text-[10px] tracking-[0.2em] uppercase ${s.labelColor}`}
-                      />
-                    </div>
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <select
-                        value={dl.urgency}
-                        onChange={e => onUpdate(dl.id, { urgency: e.target.value as DeadlineUrgency })}
-                        className="font-work-sans text-[9px] uppercase bg-transparent border border-soft-gray/30 rounded px-1 py-0.5 text-soft-gray focus:outline-none focus:border-gold-line"
-                      >
-                        {URGENCY_OPTIONS.map(o => (
-                          <option key={o.value} value={o.value}>{o.label}</option>
-                        ))}
-                      </select>
-                      <button
-                        onClick={() => onDelete(dl.id)}
-                        className="text-soft-gray/40 hover:text-muted-rose transition-colors w-6 h-6 flex items-center justify-center text-base"
-                        aria-label="Delete deadline"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Title */}
-                  <EditableText
-                    value={dl.title}
-                    onChange={v => onUpdate(dl.id, { title: v })}
-                    className="font-crimson text-lg font-semibold text-dark-taupe mb-3 block w-full"
-                  />
-
-                  {/* Bullets */}
-                  <ul className="space-y-2">
-                    {dl.bullets.map(b => (
-                      <li key={b.id} className="flex items-start gap-2 group/bullet">
-                        <span className="text-gold-line mt-0.5 flex-shrink-0 text-sm leading-snug">·</span>
+          {allEntries.map(entry => {
+            if (entry.kind === 'deadline') {
+              const dl = entry.deadline
+              const s = URGENCY_STYLES[dl.urgency]
+              return (
+                <div key={dl.id} className="relative">
+                  <div className={`absolute -left-7 top-2 w-3 h-3 rounded-full ${s.dot} ring-2 ring-ivory flex-shrink-0`} />
+                  <div className={`border rounded-lg p-4 ${s.card}`}>
+                    {/* Date / label / urgency / delete row */}
+                    <div className="flex items-start justify-between gap-2 mb-2 flex-wrap">
+                      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 flex-1 min-w-0">
                         <EditableText
-                          value={b.text}
-                          onChange={v => onUpdateBullet(dl.id, b.id, v)}
-                          className="font-crimson text-sm text-deep-ivory leading-snug flex-1"
+                          value={dl.date}
+                          onChange={v => onUpdate(dl.id, { date: v })}
+                          className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray"
                         />
+                        <EditableText
+                          value={dl.label}
+                          onChange={v => onUpdate(dl.id, { label: v })}
+                          className={`font-work-sans text-[10px] tracking-[0.2em] uppercase ${s.labelColor}`}
+                        />
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <select
+                          value={dl.urgency}
+                          onChange={e => onUpdate(dl.id, { urgency: e.target.value as DeadlineUrgency })}
+                          className="font-work-sans text-[9px] uppercase bg-transparent border border-soft-gray/30 rounded px-1 py-0.5 text-soft-gray focus:outline-none focus:border-gold-line"
+                        >
+                          {URGENCY_OPTIONS.map(o => (
+                            <option key={o.value} value={o.value}>{o.label}</option>
+                          ))}
+                        </select>
                         <button
-                          onClick={() => onDeleteBullet(dl.id, b.id)}
-                          className="text-soft-gray/30 hover:text-muted-rose transition-colors w-5 h-5 flex items-center justify-center text-base flex-shrink-0 opacity-0 group-hover/bullet:opacity-100"
-                          aria-label="Remove item"
+                          onClick={() => onDelete(dl.id)}
+                          className="text-soft-gray/40 hover:text-muted-rose transition-colors w-6 h-6 flex items-center justify-center text-base"
+                          aria-label="Delete deadline"
                         >
                           ×
                         </button>
-                      </li>
-                    ))}
-                  </ul>
+                      </div>
+                    </div>
 
-                  <button
-                    onClick={() => onAddBullet(dl.id)}
-                    className="mt-2.5 font-work-sans text-[9px] tracking-[0.15em] uppercase text-soft-gray/50 hover:text-gold-line transition-colors"
-                  >
-                    + add item
-                  </button>
+                    {/* Title */}
+                    <EditableText
+                      value={dl.title}
+                      onChange={v => onUpdate(dl.id, { title: v })}
+                      className="font-crimson text-lg font-semibold text-dark-taupe mb-3 block w-full"
+                    />
+
+                    {/* Bullets */}
+                    <ul className="space-y-2">
+                      {dl.bullets.map(b => (
+                        <li key={b.id} className="flex items-start gap-2 group/bullet">
+                          <span className="text-gold-line mt-0.5 flex-shrink-0 text-sm leading-snug">·</span>
+                          <EditableText
+                            value={b.text}
+                            onChange={v => onUpdateBullet(dl.id, b.id, v)}
+                            className="font-crimson text-sm text-deep-ivory leading-snug flex-1"
+                          />
+                          <button
+                            onClick={() => onDeleteBullet(dl.id, b.id)}
+                            className="text-soft-gray/30 hover:text-muted-rose transition-colors w-5 h-5 flex items-center justify-center text-base flex-shrink-0 opacity-0 group-hover/bullet:opacity-100"
+                            aria-label="Remove item"
+                          >
+                            ×
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <button
+                      onClick={() => onAddBullet(dl.id)}
+                      className="mt-2.5 font-work-sans text-[9px] tracking-[0.15em] uppercase text-soft-gray/50 hover:text-gold-line transition-colors"
+                    >
+                      + add item
+                    </button>
+
+                    {/* Linked tasks — shown when tasks share this deadline's date */}
+                    {entry.tasks.length > 0 && (
+                      <div className="mt-4 pt-3 border-t border-soft-gray/20">
+                        <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray/50 mb-2">
+                          Tasks due
+                        </p>
+                        {entry.tasks.map(task => (
+                          <TaskMiniRow key={task.id} task={task} onUpdate={onUpdateTask} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            }
+
+            // Standalone task cluster — tasks with a due date not covered by any deadline card
+            return (
+              <div key={`tc-${entry.dueLabel}`} className="relative">
+                <div className="absolute -left-7 top-2 w-3 h-3 rounded-full bg-soft-gray/40 ring-2 ring-ivory flex-shrink-0" />
+                <div className="border border-soft-gray/25 rounded-lg p-4 bg-ivory">
+                  <div className="flex items-baseline gap-2 mb-3">
+                    <span className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">
+                      {entry.dueLabel}
+                    </span>
+                    <span className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray/40">
+                      Deadline
+                    </span>
+                  </div>
+                  {entry.tasks.map(task => (
+                    <TaskMiniRow key={task.id} task={task} onUpdate={onUpdateTask} />
+                  ))}
                 </div>
               </div>
             )
@@ -1606,12 +1732,14 @@ export default function PlannerDashboard() {
             {activeSection === 'timeline' && (
               <TimelineSection
                 deadlines={deadlines}
+                tasks={tasks}
                 onUpdate={updateDeadline}
                 onDelete={deleteDeadline}
                 onAdd={addDeadline}
                 onAddBullet={addBullet}
                 onUpdateBullet={updateBullet}
                 onDeleteBullet={deleteBullet}
+                onUpdateTask={updateTask}
               />
             )}
             {activeSection === 'tasks' && (
