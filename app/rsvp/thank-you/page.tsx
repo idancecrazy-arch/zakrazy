@@ -24,7 +24,7 @@ export default async function ThankYouPage({ searchParams }: Props) {
       <div className="flex flex-col items-center gap-10 text-center max-w-lg">
         {/* Main message */}
         <div className="flex flex-col gap-4">
-          <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray">
+          <p className="font-work-sans text-[12px] tracking-[0.3em] uppercase text-ink-muted">
             Thank You
           </p>
           <h1 className="font-italiana text-5xl sm:text-6xl text-dark-taupe tracking-wide leading-tight">
@@ -35,15 +35,15 @@ export default async function ThankYouPage({ searchParams }: Props) {
           </p>
         </div>
 
-        <div className="h-px w-24 bg-gold-line" />
+        <div className="h-px w-24 bg-gold-deep" />
 
         {/* Attending message */}
         {attending ? (
-          <p className="font-lora italic text-lg text-dark-taupe/85 leading-relaxed">
+          <p className="font-lora italic text-lg text-dark-taupe/90 leading-relaxed">
             Your RSVP has been received. We can&apos;t wait to see you on September 12th.
           </p>
         ) : (
-          <p className="font-lora italic text-lg text-dark-taupe/85 leading-relaxed">
+          <p className="font-lora italic text-lg text-dark-taupe/90 leading-relaxed">
             We&apos;re sorry you can&apos;t make it. You&apos;ll be in our thoughts.
           </p>
         )}
@@ -51,21 +51,21 @@ export default async function ThankYouPage({ searchParams }: Props) {
         {/* RSVP summary */}
         {attending && (
           <div className="w-full bg-warm-cream/60 border border-pale-gold/40 p-6 flex flex-col gap-3 text-left">
-            <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray text-center mb-1">
+            <p className="font-work-sans text-[12px] tracking-[0.2em] uppercase text-ink-muted text-center mb-1">
               Your RSVP Summary
             </p>
             <div className="flex justify-between font-crimson text-base text-dark-taupe border-b border-pale-gold/30 pb-2">
-              <span className="text-dark-taupe/70">Attending</span>
+              <span className="text-dark-taupe/90">Attending</span>
               <span>Yes</span>
             </div>
             {plusOneName && (
               <div className="flex justify-between font-crimson text-base text-dark-taupe border-b border-pale-gold/30 pb-2">
-                <span className="text-dark-taupe/70">Plus One</span>
+                <span className="text-dark-taupe/90">Plus One</span>
                 <span>{plusOneName}</span>
               </div>
             )}
             <div className="flex justify-between font-crimson text-base text-dark-taupe">
-              <span className="text-dark-taupe/70">Date</span>
+              <span className="text-dark-taupe/90">Date</span>
               <span>September 12, 2026</span>
             </div>
           </div>
@@ -73,7 +73,7 @@ export default async function ThankYouPage({ searchParams }: Props) {
 
         {/* Hotel note */}
         {attending && wantsHotel && (
-          <p className="font-crimson italic text-base text-muted-rose">
+          <p className="font-crimson italic text-base text-rose-deep">
             We&apos;ve noted your interest in hotel accommodations.
           </p>
         )}
@@ -83,7 +83,7 @@ export default async function ThankYouPage({ searchParams }: Props) {
 
         {/* Contact info */}
         <div className="flex flex-col gap-2">
-          <p className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-soft-gray">
+          <p className="font-work-sans text-[12px] tracking-[0.2em] uppercase text-ink-muted">
             Questions?
           </p>
           <a
@@ -98,13 +98,13 @@ export default async function ThankYouPage({ searchParams }: Props) {
         <div className="flex flex-col sm:flex-row items-center gap-4 mt-2">
           <Link
             href="/"
-            className="font-work-sans text-[11px] tracking-[0.18em] uppercase px-8 py-4 min-h-[52px] flex items-center border border-gold-line text-dark-taupe hover:bg-blush transition-colors duration-200"
+            className="font-work-sans text-[12px] tracking-[0.18em] uppercase px-8 py-4 min-h-[52px] flex items-center border border-gold-line text-dark-taupe hover:bg-blush transition-colors duration-200"
           >
             Return Home
           </Link>
           <Link
             href="/faq"
-            className="font-work-sans text-[11px] tracking-[0.18em] uppercase text-dark-taupe/70 hover:text-dusty-lilac transition-colors duration-200 underline underline-offset-4"
+            className="font-work-sans text-[12px] tracking-[0.18em] uppercase text-dark-taupe/90 hover:text-dusty-lilac transition-colors duration-200 underline underline-offset-4"
           >
             Read the FAQ
           </Link>

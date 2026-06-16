@@ -12,7 +12,7 @@ const sectionHeadingClass =
   'font-cormorant text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50'
 
 const inputClass =
-  'w-full bg-ivory border border-gold-line/60 px-4 py-3.5 min-h-[48px] font-crimson text-base sm:text-lg text-dark-taupe placeholder:text-soft-gray focus:border-gold-line focus:ring-0 transition-colors duration-200'
+  'w-full bg-ivory border border-gold-line/60 px-4 py-3.5 min-h-[48px] font-crimson text-base sm:text-lg text-dark-taupe placeholder:text-ink-muted focus:border-gold-line focus:ring-0 transition-colors duration-200'
 
 const checkboxLabel = 'flex items-center gap-3 cursor-pointer min-h-[44px]'
 
@@ -29,18 +29,18 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <label className="font-work-sans text-xs sm:text-[13px] tracking-[0.12em] uppercase text-dark-taupe/85 font-medium flex flex-col gap-2">
+      <label className="font-work-sans text-xs sm:text-[13px] tracking-[0.12em] uppercase text-dark-taupe/90 font-medium flex flex-col gap-2">
         <span>
           {label}
           {optional && (
-            <span className="ml-2 normal-case tracking-normal font-crimson italic text-sm text-muted-rose">
+            <span className="ml-2 normal-case tracking-normal font-crimson italic text-sm text-rose-deep">
               optional
             </span>
           )}
         </span>
         {children}
       </label>
-      {error && <p className="font-crimson italic text-sm text-muted-rose">{error}</p>}
+      {error && <p className="font-crimson italic text-sm text-rose-deep">{error}</p>}
     </div>
   )
 }
@@ -75,7 +75,7 @@ function AttendanceRadios({
             name={`attending-${index}`}
             checked={value === opt.value}
             onChange={() => onChange(opt.value)}
-            className="w-5 h-5 accent-gold-line cursor-pointer flex-shrink-0"
+            className="w-5 h-5 accent-gold-deep cursor-pointer flex-shrink-0"
           />
           <span className="font-crimson text-base sm:text-lg text-dark-taupe">{opt.label}</span>
         </label>
@@ -238,12 +238,12 @@ export default function RSVPFlow() {
     return (
       <div className="flex flex-col items-center gap-6 text-center py-16 px-6">
         <h2 className="font-cormorant text-3xl text-dark-taupe tracking-wide">RSVP Period Has Closed</h2>
-        <p className="font-crimson text-lg text-dark-taupe/80 max-w-sm leading-relaxed">
+        <p className="font-crimson text-lg text-dark-taupe/90 max-w-sm leading-relaxed">
           Thank you for your interest. If you believe this is an error, please reach out directly.
         </p>
         <a
           href="mailto:christineandmichaelzak@gmail.com"
-          className="font-work-sans text-[11px] tracking-[0.18em] uppercase px-8 py-4 border border-gold-line text-dark-taupe hover:bg-blush transition-colors duration-200"
+          className="font-work-sans text-[12px] tracking-[0.18em] uppercase px-8 py-4 border border-gold-line text-dark-taupe hover:bg-blush transition-colors duration-200"
         >
           Contact Us
         </a>
@@ -274,7 +274,7 @@ export default function RSVPFlow() {
       {/* ── Name Lookup ──────────────────────────────────── */}
       <div className="flex flex-col gap-5">
         <h2 className={sectionHeadingClass}>Your Name</h2>
-        <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
+        <p className="font-crimson text-base text-dark-taupe/90 leading-relaxed">
           Type your name to find yourself on the guest list.
         </p>
         <GuestSelector
@@ -307,7 +307,7 @@ export default function RSVPFlow() {
             label="Attendance"
           />
           {memberErrors[0] && partyMembers[0].known && (
-            <p className="font-crimson italic text-sm text-muted-rose">{memberErrors[0]}</p>
+            <p className="font-crimson italic text-sm text-rose-deep">{memberErrors[0]}</p>
           )}
           {anyAttending && childrenSection}
         </div>
@@ -317,7 +317,7 @@ export default function RSVPFlow() {
       {guestSelected && isMultiParty && (
         <div className="flex flex-col gap-6">
           <h2 className={sectionHeadingClass}>Your Party</h2>
-          <p className="font-crimson text-base text-dark-taupe/85">
+          <p className="font-crimson text-base text-dark-taupe/90">
             Your reservation is for {guest?.partySize ?? partyMembers.length} guests. Please RSVP for each person below.
           </p>
           {partyMembers.map((member, i) => (
@@ -342,7 +342,7 @@ export default function RSVPFlow() {
                 label={`Attendance for ${member.known ? member.name : `guest ${i + 1}`}`}
               />
               {memberErrors[i] && member.known && (
-                <p className="font-crimson italic text-sm text-muted-rose">{memberErrors[i]}</p>
+                <p className="font-crimson italic text-sm text-rose-deep">{memberErrors[i]}</p>
               )}
             </div>
           ))}
@@ -354,11 +354,11 @@ export default function RSVPFlow() {
       {anyAttending && (
         <div className="flex flex-col gap-5">
           <h2 className={sectionHeadingClass}>Welcome Reception</h2>
-          <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
+          <p className="font-crimson text-base text-dark-taupe/90 leading-relaxed">
             We are hosting a casual welcome reception on <strong>Friday, September 11th evening</strong>.
             Will you be joining us?
           </p>
-          <p className="font-crimson italic text-sm text-dark-taupe/70">
+          <p className="font-crimson italic text-sm text-dark-taupe/90">
             More details to follow.
           </p>
           <div className="flex flex-col gap-3" role="group" aria-label="Welcome reception">
@@ -372,7 +372,7 @@ export default function RSVPFlow() {
                   name="welcomeReception"
                   checked={welcomeReception === value}
                   onChange={() => setWelcomeReception(value)}
-                  className="w-5 h-5 accent-gold-line cursor-pointer flex-shrink-0"
+                  className="w-5 h-5 accent-gold-deep cursor-pointer flex-shrink-0"
                 />
                 <span className="font-crimson text-base sm:text-lg text-dark-taupe">{label}</span>
               </label>
@@ -404,14 +404,14 @@ export default function RSVPFlow() {
       {anyAttending && (
         <div className="flex flex-col gap-4 bg-warm-cream/40 border border-pale-gold/30 p-5">
           <h2 className={sectionHeadingClass}>Travel &amp; Accommodations</h2>
-          <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
+          <p className="font-crimson text-base text-dark-taupe/90 leading-relaxed">
             September 12th is a busy weekend in NYC. Book flights and hotels early.
           </p>
           <Link
             href="/travel"
             target="_blank"
             rel="noopener noreferrer"
-            className="self-start font-work-sans text-[10px] tracking-[0.18em] uppercase text-muted-rose hover:text-dusty-lilac transition-colors duration-200 underline underline-offset-4"
+            className="self-start font-work-sans text-[12px] tracking-[0.18em] uppercase text-rose-deep hover:text-dusty-lilac transition-colors duration-200 underline underline-offset-4"
           >
             View hotel block &amp; travel info
           </Link>
@@ -430,7 +430,7 @@ export default function RSVPFlow() {
       {anyAttending && (
         <div className="flex flex-col gap-3 bg-warm-cream/40 border border-pale-gold/30 p-5">
           <h2 className={sectionHeadingClass}>Dress Code</h2>
-          <p className="font-crimson text-base text-dark-taupe/80 leading-relaxed">
+          <p className="font-crimson text-base text-dark-taupe/90 leading-relaxed">
             Semi-formal Attire: Suits and cocktail dresses.
           </p>
         </div>
@@ -440,7 +440,7 @@ export default function RSVPFlow() {
       {guestSelected && allAnswered && (
         <div className="flex flex-col gap-5">
           <h2 className={sectionHeadingClass}>Contact Information</h2>
-          <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
+          <p className="font-crimson text-base text-dark-taupe/90 leading-relaxed">
             Do you need to update your email, phone, or mailing address?
           </p>
           <div className="flex flex-col gap-3" role="group" aria-label="Contact update">
@@ -454,14 +454,14 @@ export default function RSVPFlow() {
                   name="updateContact"
                   checked={updateContact === value}
                   onChange={() => setUpdateContact(value)}
-                  className="w-5 h-5 accent-gold-line cursor-pointer flex-shrink-0"
+                  className="w-5 h-5 accent-gold-deep cursor-pointer flex-shrink-0"
                 />
                 <span className="font-crimson text-base sm:text-lg text-dark-taupe">{label}</span>
               </label>
             ))}
           </div>
           {errors.updateContact && (
-            <p className="font-crimson italic text-sm text-muted-rose">{errors.updateContact}</p>
+            <p className="font-crimson italic text-sm text-rose-deep">{errors.updateContact}</p>
           )}
 
           {updateContact === true && (
@@ -545,7 +545,7 @@ export default function RSVPFlow() {
 
       {/* ── Error ────────────────────────────────────────── */}
       {status === 'error' && (
-        <p className="font-crimson italic text-muted-rose text-sm text-center">
+        <p className="font-crimson italic text-rose-deep text-sm text-center">
           Something went wrong. Please try again or email us at{' '}
           <a href="mailto:christineandmichaelzak@gmail.com" className="underline">
             christineandmichaelzak@gmail.com
@@ -562,7 +562,7 @@ export default function RSVPFlow() {
             className="
               w-full sm:w-auto
               font-work-sans text-sm tracking-[0.18em] uppercase font-medium
-              px-12 py-4 min-h-[52px] bg-gold-line text-ivory
+              px-12 py-4 min-h-[52px] bg-gold-deep text-ivory
               hover:bg-dark-taupe hover:-translate-y-0.5 hover:shadow-md
               disabled:opacity-50 disabled:cursor-not-allowed
               disabled:hover:translate-y-0 disabled:hover:shadow-none

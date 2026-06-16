@@ -21,10 +21,10 @@ interface PartyCompositionProps {
 }
 
 const inputClass =
-  'w-full bg-ivory border border-gold-line/60 px-4 py-3.5 min-h-[48px] font-crimson text-base text-dark-taupe placeholder:text-soft-gray focus:border-gold-line focus:ring-0 transition-colors duration-200'
+  'w-full bg-ivory border border-gold-line/60 px-4 py-3.5 min-h-[48px] font-crimson text-base text-dark-taupe placeholder:text-ink-muted focus:border-gold-line focus:ring-0 transition-colors duration-200'
 
 const checkboxLabel = 'flex items-center gap-3 cursor-pointer min-h-[44px]'
-const checkboxClass = 'w-5 h-5 border border-gold-line/60 accent-gold-line cursor-pointer flex-shrink-0'
+const checkboxClass = 'w-5 h-5 border border-gold-line/60 accent-gold-deep cursor-pointer flex-shrink-0'
 
 export default function PartyComposition({
   plusOneAllowed,
@@ -55,7 +55,7 @@ export default function PartyComposition({
       {/* Plus One */}
       {plusOneAllowed && (
         <div className="flex flex-col gap-3">
-          <p className="font-work-sans text-[11px] tracking-[0.15em] uppercase text-dark-taupe/70">
+          <p className="font-work-sans text-[12px] tracking-[0.15em] uppercase text-dark-taupe/90">
             Your Plus One
           </p>
           <input
@@ -67,7 +67,7 @@ export default function PartyComposition({
             className={inputClass}
           />
           {errors.plusOneName && (
-            <p className="font-crimson italic text-sm text-muted-rose">{errors.plusOneName}</p>
+            <p className="font-crimson italic text-sm text-rose-deep">{errors.plusOneName}</p>
           )}
         </div>
       )}
@@ -91,7 +91,7 @@ export default function PartyComposition({
           />
           <span className="font-crimson text-base sm:text-lg text-dark-taupe">
             Children will be joining us
-            <span className="ml-2 font-lora italic text-base text-muted-rose">
+            <span className="ml-2 font-lora italic text-base text-rose-deep">
               (warmly welcome!)
             </span>
           </span>
@@ -102,14 +102,14 @@ export default function PartyComposition({
             {children.map((child, i) => (
               <div key={i} className="flex flex-col gap-2 p-4 bg-warm-cream/50 border border-pale-gold/30">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-work-sans text-[11px] tracking-[0.15em] uppercase text-dark-taupe/70">
+                  <span className="font-work-sans text-[12px] tracking-[0.15em] uppercase text-dark-taupe/90">
                     Child {i + 1}
                   </span>
                   {children.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeChild(i)}
-                      className="font-work-sans text-[10px] tracking-[0.12em] uppercase text-muted-rose hover:text-dark-taupe transition-colors duration-200"
+                      className="font-work-sans text-[12px] tracking-[0.12em] uppercase text-rose-deep hover:text-dark-taupe transition-colors duration-200"
                       aria-label={`Remove child ${i + 1}`}
                     >
                       Remove
@@ -128,7 +128,7 @@ export default function PartyComposition({
                       className={inputClass}
                     />
                     {errors.children?.[i] && (
-                      <p className="font-crimson italic text-sm text-muted-rose">{errors.children[i]}</p>
+                      <p className="font-crimson italic text-sm text-rose-deep">{errors.children[i]}</p>
                     )}
                   </div>
                   <div className="flex flex-col gap-1 col-span-2 sm:col-span-1">
@@ -153,7 +153,7 @@ export default function PartyComposition({
                     className={checkboxClass}
                     aria-label={`High chair needed for child ${i + 1}`}
                   />
-                  <span className="font-crimson text-base text-dark-taupe/85">
+                  <span className="font-crimson text-base text-dark-taupe/90">
                     High chair needed
                   </span>
                 </label>
@@ -163,7 +163,7 @@ export default function PartyComposition({
             <button
               type="button"
               onClick={addChild}
-              className="self-start font-work-sans text-[11px] tracking-[0.15em] uppercase px-5 py-2.5 border border-gold-line/50 text-dark-taupe hover:bg-blush transition-colors duration-200 min-h-[44px]"
+              className="self-start font-work-sans text-[12px] tracking-[0.15em] uppercase px-5 py-2.5 border border-gold-line/50 text-dark-taupe hover:bg-blush transition-colors duration-200 min-h-[44px]"
             >
               + Add Another Child
             </button>

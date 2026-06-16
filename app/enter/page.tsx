@@ -93,7 +93,7 @@ function EnterForm() {
                 w-full bg-transparent border-b border-gold-line
                 px-0 py-3
                 font-crimson text-xl text-dark-taupe text-center
-                placeholder:text-soft-gray/50
+                placeholder:text-ink-muted/50
                 focus:border-dark-taupe
                 disabled:opacity-50
                 transition-colors duration-200
@@ -102,7 +102,7 @@ function EnterForm() {
             />
 
             {stage.name === 'error' && (
-              <p className="font-lora italic text-sm text-muted-rose text-center">
+              <p className="font-lora italic text-sm text-rose-deep text-center">
                 {stage.message}
               </p>
             )}
@@ -111,8 +111,8 @@ function EnterForm() {
               type="submit"
               disabled={stage.name === 'loading' || !password.trim()}
               className="
-                mt-2 font-work-sans text-[11px] tracking-[0.25em] uppercase
-                px-10 py-4 bg-gold-line text-ivory
+                mt-2 font-work-sans text-[12px] tracking-[0.25em] uppercase
+                px-10 py-4 bg-gold-deep text-ivory
                 hover:bg-dark-taupe hover:-translate-y-0.5 hover:shadow-md
                 disabled:opacity-50 disabled:cursor-not-allowed
                 disabled:hover:translate-y-0 disabled:hover:shadow-none

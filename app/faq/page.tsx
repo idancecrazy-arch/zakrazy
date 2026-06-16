@@ -13,7 +13,7 @@ export default function FAQPage() {
 
         {/* Header */}
         <div className="flex flex-col items-center text-center gap-6 mb-14 sm:mb-20">
-          <p className="font-work-sans text-xs tracking-[0.18em] uppercase text-dark-taupe/80 font-medium">
+          <p className="font-work-sans text-xs tracking-[0.18em] uppercase text-dark-taupe/90 font-medium">
             Christine &amp; Michael · September 12, 2026
           </p>
           <h1 className="font-italiana text-4xl sm:text-5xl text-dark-taupe tracking-wide leading-tight">
@@ -29,12 +29,12 @@ export default function FAQPage() {
           <p className="font-cormorant text-2xl text-dark-taupe tracking-wide">
             Still have questions?
           </p>
-          <p className="font-crimson text-base text-dark-taupe/80 leading-relaxed max-w-sm">
+          <p className="font-crimson text-base text-dark-taupe/90 leading-relaxed max-w-sm">
             We&apos;d love to hear from you. Reach out and we&apos;ll get back to you as soon as we can.
           </p>
           <a
             href="mailto:christineandmichaelzak@gmail.com"
-            className="font-work-sans text-[11px] tracking-[0.18em] uppercase px-8 py-4 min-h-[52px] flex items-center border border-gold-line text-dark-taupe hover:bg-blush transition-colors duration-200 mt-2"
+            className="font-work-sans text-[12px] tracking-[0.18em] uppercase px-8 py-4 min-h-[52px] flex items-center border border-gold-line text-dark-taupe hover:bg-blush transition-colors duration-200 mt-2"
           >
             Email Us
           </a>

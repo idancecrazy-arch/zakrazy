@@ -64,7 +64,7 @@ export default function CountdownTimer() {
             >
               {pad(value)}
             </div>
-            <div className="mt-2 font-work-sans text-[9px] sm:text-[10px] tracking-[0.25em] uppercase text-soft-gray">
+            <div className="mt-2 font-work-sans text-[11px] sm:text-[12px] tracking-[0.25em] uppercase text-ink-muted">
               {label}
             </div>
           </div>

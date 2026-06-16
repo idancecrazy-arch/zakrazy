@@ -14,6 +14,15 @@
   --color-dark-taupe:   #5A5044;
   --color-deep-ivory:   #786E5F;
   --color-muted-rose:   #C3A59E;
+
+  /* ── Accessible text tones (WCAG AA on ivory) ──
+     The soft palette above is kept for borders, rules, and motifs.
+     These deeper tones are used for *text* so labels, links, and
+     buttons stay legible for every guest. */
+  --color-ink-muted:    #736C62;  /* eyebrow/label text — 4.8:1 */
+  --color-gold-deep:    #856A20;  /* gold labels & primary buttons — 4.7:1 */
+  --color-rose-deep:    #9A5F50;  /* links & inline errors — 4.7:1 */
+  --color-lilac-deep:   #766588;  /* active/current-page text — 4.9:1 */
 }
 
 /* ── Typography utilities ── */
@@ -50,8 +59,8 @@ body {
   background-color: #FAF5EB;
   color: #5A5044;
   font-family: var(--font-crimson-pro), Georgia, serif;
-  font-size: 17px;
-  line-height: 1.6;
+  font-size: 18px;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -83,4 +92,17 @@ input:focus:not(:focus-visible),
 textarea:focus:not(:focus-visible),
 select:focus:not(:focus-visible) {
   outline: none;
+}
+
+/* ── Visible keyboard focus ── */
+/* A clear, high-contrast focus indicator for keyboard and assistive-tech users */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-gold-deep);
+  outline-offset: 2px;
+  border-radius: 2px;
 }

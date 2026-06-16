@@ -10,7 +10,7 @@ export default function Footer() {
         {CONTACT_EMAIL && (
           <Link
             href={`mailto:${CONTACT_EMAIL}`}
-            className="font-work-sans text-[10px] tracking-[0.15em] uppercase text-muted-rose hover:text-dusty-lilac transition-colors duration-300"
+            className="font-work-sans text-[12px] tracking-[0.15em] uppercase text-rose-deep hover:text-dusty-lilac transition-colors duration-300"
           >
             Questions? {CONTACT_EMAIL}
           </Link>

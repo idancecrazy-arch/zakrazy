@@ -19,7 +19,7 @@ export default function RegistryPage() {
 
         {/* Content */}
         <div className="flex flex-col gap-8">
-          <p className="font-crimson text-lg text-dark-taupe/85 leading-relaxed">
+          <p className="font-crimson text-lg text-dark-taupe/90 leading-relaxed">
             Your presence at our wedding is the greatest gift we could ask for. While gifts are not necessary, we understand some may wish to contribute to our honeymoon fund. This is entirely optional and greatly appreciated.
           </p>
 
@@ -28,7 +28,7 @@ export default function RegistryPage() {
               href="https://www.honeyfund.com/site/liu-zakrajsek-09-12-2026"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-work-sans text-[11px] tracking-[0.18em] uppercase px-8 py-4 min-h-[52px] flex items-center border border-gold-line text-dark-taupe hover:bg-blush transition-colors duration-200"
+              className="font-work-sans text-[12px] tracking-[0.18em] uppercase px-8 py-4 min-h-[52px] flex items-center border border-gold-line text-dark-taupe hover:bg-blush transition-colors duration-200"
             >
               View Honeymoon Fund
             </a>

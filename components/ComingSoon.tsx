@@ -10,7 +10,7 @@ export default function ComingSoon({ title, subtitle }: ComingSoonProps) {
     <div className="min-h-screen bg-ivory flex items-center justify-center px-6 pt-36">
       <div className="flex flex-col items-center text-center gap-8 max-w-md">
 
-        <p className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-soft-gray">
+        <p className="font-work-sans text-[12px] tracking-[0.3em] uppercase text-ink-muted">
           {subtitle ?? 'Coming Soon'}
         </p>
 
@@ -25,7 +25,7 @@ export default function ComingSoon({ title, subtitle }: ComingSoonProps) {
         <Link
           href="/"
           className="
-            font-work-sans text-[11px] tracking-[0.2em] uppercase
+            font-work-sans text-[12px] tracking-[0.2em] uppercase
             text-deep-ivory hover:text-dusty-lilac
             pb-px border-b border-pale-gold/0 hover:border-pale-gold
             transition-all duration-300

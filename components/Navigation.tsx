@@ -47,7 +47,7 @@ export default function Navigation() {
           >
             <span className="flex flex-col items-start leading-snug">
               <span className="text-2xl">{COUPLE.partner1.first} {COUPLE.partner1.last}</span>
-              <span className="text-gold-line text-sm self-center">&amp;</span>
+              <span className="text-gold-deep text-sm self-center">&amp;</span>
               <span className="text-2xl">{COUPLE.partner2.first} {COUPLE.partner2.last}</span>
             </span>
           </Link>
@@ -61,14 +61,14 @@ export default function Navigation() {
                   <Link
                     href={href}
                     className={`
-                      font-work-sans text-[11px] tracking-[0.18em] uppercase
+                      font-work-sans text-[12px] tracking-[0.18em] uppercase
                       transition-colors duration-300 relative pb-0.5
-                      ${active ? 'text-dusty-lilac' : 'text-dark-taupe hover:text-dusty-lilac'}
+                      ${active ? 'text-lilac-deep' : 'text-dark-taupe hover:text-lilac-deep'}
                     `}
                   >
                     {label}
                     {active && (
-                      <span className="absolute bottom-0 left-0 right-0 h-px bg-gold-line" />
+                      <span className="absolute bottom-0 left-0 right-0 h-px bg-gold-deep" />
                     )}
                   </Link>
                 </li>
@@ -78,9 +78,11 @@ export default function Navigation() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden flex flex-col gap-1.5 p-1"
+            className="md:hidden flex flex-col gap-1.5 p-3 -m-2"
             onClick={() => setMenuOpen((o) => !o)}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
           >
             <span
               className={`block w-6 h-px bg-dark-taupe transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2.5' : ''}`}
@@ -102,6 +104,9 @@ export default function Navigation() {
 
       {/* Mobile slide-in menu */}
       <div
+        id="mobile-menu"
+        aria-hidden={!menuOpen}
+        inert={!menuOpen}
         className={`
           fixed inset-0 z-40 bg-ivory flex flex-col items-center justify-center
           transition-all duration-400 md:hidden
@@ -117,7 +122,7 @@ export default function Navigation() {
                   href={href}
                   className={`
                     font-italiana text-3xl tracking-wide
-                    ${active ? 'text-dusty-lilac' : 'text-dark-taupe'}
+                    ${active ? 'text-lilac-deep' : 'text-dark-taupe'}
                   `}
                 >
                   {label}

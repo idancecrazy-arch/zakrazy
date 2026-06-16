@@ -46,7 +46,7 @@ export default function HotelModal({ open, onClose }: HotelModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="font-work-sans text-[10px] tracking-[0.2em] uppercase text-dark-taupe hover:text-muted-rose transition-colors duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="font-work-sans text-[12px] tracking-[0.2em] uppercase text-dark-taupe hover:text-rose-deep transition-colors duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="Close hotel options"
           >
             Close
@@ -54,7 +54,7 @@ export default function HotelModal({ open, onClose }: HotelModalProps) {
         </div>
 
         <div className="px-6 py-6 flex flex-col gap-6">
-          <p className="font-crimson text-base text-dark-taupe/85 leading-relaxed">
+          <p className="font-crimson text-base text-dark-taupe/90 leading-relaxed">
             We&apos;ve highlighted nearby hotels for your convenience. Rates and availability vary —
             book early as September fills quickly in New York.
           </p>
@@ -62,23 +62,23 @@ export default function HotelModal({ open, onClose }: HotelModalProps) {
           {HOTELS.map((hotel) => (
             <div key={hotel.name} className="flex flex-col gap-2 pb-6 border-b border-pale-gold/40 last:border-0 last:pb-0">
               <h3 className="font-cormorant text-xl text-dark-taupe tracking-wide">{hotel.name}</h3>
-              <p className="font-work-sans text-[10px] tracking-[0.18em] uppercase text-gold-line">
+              <p className="font-work-sans text-[12px] tracking-[0.18em] uppercase text-gold-deep">
                 {hotel.neighborhood}
               </p>
               <p className="font-crimson text-sm text-dark-taupe/75">{hotel.address}</p>
-              <p className="font-crimson italic text-sm text-muted-rose">{hotel.distanceToCeremony}</p>
+              <p className="font-crimson italic text-sm text-rose-deep">{hotel.distanceToCeremony}</p>
               {hotel.note && (
-                <p className="font-crimson text-base text-dark-taupe/85">{hotel.note}</p>
+                <p className="font-crimson text-base text-dark-taupe/90">{hotel.note}</p>
               )}
               {'rates' in hotel && hotel.rates && (
                 <div className="flex flex-col gap-0.5 mt-1">
                   {(hotel.rates as string).split('\n').map((line: string) => (
-                    <p key={line} className="font-crimson text-sm text-dark-taupe/85">{line}</p>
+                    <p key={line} className="font-crimson text-sm text-dark-taupe/90">{line}</p>
                   ))}
                 </div>
               )}
               {'accessCode' in hotel && hotel.accessCode && (
-                <p className="font-crimson text-sm text-dark-taupe/70">
+                <p className="font-crimson text-sm text-dark-taupe/90">
                   Access code: <span className="font-work-sans tracking-widest text-dark-taupe">{hotel.accessCode as string}</span>
                 </p>
               )}
