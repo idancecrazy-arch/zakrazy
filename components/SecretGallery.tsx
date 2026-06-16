@@ -79,10 +79,6 @@ export default function SecretGallery() {
         <div className="sg-reveal">
           <header className="sg-head">
             <p className="sg-kick">the unedited us</p>
-            <h3 className="sg-title">Our (funny) history</h3>
-            <p className="sg-sub">
-              Years of dim sum, bad lighting, pets, and questionable faces.
-            </p>
           </header>
 
           <div className="sg-masonry">
