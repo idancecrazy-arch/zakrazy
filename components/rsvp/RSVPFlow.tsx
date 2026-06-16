@@ -251,6 +251,19 @@ export default function RSVPFlow() {
     )
   }
 
+  const childrenSection = (
+    <PartyComposition
+      plusOneAllowed={false}
+      plusOneName=""
+      hasChildren={hasChildren}
+      children={children}
+      onPlusOneNameChange={() => {}}
+      onChildrenToggle={setHasChildren}
+      onChildrenChange={setChildren}
+      errors={{ children: childErrors }}
+    />
+  )
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -296,6 +309,7 @@ export default function RSVPFlow() {
           {memberErrors[0] && partyMembers[0].known && (
             <p className="font-crimson italic text-sm text-muted-rose">{memberErrors[0]}</p>
           )}
+          {anyAttending && childrenSection}
         </div>
       )}
 
@@ -332,6 +346,7 @@ export default function RSVPFlow() {
               )}
             </div>
           ))}
+          {anyAttending && childrenSection}
         </div>
       )}
 
@@ -364,20 +379,6 @@ export default function RSVPFlow() {
             ))}
           </div>
         </div>
-      )}
-
-      {/* ── Children (party-level) ───────────────────────── */}
-      {anyAttending && (
-        <PartyComposition
-          plusOneAllowed={false}
-          plusOneName=""
-          hasChildren={hasChildren}
-          children={children}
-          onPlusOneNameChange={() => {}}
-          onChildrenToggle={setHasChildren}
-          onChildrenChange={setChildren}
-          errors={{ children: childErrors }}
-        />
       )}
 
       {/* ── Dietary (attending only) ─────────────────────── */}
