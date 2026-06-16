@@ -43,7 +43,10 @@ async function createRecord(
     {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fields }),
+      // typecast lets Airtable accept guest names that aren't already options on
+      // a single-select "Guest Name" field — required now that each guest is
+      // submitted individually rather than as one combined name.
+      body: JSON.stringify({ fields, typecast: true }),
     },
   )
   if (!res.ok) {
