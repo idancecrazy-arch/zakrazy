@@ -1,13 +1,9 @@
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
-import { isPlannerAuthed } from '../../lib/plannerAuth'
-
-export default async function PlannerLayout({ children }: { children: React.ReactNode }) {
-  const cookieStore = await cookies()
-  if (!(await isPlannerAuthed(cookieStore.get('planner-auth')?.value))) {
-    redirect('/planner/login')
-  }
-
+// Auth for the planner portal is enforced in proxy.ts, which redirects
+// unauthenticated /planner/* requests to /planner/login while exempting the
+// login page itself. This layout must NOT re-gate, because it also wraps
+// /planner/login — redirecting there from here loops the login page forever
+// (ERR_TOO_MANY_REDIRECTS).
+export default function PlannerLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 z-[9999] bg-ivory overflow-y-auto">
       {children}
