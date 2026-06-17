@@ -65,6 +65,7 @@ export default function InvitationModal() {
             src="/img-0021.jpg"
             alt="Christine & Michael at Bethesda Terrace"
             fill
+            sizes="(max-width: 512px) 78vw, 400px"
             className="object-cover object-center"
             priority
           />

@@ -30,13 +30,24 @@ function getSecret(): string {
  * Derive the cookie token value for the current secret. Async because it uses
  * Web Crypto's SHA-256, which is the only digest API available in both the
  * edge and Node runtimes.
+ *
+ * The secret is fixed for the lifetime of the process, so the digest is
+ * computed once and the resulting promise is cached — the proxy calls this on
+ * every planner navigation, and there is no reason to re-hash each time.
  */
-export async function plannerAuthToken(): Promise<string> {
-  const data = new TextEncoder().encode(`planner-auth:${TOKEN_VERSION}:${getSecret()}`)
-  const digest = await crypto.subtle.digest('SHA-256', data)
-  return Array.from(new Uint8Array(digest))
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
+let _tokenPromise: Promise<string> | null = null
+
+export function plannerAuthToken(): Promise<string> {
+  if (!_tokenPromise) {
+    _tokenPromise = (async () => {
+      const data = new TextEncoder().encode(`planner-auth:${TOKEN_VERSION}:${getSecret()}`)
+      const digest = await crypto.subtle.digest('SHA-256', data)
+      return Array.from(new Uint8Array(digest))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+    })()
+  }
+  return _tokenPromise
 }
 
 /** Constant-time comparison of a presented cookie value against the token. */

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 
 /**
  * SecretGallery
@@ -89,8 +90,19 @@ export default function SecretGallery() {
                 onClick={() => setActive(i)}
                 aria-label={`Open photo ${i + 1}`}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={BASE + f} alt="" loading="lazy" />
+                {/* width/height 0 + sizes is Next's responsive pattern for
+                    images of unknown aspect ratio: it generates a srcset and
+                    the browser fetches a thumbnail sized to the masonry column
+                    (~260px) instead of the full multi-MB original. */}
+                <Image
+                  src={BASE + f}
+                  alt=""
+                  width={0}
+                  height={0}
+                  sizes="(max-width: 560px) 50vw, (max-width: 900px) 33vw, 260px"
+                  loading="lazy"
+                  style={{ width: "100%", height: "auto" }}
+                />
               </button>
             ))}
           </div>
@@ -107,11 +119,14 @@ export default function SecretGallery() {
           >
             &#8249;
           </button>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             className="sg-full"
             src={BASE + PHOTOS[active]}
             alt=""
+            width={0}
+            height={0}
+            sizes="90vw"
+            style={{ width: "auto", height: "auto", maxWidth: "90vw", maxHeight: "86vh" }}
             onClick={(e) => e.stopPropagation()}
           />
           <button
