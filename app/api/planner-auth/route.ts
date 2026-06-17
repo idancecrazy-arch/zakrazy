@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { plannerAuthToken } from '../../../lib/plannerAuth'
 
 const attempts = new Map<string, { count: number; resetAt: number }>()
 const RATE_WINDOW_MS = 15 * 60 * 1000
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
   }
 
   const response = NextResponse.json({ ok: true })
-  response.cookies.set('planner-auth', 'granted', {
+  response.cookies.set('planner-auth', await plannerAuthToken(), {
     httpOnly: true,
     sameSite: 'lax',
     maxAge: COOKIE_MAX_AGE,

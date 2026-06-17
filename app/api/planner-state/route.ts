@@ -1,5 +1,6 @@
 import { createClient } from 'redis'
 import { NextRequest, NextResponse } from 'next/server'
+import { isPlannerAuthed } from '../../../lib/plannerAuth'
 
 const KEY = 'planner-state'
 
@@ -15,12 +16,12 @@ async function getRedis() {
   return _client
 }
 
-function plannerAuthed(req: NextRequest): boolean {
-  return req.cookies.get('planner-auth')?.value === 'granted'
+function plannerAuthed(req: NextRequest): Promise<boolean> {
+  return isPlannerAuthed(req.cookies.get('planner-auth')?.value)
 }
 
 export async function GET(req: NextRequest) {
-  if (!plannerAuthed(req)) {
+  if (!(await plannerAuthed(req))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const redis = await getRedis()
@@ -37,7 +38,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!plannerAuthed(req)) {
+  if (!(await plannerAuthed(req))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const redis = await getRedis()

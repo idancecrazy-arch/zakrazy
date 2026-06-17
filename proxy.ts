@@ -1,18 +1,19 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { isPlannerAuthed } from './lib/plannerAuth'
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Planner portal: separate auth layer
   if (pathname.startsWith('/planner')) {
     if (pathname === '/planner/login') return NextResponse.next()
     const plannerAuth = request.cookies.get('planner-auth')
-    if (plannerAuth?.value === 'granted') return NextResponse.next()
+    if (await isPlannerAuthed(plannerAuth?.value)) return NextResponse.next()
     return NextResponse.redirect(new URL('/planner/login', request.url))
   }
 
-  // Main site auth
+  // Main site auth (unchanged — fronts the public site and RSVP flow)
   const auth = request.cookies.get('auth')
   if (auth?.value === 'granted') return NextResponse.next()
 

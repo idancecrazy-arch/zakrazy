@@ -33,21 +33,35 @@ export default function PhotoCarousel() {
 
   return (
     <div className="relative w-full h-[85vh] sm:h-screen overflow-hidden">
-      {PHOTOS.map((photo, i) => (
-        <div
-          key={photo.src}
-          className="absolute inset-0 transition-opacity duration-700 bg-[#faf6f0]"
-          style={{ opacity: i === current ? (fading ? 0 : 1) : 0 }}
-        >
-          <Image
-            src={photo.src}
-            alt={photo.alt}
-            fill
-            className="object-contain object-center"
-            priority={i === 0}
-          />
-        </div>
-      ))}
+      {PHOTOS.map((photo, i) => {
+        // Only mount the image for the current slide and its immediate
+        // neighbours. The next slide is preloaded one step ahead so the
+        // crossfade stays smooth, but the browser no longer downloads all
+        // ten full-bleed photos on first paint of the homepage.
+        const distance = Math.min(
+          (i - current + PHOTOS.length) % PHOTOS.length,
+          (current - i + PHOTOS.length) % PHOTOS.length,
+        )
+        const mounted = distance <= 1
+        return (
+          <div
+            key={photo.src}
+            className="absolute inset-0 transition-opacity duration-700 bg-[#faf6f0]"
+            style={{ opacity: i === current ? (fading ? 0 : 1) : 0 }}
+          >
+            {mounted && (
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                fill
+                sizes="100vw"
+                className="object-contain object-center"
+                priority={i === 0}
+              />
+            )}
+          </div>
+        )
+      })}
       {/* Subtle ivory fade at top and bottom to blend with sections */}
       <div
         className="absolute inset-0 pointer-events-none"

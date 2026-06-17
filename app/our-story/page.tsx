@@ -49,6 +49,7 @@ export default function OurStoryPage() {
               alt="Christine & Michael"
               width={800}
               height={1000}
+              sizes="(max-width: 640px) 50vw, 33vw"
               className="w-full h-auto object-cover block"
             />
           </div>
