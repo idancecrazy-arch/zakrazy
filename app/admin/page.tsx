@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import AdminDashboard from '@/components/admin/AdminDashboard'
+import { isPlannerAuthed } from '@/lib/plannerAuth'
 
 export const metadata: Metadata = {
   title: 'RSVP Dashboard',
@@ -9,8 +10,7 @@ export const metadata: Metadata = {
 
 export default async function AdminPage() {
   const cookieStore = await cookies()
-  const auth = cookieStore.get('planner-auth')
-  if (auth?.value !== 'granted') {
+  if (!(await isPlannerAuthed(cookieStore.get('planner-auth')?.value))) {
     redirect('/admin/login')
   }
 

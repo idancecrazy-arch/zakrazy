@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { isPlannerAuthed } from '../../../../lib/plannerAuth'
 
 export async function GET(req: NextRequest) {
   const cookieStore = await cookies()
-  const auth = cookieStore.get('planner-auth')
-  if (auth?.value !== 'granted') {
+  if (!(await isPlannerAuthed(cookieStore.get('planner-auth')?.value))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
