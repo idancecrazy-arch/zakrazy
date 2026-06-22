@@ -24,7 +24,7 @@ export default function TravelPage() {
             Friday Welcome Reception
           </h2>
                <p className="font-crimson text-base text-dark-taupe/90">
-                We are finalizing details for a casual welcome cocktail reception in the evening on Friday, September 11. While we intend to have light fare, we encourage you to eat before.
+                We are finalizing details for a casual welcome cocktail reception in the evening on Friday, September 11 (also in lower Manhattan!). While we intend to have light fare, we encourage you to eat before.
               </p>
         </div>
 
