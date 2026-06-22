@@ -8,6 +8,9 @@ export default function CeremonyReceptionDetails() {
         <p className="font-work-sans text-[12px] tracking-[0.25em] uppercase text-gold-deep">
           Ceremony
         </p>
+        <p className="font-crimson text-2xl font-bold text-dark-taupe">
+          2:00 PM
+        </p>
         <p className="font-cormorant text-2xl text-dark-taupe tracking-wide">
           {VENUE.shortName}
         </p>
@@ -36,6 +39,9 @@ export default function CeremonyReceptionDetails() {
         <p className="font-work-sans text-[12px] tracking-[0.25em] uppercase text-gold-deep">
           Reception
         </p>
+        <p className="font-crimson text-2xl font-bold text-dark-taupe">
+          5:00 PM
+        </p>
         <p className="font-cormorant text-2xl text-dark-taupe tracking-wide">
           {RECEPTION_VENUE.shortName}
         </p>
@@ -45,7 +51,7 @@ export default function CeremonyReceptionDetails() {
           {RECEPTION_VENUE.city}, {RECEPTION_VENUE.state} {RECEPTION_VENUE.zip}
         </p>
         <p className="font-crimson text-base text-dark-taupe/90">
-          Cocktail hour starts at 5pm.
+          Cocktail hour starts at 5:00 PM.
         </p>
         <a
           href={RECEPTION_VENUE.googleMapsUrl}

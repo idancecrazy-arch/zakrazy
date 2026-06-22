@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import Image from 'next/image'
+import PhotoMontage from '@/components/PhotoMontage'
 import SecretGallery from '@/components/SecretGallery'
 
 export const metadata: Metadata = {
@@ -27,6 +27,8 @@ const MONTAGE = [
   { src: '/gallery-0423.jpg', tall: false },
   { src: '/gallery-0184.jpg', tall: true },
   { src: '/gallery-0214.jpg', tall: false },
+  { src: '/img-0021.jpg', tall: false },
+  { src: '/img-0195.jpg', tall: true },
 ]
 
 export default function OurStoryPage() {
@@ -40,21 +42,8 @@ export default function OurStoryPage() {
         </h1>
       </div>
 
-      {/* Montage grid */}
-      <div className="columns-2 sm:columns-3 gap-2 sm:gap-3 px-2 sm:px-4 max-w-5xl mx-auto">
-        {MONTAGE.map(({ src }) => (
-          <div key={src} className="break-inside-avoid mb-2 sm:mb-3 overflow-hidden">
-            <Image
-              src={src}
-              alt="Christine & Michael"
-              width={800}
-              height={1000}
-              sizes="(max-width: 640px) 50vw, 33vw"
-              className="w-full h-auto object-cover block"
-            />
-          </div>
-        ))}
-      </div>
+      {/* Montage grid with interactive hover and click enlargement */}
+      <PhotoMontage items={MONTAGE} />
 
       {/* Hidden footer to the engagement shoot — click to unlock candids */}
       <SecretGallery />
