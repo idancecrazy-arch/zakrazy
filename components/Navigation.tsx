@@ -10,7 +10,7 @@ const navLinks = [
   { href: '/rsvp', label: 'RSVP' },
   { href: '/our-story', label: 'Our Story' },
   { href: '/faq', label: 'FAQ' },
-  { href: '/travel', label: 'Travel' },
+  { href: '/travel', label: 'Events & Travel' },
   { href: '/registry', label: 'Registry' },
 ]
 
