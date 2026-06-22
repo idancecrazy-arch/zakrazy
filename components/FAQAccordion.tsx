@@ -9,7 +9,7 @@ const FAQS = [
       'Semi-formal Attire: We kindly request guests wear suits and cocktail dresses comfortable for the season (September will hopefully be temperate and mild). Tuxes and gowns are welcome, and traditional attire is also encouraged!',
   },
   {
-    question: 'Is the ceremony and reception indoors?',
+    question: 'Are the ceremony and reception indoors?',
     answer:
       'Yes, both the ceremony at St. Joseph\'s Church and the reception at Golden Unicorn are entirely indoors.',
   },
