@@ -13,7 +13,6 @@ export type Invite = {
   partySize: number
   plusOneAllowed: boolean
   email?: string
-  inviteStatus?: string
   hasEmail: boolean
 }
 
