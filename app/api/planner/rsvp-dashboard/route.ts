@@ -36,6 +36,18 @@ function str(v: unknown): string | undefined {
   return typeof v === 'string' ? v : undefined
 }
 
+// The submit route saves children as a JSON array string on the primary guest's
+// row. Count its entries; treat anything unparseable as zero kids.
+function childrenCount(v: unknown): number {
+  if (typeof v !== 'string' || !v.trim()) return 0
+  try {
+    const parsed = JSON.parse(v)
+    return Array.isArray(parsed) ? parsed.length : 0
+  } catch {
+    return 0
+  }
+}
+
 export async function GET(req: NextRequest) {
   if (!(await isPlannerAuthed(req.cookies.get('planner-auth')?.value))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -69,6 +81,7 @@ export async function GET(req: NextRequest) {
         'Primary Guest',
         'Submitted Timestamp',
         'Dietary Restrictions',
+        'Children',
       ]),
     ])
   } catch (e) {
@@ -103,6 +116,7 @@ export async function GET(req: NextRequest) {
       primaryGuest: primaryName,
       submittedAt: str(r.fields['Submitted Timestamp']),
       dietary: str(r.fields['Dietary Restrictions']),
+      childrenCount: childrenCount(r.fields['Children']),
     }
   })
 

@@ -43,6 +43,7 @@ function HouseholdItem({ h }: { h: HouseholdRow }) {
         <p className="font-work-sans text-[9px] tracking-wide uppercase text-soft-gray/70">
           {h.partySize} {h.partySize === 1 ? 'guest' : 'guests'} invited
           {h.status === 'attending' && h.acceptedCount > 0 && ` · ${h.acceptedCount} coming`}
+          {h.status === 'attending' && h.childCount > 0 && ` · ${h.childCount} ${h.childCount === 1 ? 'kid' : 'kids'}`}
           {h.declinedCount > 0 && ` · ${h.declinedCount} declined`}
           {!h.hasEmail && ' · no email on file'}
         </p>
@@ -144,7 +145,7 @@ export default function RsvpDashboard() {
       </div>
 
       {/* Guest head counts */}
-      <div className="grid grid-cols-3 gap-3 mb-7 bg-warm-cream border border-soft-gray/20 rounded-lg p-4">
+      <div className="grid grid-cols-3 gap-3 mb-4 bg-warm-cream border border-soft-gray/20 rounded-lg p-4">
         <div>
           <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Guests Coming</p>
           <p className="font-crimson text-xl sm:text-2xl text-dusty-lilac leading-none">{data.acceptedGuests}</p>
@@ -156,6 +157,25 @@ export default function RsvpDashboard() {
         <div>
           <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Guests Invited</p>
           <p className="font-crimson text-xl sm:text-2xl text-dark-taupe leading-none">{data.invitedGuests}</p>
+        </div>
+      </div>
+
+      {/* Confirmed head count: adults, kids, and the grand total for the caterer */}
+      <div className="grid grid-cols-3 gap-3 mb-7 bg-warm-cream border border-soft-gray/20 rounded-lg p-4">
+        <div>
+          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Accepted Adults</p>
+          <p className="font-crimson text-xl sm:text-2xl text-dusty-lilac leading-none">{data.acceptedAdults}</p>
+          <p className="font-crimson text-[11px] text-soft-gray/70 mt-0.5">guests &amp; plus ones</p>
+        </div>
+        <div>
+          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Kids</p>
+          <p className="font-crimson text-xl sm:text-2xl text-dusty-lilac leading-none">{data.acceptedKids}</p>
+          <p className="font-crimson text-[11px] text-soft-gray/70 mt-0.5">children joining</p>
+        </div>
+        <div>
+          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Total Guests</p>
+          <p className="font-crimson text-xl sm:text-2xl text-gold-line leading-none">{data.acceptedTotalGuests}</p>
+          <p className="font-crimson text-[11px] text-soft-gray/70 mt-0.5">adults &amp; kids</p>
         </div>
       </div>
 
