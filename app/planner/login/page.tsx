@@ -50,7 +50,7 @@ export default function PlannerLoginPage() {
               <circle cx="16" cy="21" r="2" fill="#C3AF82" />
             </svg>
           </div>
-          <p className="font-work-sans text-[10px] tracking-[0.35em] uppercase text-soft-gray">
+          <p className="font-work-sans text-[10px] tracking-[0.35em] uppercase text-ink-muted">
             Planning Portal
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function PlannerLoginPage() {
               w-full bg-transparent border-b border-gold-line
               px-0 py-3
               font-crimson text-xl text-dark-taupe text-center
-              placeholder:text-soft-gray/50
+              placeholder:text-ink-muted
               focus:border-dark-taupe
               disabled:opacity-50
               transition-colors duration-200
@@ -78,7 +78,7 @@ export default function PlannerLoginPage() {
           />
 
           {error && (
-            <p className="font-lora italic text-sm text-muted-rose text-center">
+            <p className="font-lora italic text-sm text-rose-deep text-center">
               {error}
             </p>
           )}

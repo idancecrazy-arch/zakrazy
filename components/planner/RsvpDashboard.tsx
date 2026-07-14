@@ -8,9 +8,9 @@ import type { RsvpDashboard as RsvpDashboardData, HouseholdRow, HouseholdStatus 
 // guest responses back to the household they were invited under.
 
 const STATUS_PILL: Record<HouseholdStatus, string> = {
-  attending: 'bg-lilac/20 text-dusty-lilac border border-lilac/40',
-  declined: 'bg-muted-rose/15 text-muted-rose border border-muted-rose/40',
-  awaiting: 'bg-soft-gray/15 text-soft-gray border border-soft-gray/40',
+  attending: 'bg-lilac/20 text-lilac-deep border border-lilac/40',
+  declined: 'bg-muted-rose/15 text-rose-deep border border-muted-rose/40',
+  awaiting: 'bg-soft-gray/15 text-ink-muted border border-soft-gray/40',
 }
 const STATUS_LABEL: Record<HouseholdStatus, string> = {
   attending: 'Attending',
@@ -29,8 +29,8 @@ function StatCard({ label, value, sub, color = 'text-dark-taupe' }: {
   return (
     <div className="bg-warm-cream border border-soft-gray/20 rounded px-3 py-2.5">
       <p className={`font-crimson text-2xl sm:text-3xl ${color} leading-none mb-0.5`}>{value}</p>
-      <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray">{label}</p>
-      {sub && <p className="font-crimson text-[11px] text-soft-gray/70 mt-0.5">{sub}</p>}
+      <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-ink-muted">{label}</p>
+      {sub && <p className="font-crimson text-[11px] text-ink-muted mt-0.5">{sub}</p>}
     </div>
   )
 }
@@ -40,7 +40,7 @@ function HouseholdItem({ h }: { h: HouseholdRow }) {
     <div className="flex items-center gap-2 px-3 py-2.5 border-b border-soft-gray/15 last:border-0">
       <div className="flex-1 min-w-0">
         <p className="font-crimson text-sm text-dark-taupe truncate">{h.name}</p>
-        <p className="font-work-sans text-[9px] tracking-wide uppercase text-soft-gray/70">
+        <p className="font-work-sans text-[9px] tracking-wide uppercase text-ink-muted">
           {h.partySize} {h.partySize === 1 ? 'guest' : 'guests'} invited
           {h.status === 'attending' && h.acceptedCount > 0 && ` · ${h.acceptedCount} coming`}
           {h.status === 'attending' && h.childCount > 0 && ` · ${h.childCount} ${h.childCount === 1 ? 'kid' : 'kids'}`}
@@ -79,7 +79,7 @@ export default function RsvpDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="font-work-sans text-[9px] tracking-[0.3em] uppercase text-soft-gray/50 animate-pulse">
+        <p className="font-work-sans text-[9px] tracking-[0.3em] uppercase text-ink-muted animate-pulse">
           Loading RSVPs…
         </p>
       </div>
@@ -89,10 +89,10 @@ export default function RsvpDashboard() {
   if (error || !data) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3">
-        <p className="font-crimson italic text-muted-rose">{error || 'No data.'}</p>
+        <p className="font-crimson italic text-rose-deep">{error || 'No data.'}</p>
         <button
           onClick={() => { setError(''); setLoading(true); load().finally(() => setLoading(false)) }}
-          className="font-work-sans text-[9px] tracking-[0.2em] uppercase px-4 py-2 border border-soft-gray/40 text-soft-gray hover:text-gold-line hover:border-gold-line transition-colors rounded"
+          className="font-work-sans text-[9px] tracking-[0.2em] uppercase px-4 py-2 border border-soft-gray/40 text-ink-muted hover:text-gold-deep hover:border-gold-line transition-colors rounded"
         >
           Retry
         </button>
@@ -111,13 +111,13 @@ export default function RsvpDashboard() {
   return (
     <section>
       <div className="flex items-center justify-between mb-5">
-        <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-line">
+        <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-deep">
           RSVP Status
         </h2>
         <button
           onClick={async () => { setRefreshing(true); await load(); setRefreshing(false) }}
           disabled={refreshing}
-          className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-soft-gray hover:text-gold-line transition-colors disabled:opacity-50"
+          className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-ink-muted hover:text-gold-deep transition-colors disabled:opacity-50"
         >
           {refreshing ? 'Refreshing…' : '↻ Refresh'}
         </button>
@@ -126,9 +126,9 @@ export default function RsvpDashboard() {
       {/* Top-line household stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
         <StatCard label="Invites Sent" value={data.householdsInvited} sub="households" />
-        <StatCard label="Responded" value={`${data.householdsResponded}`} sub={`${data.responseRate}% replied`} color="text-gold-line" />
-        <StatCard label="Attending" value={data.householdsAttending} sub="households" color="text-dusty-lilac" />
-        <StatCard label="Awaiting" value={data.householdsAwaiting} sub="no reply yet" color="text-muted-rose" />
+        <StatCard label="Responded" value={`${data.householdsResponded}`} sub={`${data.responseRate}% replied`} color="text-gold-deep" />
+        <StatCard label="Attending" value={data.householdsAttending} sub="households" color="text-lilac-deep" />
+        <StatCard label="Awaiting" value={data.householdsAwaiting} sub="no reply yet" color="text-rose-deep" />
       </div>
 
       {/* Response progress bar */}
@@ -147,15 +147,15 @@ export default function RsvpDashboard() {
       {/* Guest head counts */}
       <div className="grid grid-cols-3 gap-3 mb-4 bg-warm-cream border border-soft-gray/20 rounded-lg p-4">
         <div>
-          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Guests Coming</p>
-          <p className="font-crimson text-xl sm:text-2xl text-dusty-lilac leading-none">{data.acceptedGuests}</p>
+          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-ink-muted mb-1">Guests Coming</p>
+          <p className="font-crimson text-xl sm:text-2xl text-lilac-deep leading-none">{data.acceptedGuests}</p>
         </div>
         <div>
-          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Declined</p>
-          <p className="font-crimson text-xl sm:text-2xl text-muted-rose leading-none">{data.declinedGuests}</p>
+          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-ink-muted mb-1">Declined</p>
+          <p className="font-crimson text-xl sm:text-2xl text-rose-deep leading-none">{data.declinedGuests}</p>
         </div>
         <div>
-          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Guests Invited</p>
+          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-ink-muted mb-1">Guests Invited</p>
           <p className="font-crimson text-xl sm:text-2xl text-dark-taupe leading-none">{data.invitedGuests}</p>
         </div>
       </div>
@@ -163,19 +163,19 @@ export default function RsvpDashboard() {
       {/* Confirmed head count: adults, kids, and the grand total for the caterer */}
       <div className="grid grid-cols-3 gap-3 mb-7 bg-warm-cream border border-soft-gray/20 rounded-lg p-4">
         <div>
-          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Accepted Adults</p>
-          <p className="font-crimson text-xl sm:text-2xl text-dusty-lilac leading-none">{data.acceptedAdults}</p>
-          <p className="font-crimson text-[11px] text-soft-gray/70 mt-0.5">guests &amp; plus ones</p>
+          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-ink-muted mb-1">Accepted Adults</p>
+          <p className="font-crimson text-xl sm:text-2xl text-lilac-deep leading-none">{data.acceptedAdults}</p>
+          <p className="font-crimson text-[11px] text-ink-muted mt-0.5">guests &amp; plus ones</p>
         </div>
         <div>
-          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Kids</p>
-          <p className="font-crimson text-xl sm:text-2xl text-dusty-lilac leading-none">{data.acceptedKids}</p>
-          <p className="font-crimson text-[11px] text-soft-gray/70 mt-0.5">children joining</p>
+          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-ink-muted mb-1">Kids</p>
+          <p className="font-crimson text-xl sm:text-2xl text-lilac-deep leading-none">{data.acceptedKids}</p>
+          <p className="font-crimson text-[11px] text-ink-muted mt-0.5">children joining</p>
         </div>
         <div>
-          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray mb-1">Total Guests</p>
-          <p className="font-crimson text-xl sm:text-2xl text-gold-line leading-none">{data.acceptedTotalGuests}</p>
-          <p className="font-crimson text-[11px] text-soft-gray/70 mt-0.5">adults &amp; kids</p>
+          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-ink-muted mb-1">Total Guests</p>
+          <p className="font-crimson text-xl sm:text-2xl text-gold-deep leading-none">{data.acceptedTotalGuests}</p>
+          <p className="font-crimson text-[11px] text-ink-muted mt-0.5">adults &amp; kids</p>
         </div>
       </div>
 
@@ -191,16 +191,16 @@ export default function RsvpDashboard() {
               <div key={h.name} className="flex items-center gap-2 px-3 py-2.5 border-b border-soft-gray/15 last:border-0">
                 <div className="flex-1 min-w-0">
                   <p className="font-crimson text-sm text-dark-taupe truncate">{h.name}</p>
-                  <p className="font-work-sans text-[9px] tracking-wide uppercase text-soft-gray/70">
+                  <p className="font-work-sans text-[9px] tracking-wide uppercase text-ink-muted">
                     {h.partySize} {h.partySize === 1 ? 'guest' : 'guests'}
                   </p>
                 </div>
                 {h.hasEmail ? (
-                  <a href={`mailto:${h.email}`} className="font-crimson text-[11px] text-gold-line underline underline-offset-2 truncate max-w-[45%] flex-shrink-0">
+                  <a href={`mailto:${h.email}`} className="font-crimson text-[11px] text-gold-deep underline underline-offset-2 truncate max-w-[45%] flex-shrink-0">
                     {h.email}
                   </a>
                 ) : (
-                  <span className="font-work-sans text-[8px] tracking-wider uppercase text-muted-rose flex-shrink-0">no email</span>
+                  <span className="font-work-sans text-[8px] tracking-wider uppercase text-rose-deep flex-shrink-0">no email</span>
                 )}
               </div>
             ))}
@@ -230,7 +230,7 @@ export default function RsvpDashboard() {
         </div>
         <div className="border border-soft-gray/20 rounded-lg overflow-hidden bg-ivory">
           {visible.length === 0 ? (
-            <p className="font-crimson italic text-sm text-soft-gray/50 px-3 py-4 text-center">None in this group.</p>
+            <p className="font-crimson italic text-sm text-ink-muted px-3 py-4 text-center">None in this group.</p>
           ) : (
             visible.map((h) => <HouseholdItem key={h.name} h={h} />)
           )}
@@ -243,12 +243,12 @@ export default function RsvpDashboard() {
           <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory mb-2">
             No Email on File ({data.invitesMissingEmail.length})
           </h3>
-          <p className="font-crimson italic text-xs text-soft-gray/70 mb-2">
+          <p className="font-crimson italic text-xs text-ink-muted mb-2">
             These invites cannot be followed up by email. Reach out another way.
           </p>
           <div className="flex flex-wrap gap-1.5">
             {data.invitesMissingEmail.map((h) => (
-              <span key={h.name} className="font-work-sans text-[9px] tracking-wide uppercase px-2.5 py-1.5 border border-muted-rose/30 text-muted-rose rounded-full">
+              <span key={h.name} className="font-work-sans text-[9px] tracking-wide uppercase px-2.5 py-1.5 border border-muted-rose/30 text-rose-deep rounded-full">
                 {h.name}
               </span>
             ))}
@@ -262,14 +262,14 @@ export default function RsvpDashboard() {
           <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory mb-2">
             Replies Without a Matching Invite ({data.unmatchedResponses.length})
           </h3>
-          <p className="font-crimson italic text-xs text-soft-gray/70 mb-2">
+          <p className="font-crimson italic text-xs text-ink-muted mb-2">
             These RSVPs did not match any name on the guest list. Check for typos or add them.
           </p>
           <div className="border border-soft-gray/20 rounded-lg overflow-hidden bg-ivory">
             {data.unmatchedResponses.map((r, i) => (
               <div key={`${r.guestName}-${i}`} className="flex items-center justify-between gap-2 px-3 py-2 border-b border-soft-gray/15 last:border-0">
                 <span className="font-crimson text-sm text-dark-taupe truncate">{r.guestName || '(no name)'}</span>
-                <span className="font-work-sans text-[9px] tracking-wider uppercase text-soft-gray flex-shrink-0">{r.status || 'pending'}</span>
+                <span className="font-work-sans text-[9px] tracking-wider uppercase text-ink-muted flex-shrink-0">{r.status || 'pending'}</span>
               </div>
             ))}
           </div>
@@ -295,7 +295,7 @@ export default function RsvpDashboard() {
 
 function Legend({ color, label }: { color: string; label: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 font-work-sans text-[9px] tracking-wide uppercase text-soft-gray">
+    <span className="inline-flex items-center gap-1.5 font-work-sans text-[9px] tracking-wide uppercase text-ink-muted">
       <span className={`w-2 h-2 rounded-full ${color} inline-block`} />
       {label}
     </span>
