@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Reorder, useDragControls } from 'framer-motion'
+import RsvpDashboard from '../../components/planner/RsvpDashboard'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -1473,7 +1474,7 @@ export default function PlannerDashboard() {
   const [scheduleItems, setScheduleItems] = useState<BudgetItem[]>(INITIAL_SCHEDULE_ITEMS)
   const [scenarios, setScenarios] = useState<GuestScenario[]>(INITIAL_SCENARIOS)
   const [vendors, setVendors] = useState<Vendor[]>(INITIAL_VENDORS)
-  const [activeSection, setActiveSection] = useState<'timeline' | 'tasks' | 'budget' | 'vendors'>('timeline')
+  const [activeSection, setActiveSection] = useState<'rsvp' | 'timeline' | 'tasks' | 'budget' | 'vendors'>('rsvp')
 
   useEffect(() => { localStorage.setItem('planner-deadlines', JSON.stringify(deadlines)) }, [deadlines])
   useEffect(() => { localStorage.setItem('planner-tasks', JSON.stringify(tasks)) }, [tasks])
@@ -1484,6 +1485,7 @@ export default function PlannerDashboard() {
   const [initialized, setInitialized] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [kvMissing, setKvMissing] = useState(false)
+  const [kvError, setKvError] = useState(false)
   const dirtyRef = useRef(false)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const lastSavedAtRef = useRef<number>(0)
@@ -1523,16 +1525,22 @@ export default function PlannerDashboard() {
     if (data._savedAt)       lastSavedAtRef.current = data._savedAt as number
   }
 
-  // Load saved state from Redis on mount; surface missing-KV warning
+  // Load saved state from Redis on mount; surface missing-KV warning.
+  // A hard client-side timeout guarantees the portal renders even if the API
+  // is slow or hanging — the page must never be stuck on "Loading…" forever.
   useEffect(() => {
-    fetch('/api/planner-state')
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 6000)
+    fetch('/api/planner-state', { signal: controller.signal })
       .then(r => r.json())
       .then((json) => {
         if (json.kvMissing) { setKvMissing(true); return }
+        if (json.kvError) { setKvError(true); return }
         if (json.data) applyData(json.data)
       })
-      .catch(() => {})
-      .finally(() => setInitialized(true))
+      .catch(() => { setKvError(true) })
+      .finally(() => { clearTimeout(timer); setInitialized(true) })
+    return () => { clearTimeout(timer); controller.abort() }
   }, [])
 
   // Debounced auto-save on any user-initiated state change
@@ -1551,6 +1559,8 @@ export default function PlannerDashboard() {
         })
         const json = await res.json()
         if (json.kvMissing) { setKvMissing(true); setSaveStatus('error'); return }
+        if (json.kvError || !res.ok) { setKvError(true); setSaveStatus('error'); return }
+        setKvError(false)
         lastSavedAtRef.current = savedAt
         setSaveStatus('saved')
         setTimeout(() => setSaveStatus('idle'), 2000)
@@ -1642,6 +1652,7 @@ export default function PlannerDashboard() {
   const pending = tasks.filter(t => t.status === 'pending').length
 
   const navItems: { key: typeof activeSection; label: string }[] = [
+    { key: 'rsvp',     label: 'RSVPs'    },
     { key: 'timeline', label: 'Timeline' },
     { key: 'tasks',    label: 'Tasks'    },
     { key: 'budget',   label: 'Budget'   },
@@ -1704,24 +1715,37 @@ export default function PlannerDashboard() {
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 sm:py-7">
-        {/* Stats strip */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
-          {[
-            { label: 'Total',       value: tasks.length, color: 'text-dark-taupe' },
-            { label: 'Done',        value: doneTasks,    color: 'text-deep-ivory' },
-            { label: 'In Progress', value: inProgress,   color: 'text-dusty-lilac' },
-            { label: 'Pending',     value: pending,      color: 'text-soft-gray' },
-          ].map(({ label, value, color }) => (
-            <div key={label} className="bg-warm-cream border border-soft-gray/20 rounded px-3 py-2.5">
-              <p className={`font-crimson text-2xl sm:text-3xl ${color} leading-none mb-0.5`}>{value}</p>
-              <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray">{label}</p>
-            </div>
-          ))}
+      {!kvMissing && kvError && (
+        <div className="bg-muted-rose/10 border-b border-muted-rose/30 px-4 sm:px-6 py-2 text-center">
+          <p className="font-work-sans text-[9px] tracking-[0.15em] uppercase text-muted-rose">
+            ⚠ Could not reach the saved-data store — recent edits may not be saved. Check your Redis connection.
+          </p>
         </div>
+      )}
 
-        {/* Active section */}
-        {!initialized ? (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 sm:py-7">
+        {/* Stats strip — task summary, hidden on the RSVP tab where it doesn't apply */}
+        {activeSection !== 'rsvp' && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+            {[
+              { label: 'Total',       value: tasks.length, color: 'text-dark-taupe' },
+              { label: 'Done',        value: doneTasks,    color: 'text-deep-ivory' },
+              { label: 'In Progress', value: inProgress,   color: 'text-dusty-lilac' },
+              { label: 'Pending',     value: pending,      color: 'text-soft-gray' },
+            ].map(({ label, value, color }) => (
+              <div key={label} className="bg-warm-cream border border-soft-gray/20 rounded px-3 py-2.5">
+                <p className={`font-crimson text-2xl sm:text-3xl ${color} leading-none mb-0.5`}>{value}</p>
+                <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-soft-gray">{label}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* RSVP dashboard has its own data source (Airtable), so it renders
+            immediately and is never gated on the Redis-backed planner state. */}
+        {activeSection === 'rsvp' ? (
+          <RsvpDashboard />
+        ) : !initialized ? (
           <div className="flex items-center justify-center py-20">
             <p className="font-work-sans text-[9px] tracking-[0.3em] uppercase text-soft-gray/50 animate-pulse">
               Loading…
