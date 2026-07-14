@@ -73,7 +73,6 @@ export async function GET(req: NextRequest) {
         'Total Party Size',
         'Plus One Allowed',
         'Invite Email',
-        'Invite Status',
       ]),
       fetchAll(airtableBase, responseTable, airtableKey, [
         'Guest Name',
@@ -97,7 +96,6 @@ export async function GET(req: NextRequest) {
       partySize: typeof r.fields['Total Party Size'] === 'number' ? (r.fields['Total Party Size'] as number) : 1,
       plusOneAllowed: Boolean(r.fields['Plus One Allowed']),
       email: email || undefined,
-      inviteStatus: str(r.fields['Invite Status']),
       hasEmail: Boolean(email),
     }
   })
