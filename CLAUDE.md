@@ -14,7 +14,7 @@ experience for guests who have already replied.
 - react-hook-form and Zod for the RSVP form and its validation.
 - Airtable holds the guest list and RSVP responses, reached through the site's
   own API routes (its secret key lives in an environment variable, never in the code).
-- Redis stores saved state for the private planner section; Resend sends email notifications.
+- Airtable also stores saved state for the private planner section (one JSON blob in a "Planner State" table); Resend sends email notifications.
 - Hosted on Vercel.
 
 ## How to run it
