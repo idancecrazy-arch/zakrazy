@@ -23,6 +23,7 @@ export type RsvpResponse = {
   primaryGuest?: string
   submittedAt?: string
   dietary?: string
+  childrenCount?: number // kids attached to this row (stored on the primary guest)
 }
 
 export type HouseholdStatus = 'attending' | 'declined' | 'awaiting'
@@ -35,6 +36,7 @@ export type HouseholdRow = {
   status: HouseholdStatus
   acceptedCount: number
   declinedCount: number
+  childCount: number // kids joining from this household
 }
 
 export type RsvpDashboard = {
@@ -49,6 +51,10 @@ export type RsvpDashboard = {
   invitedGuests: number // sum of party sizes across all invites
   acceptedGuests: number
   declinedGuests: number
+  // Accepted head count, split by adult vs child
+  acceptedAdults: number // accepted response rows: named guests and plus ones
+  acceptedKids: number // children joining, from attending households
+  acceptedTotalGuests: number // acceptedAdults + acceptedKids
   // Follow-up helpers
   households: HouseholdRow[] // every invite, sorted by status then name
   awaiting: HouseholdRow[] // invites with no reply yet
@@ -131,6 +137,9 @@ export function buildDashboard(invites: Invite[], responsesRaw: RsvpResponse[]):
     const rs = matched[i]
     const acceptedCount = rs.filter((r) => isAccepted(r.status)).length
     const declinedCount = rs.filter((r) => isDeclined(r.status)).length
+    // Kids are recorded on the primary guest's row and only saved when the party
+    // is attending, so summing across the household's rows gives its child count.
+    const childCount = rs.reduce((sum, r) => sum + (r.childrenCount || 0), 0)
     let status: HouseholdStatus
     if (rs.length === 0) status = 'awaiting'
     else if (acceptedCount > 0) status = 'attending'
@@ -143,6 +152,7 @@ export function buildDashboard(invites: Invite[], responsesRaw: RsvpResponse[]):
       status,
       acceptedCount,
       declinedCount,
+      childCount,
     }
   })
 
@@ -161,6 +171,15 @@ export function buildDashboard(invites: Invite[], responsesRaw: RsvpResponse[]):
   const declinedGuests = responses.filter((r) => isDeclined(r.status)).length
   const invitedGuests = invites.reduce((sum, inv) => sum + (inv.partySize || 0), 0)
 
+  // Adults are the accepted people-rows (guests and plus ones); kids come off
+  // the Children field on attending households. Total = both, so the couple can
+  // give the caterer a single confirmed head count.
+  const acceptedAdults = acceptedGuests
+  const acceptedKids = households
+    .filter((h) => h.status === 'attending')
+    .reduce((sum, h) => sum + h.childCount, 0)
+  const acceptedTotalGuests = acceptedAdults + acceptedKids
+
   const dietary = responses
     .filter((r) => isAccepted(r.status) && r.dietary && r.dietary.trim())
     .map((r) => `${r.guestName.trim()}: ${r.dietary!.trim()}`)
@@ -175,6 +194,9 @@ export function buildDashboard(invites: Invite[], responsesRaw: RsvpResponse[]):
     invitedGuests,
     acceptedGuests,
     declinedGuests,
+    acceptedAdults,
+    acceptedKids,
+    acceptedTotalGuests,
     households,
     awaiting: households.filter((h) => h.status === 'awaiting'),
     invitesMissingEmail: households.filter((h) => !h.hasEmail),

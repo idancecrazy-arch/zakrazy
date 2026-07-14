@@ -98,6 +98,27 @@ describe('buildDashboard', () => {
     expect(d.households[0].name).toBe('Brendan Fang')
   })
 
+  it('counts kids from attending households and totals adults plus kids', () => {
+    const invites = [
+      invite('Zach & Mindy', 2, 'z@example.com'),
+      invite('Brendan Fang', 1, 'b@example.com'),
+      invite('Cat & Adam Hosey', 2, 'c@example.com'), // declined: kids do not count
+    ]
+    const responses = [
+      resp('Zach', 'Accepted', { childrenCount: 2 }), // 2 kids on the primary row
+      resp('Mindy', 'Accepted', { primaryGuest: 'Zach' }),
+      resp('Brendan Fang', 'Accepted', { childrenCount: 1 }),
+      resp('Cat', 'Declined', { childrenCount: 3 }),
+      resp('Adam Hosey', 'Declined', { primaryGuest: 'Cat' }),
+    ]
+    const d = buildDashboard(invites, responses)
+    expect(d.acceptedAdults).toBe(3) // Zach, Mindy, Brendan
+    expect(d.acceptedKids).toBe(3) // 2 + 1, Cat's household declined
+    expect(d.acceptedTotalGuests).toBe(6)
+    const zach = d.households.find((h) => h.name === 'Zach & Mindy')!
+    expect(zach.childCount).toBe(2)
+  })
+
   it('collects dietary notes from attending guests only', () => {
     const invites = [invite('Cat & Adam Hosey', 2, 'c@example.com')]
     const responses = [
