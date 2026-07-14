@@ -1457,10 +1457,10 @@ function VendorsSection({
 // ── Main dashboard ─────────────────────────────────────────────────────────────
 
 // A single combined snapshot of the whole planner, kept in localStorage as an
-// offline fallback. When Redis is unreachable (or not yet configured) the page
-// restores from this on load so a device's own edits survive a refresh instead
-// of resetting to the defaults. Redis stays the source of truth whenever it is
-// reachable — this only fills in when it is not.
+// offline fallback. When the saved-data store (Airtable) is unreachable (or not
+// yet configured) the page restores from this on load so a device's own edits
+// survive a refresh instead of resetting to the defaults. Airtable stays the
+// source of truth whenever it is reachable — this only fills in when it is not.
 const LOCAL_BACKUP_KEY = 'planner-state-backup'
 
 function loadLocalBackup(): Record<string, unknown> | null {
@@ -1485,9 +1485,9 @@ export default function PlannerDashboard() {
 
   // ── Persistence ────────────────────────────────────────────────────────────
   // Mirror the full state to a single localStorage snapshot on every change. This
-  // is the offline fallback restored on load when Redis is unreachable, so it must
-  // include every slice — including scheduleItems, which the old per-key writes
-  // missed.
+  // is the offline fallback restored on load when Airtable is unreachable, so it
+  // must include every slice — including scheduleItems, which the old per-key
+  // writes missed.
   useEffect(() => {
     try {
       localStorage.setItem(
@@ -1495,7 +1495,7 @@ export default function PlannerDashboard() {
         JSON.stringify({ deadlines, tasks, budgetItems, scheduleItems, vendors, scenarios }),
       )
     } catch {
-      /* storage full or unavailable — nothing we can do, Redis is the real store */
+      /* storage full or unavailable — nothing we can do, Airtable is the real store */
     }
   }, [deadlines, tasks, budgetItems, scheduleItems, vendors, scenarios])
   const [initialized, setInitialized] = useState(false)
@@ -1541,13 +1541,13 @@ export default function PlannerDashboard() {
     if (data._savedAt)       lastSavedAtRef.current = data._savedAt as number
   }
 
-  // Load saved state from Redis on mount; surface missing-KV warning.
+  // Load saved state from Airtable on mount; surface missing-store warning.
   // A hard client-side timeout guarantees the portal renders even if the API
   // is slow or hanging — the page must never be stuck on "Loading…" forever.
   useEffect(() => {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), 6000)
-    // When Redis can't be reached, restore this device's last edits from the
+    // When Airtable can't be reached, restore this device's last edits from the
     // local snapshot so a refresh doesn't reset everything to the defaults.
     const restoreFromBackup = () => {
       const backup = loadLocalBackup()
@@ -1733,7 +1733,7 @@ export default function PlannerDashboard() {
       {kvMissing && (
         <div className="bg-muted-rose/10 border-b border-muted-rose/30 px-4 sm:px-6 py-2 text-center">
           <p className="font-work-sans text-[9px] tracking-[0.15em] uppercase text-muted-rose">
-            ⚠ Redis not configured — edits are saved on this device only. Add REDIS_URL to your Vercel environment variables to sync across devices.
+            ⚠ Saved-data store not configured — edits are saved on this device only. Add your Airtable environment variables to your Vercel project to sync across devices.
           </p>
         </div>
       )}
@@ -1741,7 +1741,7 @@ export default function PlannerDashboard() {
       {!kvMissing && kvError && (
         <div className="bg-muted-rose/10 border-b border-muted-rose/30 px-4 sm:px-6 py-2 text-center">
           <p className="font-work-sans text-[9px] tracking-[0.15em] uppercase text-muted-rose">
-            ⚠ Could not reach the saved-data store — edits are saved on this device only for now. Check your Redis connection to sync across devices.
+            ⚠ Could not reach the saved-data store — edits are saved on this device only for now. Check your Airtable connection to sync across devices.
           </p>
         </div>
       )}
@@ -1764,8 +1764,8 @@ export default function PlannerDashboard() {
           </div>
         )}
 
-        {/* RSVP dashboard has its own data source (Airtable), so it renders
-            immediately and is never gated on the Redis-backed planner state. */}
+        {/* RSVP dashboard has its own Airtable table, so it renders immediately
+            and is never gated on the Airtable-backed planner state. */}
         {activeSection === 'rsvp' ? (
           <RsvpDashboard />
         ) : !initialized ? (
