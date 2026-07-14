@@ -620,7 +620,7 @@ function TaskRow({
         {/* Status toggle */}
         <button
           onClick={() => onUpdate(task.id, { status: STATUS_CYCLE[task.status] })}
-          className="mt-0.5 flex-shrink-0 w-5 h-5 rounded border border-gold-line/50 flex items-center justify-center hover:border-gold-line transition-colors"
+          className="mt-0.5 flex-shrink-0 w-7 h-7 rounded border border-gold-line/50 flex items-center justify-center hover:border-gold-line transition-colors"
           aria-label={`Status: ${task.status}. Tap to advance.`}
         >
           {task.status === 'done' && (
@@ -637,19 +637,19 @@ function TaskRow({
             <EditableText
               value={task.title}
               onChange={v => onUpdate(task.id, { title: v })}
-              className={`font-crimson text-sm text-dark-taupe leading-snug flex-1 ${task.status === 'done' ? 'line-through' : ''}`}
+              className={`font-crimson text-base text-dark-taupe leading-snug flex-1 ${task.status === 'done' ? 'line-through' : ''}`}
             />
             <div className="flex items-center gap-0.5 flex-shrink-0 ml-1">
               <button
                 onClick={() => setShowDetails(!showDetails)}
-                className="text-ink-muted hover:text-deep-ivory w-5 h-5 flex items-center justify-center text-[10px] transition-colors"
+                className="text-ink-muted hover:text-deep-ivory w-7 h-7 flex items-center justify-center text-sm transition-colors"
                 aria-label={showDetails ? 'Hide details' : 'Show details'}
               >
                 {showDetails ? '▲' : '▼'}
               </button>
               <button
                 onClick={() => onDelete(task.id)}
-                className="text-ink-muted hover:text-rose-deep w-5 h-5 flex items-center justify-center text-base transition-colors opacity-0 group-hover/task:opacity-100"
+                className="text-ink-muted hover:text-rose-deep w-7 h-7 flex items-center justify-center text-base transition-colors opacity-60 group-hover/task:opacity-100"
                 aria-label="Delete task"
               >
                 ×
@@ -659,7 +659,7 @@ function TaskRow({
 
           {/* Meta row */}
           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-work-sans tracking-wider uppercase whitespace-nowrap ${STATUS_PILL[task.status]}`}>
+            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-work-sans tracking-wider uppercase whitespace-nowrap ${STATUS_PILL[task.status]}`}>
               {STATUS_LABEL[task.status]}
             </span>
 
@@ -674,14 +674,14 @@ function TaskRow({
               value={task.dueLabel}
               onChange={v => onUpdate(task.id, { dueLabel: v })}
               placeholder="+ due date"
-              className="font-work-sans text-[9px] tracking-wider uppercase text-rose-deep"
+              className="font-work-sans text-xs tracking-wider uppercase text-rose-deep"
             />
 
             <EditableText
               value={task.assignee}
               onChange={v => onUpdate(task.id, { assignee: v })}
               placeholder="+ assign"
-              className="font-work-sans text-[9px] tracking-wide text-deep-ivory/60 hover:text-gold-deep"
+              className="font-work-sans text-xs tracking-wide text-deep-ivory/60 hover:text-gold-deep"
             />
           </div>
 
@@ -689,12 +689,12 @@ function TaskRow({
           {showDetails && (
             <div className="mt-2 space-y-1.5 pl-0">
               <div className="flex items-start gap-2">
-                <span className="font-work-sans text-[9px] uppercase tracking-wide text-ink-muted flex-shrink-0 pt-0.5">Notes:</span>
+                <span className="font-work-sans text-xs uppercase tracking-wide text-ink-muted flex-shrink-0 pt-0.5">Notes:</span>
                 <EditableText
                   value={task.notes}
                   onChange={v => onUpdate(task.id, { notes: v })}
                   placeholder="add notes…"
-                  className="font-crimson text-xs text-deep-ivory flex-1"
+                  className="font-crimson text-sm text-deep-ivory flex-1"
                 />
               </div>
             </div>
@@ -733,7 +733,7 @@ function CategoryEdit({ value, options, onChange }: {
             if (e.key === 'Enter') { e.preventDefault(); save() }
             if (e.key === 'Escape') { setEditing(false); setDraft(value) }
           }}
-          className="font-work-sans text-[9px] tracking-wide uppercase bg-warm-cream border border-gold-line/50 rounded px-1.5 py-0.5 text-ink-muted outline-none w-28"
+          className="font-work-sans text-xs tracking-wide uppercase bg-warm-cream border border-gold-line/50 rounded px-2 py-1 text-ink-muted outline-none w-32"
           placeholder="category…"
         />
         <datalist id={listId}>
@@ -746,7 +746,7 @@ function CategoryEdit({ value, options, onChange }: {
   return (
     <button
       onClick={() => { setEditing(true); setDraft(value) }}
-      className="font-work-sans text-[9px] tracking-wide uppercase bg-warm-cream/50 border border-soft-gray/30 hover:border-gold-line/50 rounded px-1.5 py-0.5 text-ink-muted transition-colors"
+      className="font-work-sans text-xs tracking-wide uppercase bg-warm-cream/50 border border-soft-gray/30 hover:border-gold-line/50 rounded px-2 py-1 text-ink-muted transition-colors"
     >
       {value}
     </button>
@@ -778,18 +778,18 @@ function TasksSection({
   return (
     <section>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-deep">
+        <h2 className="font-work-sans text-sm tracking-[0.3em] uppercase text-gold-deep">
           Task Board
         </h2>
         <button
           onClick={() => onAdd(activeCategory !== 'All' ? activeCategory : undefined)}
-          className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-ink-muted hover:text-gold-deep transition-colors"
+          className="font-work-sans text-xs tracking-[0.2em] uppercase text-ink-muted hover:text-gold-deep transition-colors"
         >
           + Add Task
         </button>
       </div>
 
-      <p className="font-crimson italic text-xs text-ink-muted mb-4">
+      <p className="font-crimson italic text-sm text-ink-muted mb-4">
         Tap the circle to cycle status · tap any field to edit
       </p>
 
@@ -799,7 +799,7 @@ function TasksSection({
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
-            className={`font-work-sans text-[9px] tracking-[0.15em] uppercase px-2.5 py-1.5 border rounded-full transition-colors min-h-[36px] ${
+            className={`font-work-sans text-xs tracking-[0.15em] uppercase px-2.5 py-1.5 border rounded-full transition-colors min-h-[44px] ${
               activeCategory === cat
                 ? 'bg-dark-taupe text-ivory border-dark-taupe'
                 : 'bg-transparent text-deep-ivory border-soft-gray/40 hover:border-gold-line'
@@ -814,15 +814,15 @@ function TasksSection({
         ? Object.entries(grouped).map(([cat, catTasks]) => (
           <div key={cat} className="mb-6">
             <div className="flex items-center justify-between mb-1 pb-1 border-b border-soft-gray/20">
-              <span className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-ink-muted">
+              <span className="font-work-sans text-xs tracking-[0.25em] uppercase text-ink-muted">
                 {cat}
-                <span className="ml-2 normal-case font-crimson text-xs text-ink-muted">
+                <span className="ml-2 normal-case font-crimson text-sm text-ink-muted">
                   {catTasks.filter(t => t.status === 'done').length}/{catTasks.length}
                 </span>
               </span>
               <button
                 onClick={() => onAdd(cat)}
-                className="font-work-sans text-[9px] uppercase tracking-wide text-ink-muted hover:text-gold-deep transition-colors"
+                className="font-work-sans text-xs uppercase tracking-wide text-ink-muted hover:text-gold-deep transition-colors"
               >
                 + add
               </button>
@@ -879,12 +879,12 @@ function PaymentSchedule({
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory">
+        <h3 className="font-work-sans text-xs tracking-[0.25em] uppercase text-deep-ivory">
           Payment Schedule
         </h3>
         <button
           onClick={() => onAddItem()}
-          className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-ink-muted hover:text-gold-deep transition-colors"
+          className="font-work-sans text-xs tracking-[0.1em] uppercase text-ink-muted hover:text-gold-deep transition-colors"
         >
           + add payment
         </button>
@@ -904,7 +904,7 @@ function PaymentSchedule({
               <div key={monthKey}>
                 {/* Month header */}
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-gold-deep">
+                  <span className="font-work-sans text-xs tracking-[0.25em] uppercase text-gold-deep">
                     {MONTH_NAMES[mo - 1]} {yr}
                   </span>
                   <div className="flex-1 h-px bg-gold-line/20" />
@@ -924,8 +924,8 @@ function PaymentSchedule({
                     return (
                       <div key={item.id} className={`flex items-stretch border rounded-lg overflow-hidden ${borderColor}`}>
                         {/* Date block */}
-                        <div className={`flex flex-col items-center justify-center px-3 py-2 min-w-[52px] ${accentColor}`}>
-                          <span className="font-work-sans text-[8px] tracking-widest uppercase text-ivory/70">{dayName}</span>
+                        <div className={`flex flex-col items-center justify-center px-3 py-2 min-w-[60px] ${accentColor}`}>
+                          <span className="font-work-sans text-[11px] tracking-widest uppercase text-ivory/70">{dayName}</span>
                           <span className="font-crimson text-2xl leading-none text-ivory font-semibold">{day}</span>
                         </div>
                         {/* Content */}
@@ -941,7 +941,7 @@ function PaymentSchedule({
                                 type="date"
                                 value={item.dueDate ?? ''}
                                 onChange={e => onUpdateItem(item.id, { dueDate: normalizeDate(e.target.value) })}
-                                className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-ink-muted bg-transparent border-none outline-none cursor-pointer"
+                                className="font-work-sans text-xs tracking-[0.1em] uppercase text-ink-muted bg-transparent border-none outline-none cursor-pointer"
                               />
                             </label>
                           </div>
@@ -949,11 +949,11 @@ function PaymentSchedule({
                             <EditableText
                               value={item.cost}
                               onChange={v => onUpdateItem(item.id, { cost: v })}
-                              className="font-crimson text-sm text-deep-ivory"
+                              className="font-crimson text-base text-deep-ivory"
                             />
                             <button
                               onClick={() => onDeleteItem(item.id)}
-                              className="text-ink-muted hover:text-rose-deep transition-colors text-lg w-5 h-5 flex items-center justify-center"
+                              className="text-ink-muted hover:text-rose-deep transition-colors text-lg w-7 h-7 flex items-center justify-center"
                               aria-label="Delete payment"
                             >
                               ×
@@ -971,7 +971,7 @@ function PaymentSchedule({
           {unscheduled.length > 0 && (
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <span className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-ink-muted">
+                <span className="font-work-sans text-xs tracking-[0.25em] uppercase text-ink-muted">
                   No Date Set
                 </span>
                 <div className="flex-1 h-px bg-soft-gray/15" />
@@ -979,8 +979,8 @@ function PaymentSchedule({
               <div className="flex flex-col gap-2">
                 {unscheduled.map(item => (
                   <div key={item.id} className="flex items-stretch border border-soft-gray/15 rounded-lg overflow-hidden">
-                    <div className="flex flex-col items-center justify-center px-3 py-2 min-w-[52px] bg-soft-gray/10">
-                      <span className="font-work-sans text-[8px] tracking-widest uppercase text-ink-muted">—</span>
+                    <div className="flex flex-col items-center justify-center px-3 py-2 min-w-[60px] bg-soft-gray/10">
+                      <span className="font-work-sans text-[11px] tracking-widest uppercase text-ink-muted">—</span>
                       <span className="font-crimson text-2xl leading-none text-ink-muted font-semibold">?</span>
                     </div>
                     <div className="flex-1 flex items-center justify-between gap-2 px-3 py-2 bg-warm-cream/50 min-w-0">
@@ -995,7 +995,7 @@ function PaymentSchedule({
                             type="date"
                             value={item.dueDate ?? ''}
                             onChange={e => onUpdateItem(item.id, { dueDate: normalizeDate(e.target.value) })}
-                            className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-ink-muted bg-transparent border-none outline-none cursor-pointer"
+                            className="font-work-sans text-xs tracking-[0.1em] uppercase text-ink-muted bg-transparent border-none outline-none cursor-pointer"
                           />
                         </label>
                       </div>
@@ -1003,11 +1003,11 @@ function PaymentSchedule({
                         <EditableText
                           value={item.cost}
                           onChange={v => onUpdateItem(item.id, { cost: v })}
-                          className="font-crimson text-sm text-deep-ivory"
+                          className="font-crimson text-base text-deep-ivory"
                         />
                         <button
                           onClick={() => onDeleteItem(item.id)}
-                          className="text-ink-muted hover:text-rose-deep transition-colors text-lg w-5 h-5 flex items-center justify-center"
+                          className="text-ink-muted hover:text-rose-deep transition-colors text-lg w-7 h-7 flex items-center justify-center"
                           aria-label="Delete payment"
                         >
                           ×
@@ -1064,22 +1064,22 @@ function BudgetSection({
 
   return (
     <section>
-      <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-deep mb-5">
+      <h2 className="font-work-sans text-sm tracking-[0.3em] uppercase text-gold-deep mb-5">
         Budget Tracker
       </h2>
 
       {/* Totals banner */}
       <div className="grid grid-cols-3 gap-3 mb-7 bg-warm-cream border border-soft-gray/20 rounded-lg p-4">
         <div>
-          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-ink-muted mb-1">Paid</p>
+          <p className="font-work-sans text-[11px] tracking-[0.2em] uppercase text-ink-muted mb-1">Paid</p>
           <p className="font-crimson text-xl sm:text-2xl text-gold-deep leading-none">{formatRange(paidTotal, paidTotal)}</p>
         </div>
         <div>
-          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-ink-muted mb-1">Remaining</p>
+          <p className="font-work-sans text-[11px] tracking-[0.2em] uppercase text-ink-muted mb-1">Remaining</p>
           <p className="font-crimson text-xl sm:text-2xl text-rose-deep leading-none">{formatRange(remainingLow, remainingHigh)}</p>
         </div>
         <div>
-          <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-ink-muted mb-1">Total Estimate</p>
+          <p className="font-work-sans text-[11px] tracking-[0.2em] uppercase text-ink-muted mb-1">Total Estimate</p>
           <p className="font-crimson text-xl sm:text-2xl text-dark-taupe leading-none">{formatRange(totalLow, totalHigh)}</p>
         </div>
       </div>
@@ -1088,11 +1088,11 @@ function BudgetSection({
         {/* Paid column */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory flex items-center gap-2">
+            <h3 className="font-work-sans text-xs tracking-[0.25em] uppercase text-deep-ivory flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-gold-line inline-block" />
               Already Paid
             </h3>
-            <button onClick={() => onAddItem(true)} className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-ink-muted hover:text-gold-deep transition-colors">
+            <button onClick={() => onAddItem(true)} className="font-work-sans text-xs tracking-[0.1em] uppercase text-ink-muted hover:text-gold-deep transition-colors">
               + add
             </button>
           </div>
@@ -1101,7 +1101,7 @@ function BudgetSection({
               <div key={item.id} className={`flex items-center gap-2 px-3 py-2.5 group/bi ${i % 2 === 0 ? 'bg-ivory' : 'bg-warm-cream'}`}>
                 <button
                   onClick={() => onUpdateItem(item.id, { paid: false })}
-                  className="text-gold-deep hover:text-ink-muted transition-colors flex-shrink-0 text-xs w-5 h-5 flex items-center justify-center"
+                  className="text-gold-deep hover:text-ink-muted transition-colors flex-shrink-0 text-sm w-7 h-7 flex items-center justify-center"
                   title="Unmark paid"
                 >
                   ✓
@@ -1109,16 +1109,16 @@ function BudgetSection({
                 <EditableText
                   value={item.item}
                   onChange={v => onUpdateItem(item.id, { item: v })}
-                  className="font-crimson text-sm text-dark-taupe flex-1 min-w-0"
+                  className="font-crimson text-base text-dark-taupe flex-1 min-w-0"
                 />
                 <EditableText
                   value={item.cost}
                   onChange={v => onUpdateItem(item.id, { cost: v })}
-                  className="font-crimson text-sm text-deep-ivory text-right flex-shrink-0"
+                  className="font-crimson text-base text-deep-ivory text-right flex-shrink-0"
                 />
                 <button
                   onClick={() => onDeleteItem(item.id)}
-                  className="text-ink-muted hover:text-rose-deep transition-colors text-base flex-shrink-0 w-5 h-5 flex items-center justify-center opacity-0 group-hover/bi:opacity-100"
+                  className="text-ink-muted hover:text-rose-deep transition-colors text-base flex-shrink-0 w-7 h-7 flex items-center justify-center opacity-60 group-hover/bi:opacity-100"
                   aria-label="Delete item"
                 >
                   ×
@@ -1134,11 +1134,11 @@ function BudgetSection({
         {/* Pending column */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory flex items-center gap-2">
+            <h3 className="font-work-sans text-xs tracking-[0.25em] uppercase text-deep-ivory flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-muted-rose inline-block" />
               Pending Payment
             </h3>
-            <button onClick={() => onAddItem(false)} className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-ink-muted hover:text-gold-deep transition-colors">
+            <button onClick={() => onAddItem(false)} className="font-work-sans text-xs tracking-[0.1em] uppercase text-ink-muted hover:text-gold-deep transition-colors">
               + add
             </button>
           </div>
@@ -1147,7 +1147,7 @@ function BudgetSection({
               <div key={item.id} className={`flex items-center gap-2 px-3 py-2.5 group/bi ${i % 2 === 0 ? 'bg-ivory' : 'bg-warm-cream'}`}>
                 <button
                   onClick={() => onUpdateItem(item.id, { paid: true })}
-                  className="text-ink-muted hover:text-gold-deep transition-colors flex-shrink-0 text-xs w-5 h-5 flex items-center justify-center"
+                  className="text-ink-muted hover:text-gold-deep transition-colors flex-shrink-0 text-sm w-7 h-7 flex items-center justify-center"
                   title="Mark as paid"
                 >
                   ✓
@@ -1155,16 +1155,16 @@ function BudgetSection({
                 <EditableText
                   value={item.item}
                   onChange={v => onUpdateItem(item.id, { item: v })}
-                  className="font-crimson text-sm text-dark-taupe flex-1 min-w-0"
+                  className="font-crimson text-base text-dark-taupe flex-1 min-w-0"
                 />
                 <EditableText
                   value={item.cost}
                   onChange={v => onUpdateItem(item.id, { cost: v })}
-                  className="font-crimson text-sm text-deep-ivory text-right flex-shrink-0"
+                  className="font-crimson text-base text-deep-ivory text-right flex-shrink-0"
                 />
                 <button
                   onClick={() => onDeleteItem(item.id)}
-                  className="text-ink-muted hover:text-rose-deep transition-colors text-base flex-shrink-0 w-5 h-5 flex items-center justify-center opacity-0 group-hover/bi:opacity-100"
+                  className="text-ink-muted hover:text-rose-deep transition-colors text-base flex-shrink-0 w-7 h-7 flex items-center justify-center opacity-60 group-hover/bi:opacity-100"
                   aria-label="Delete item"
                 >
                   ×
@@ -1186,17 +1186,17 @@ function BudgetSection({
       {/* Reception scenarios */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-deep-ivory">
+          <h3 className="font-work-sans text-xs tracking-[0.25em] uppercase text-deep-ivory">
             Reception Cost Scenarios
           </h3>
           <button
             onClick={onAddScenario}
-            className="font-work-sans text-[9px] tracking-[0.1em] uppercase text-ink-muted hover:text-gold-deep transition-colors"
+            className="font-work-sans text-xs tracking-[0.1em] uppercase text-ink-muted hover:text-gold-deep transition-colors"
           >
             + add
           </button>
         </div>
-        <p className="font-crimson italic text-xs text-ink-muted mb-3">
+        <p className="font-crimson italic text-sm text-ink-muted mb-3">
           Tap any number to edit. Total auto-calculates.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -1207,7 +1207,7 @@ function BudgetSection({
               <div key={sc.id} className="border border-soft-gray/20 rounded-lg px-4 py-3 bg-warm-cream group/sc relative">
                 <button
                   onClick={() => onDeleteScenario(sc.id)}
-                  className="absolute top-2 right-2 text-ink-muted hover:text-rose-deep transition-colors text-base w-5 h-5 flex items-center justify-center opacity-0 group-hover/sc:opacity-100"
+                  className="absolute top-2 right-2 text-ink-muted hover:text-rose-deep transition-colors text-base w-7 h-7 flex items-center justify-center opacity-60 group-hover/sc:opacity-100"
                   aria-label="Delete scenario"
                 >
                   ×
@@ -1222,25 +1222,25 @@ function BudgetSection({
                   <span className="font-crimson text-base text-deep-ivory">guests</span>
                 </div>
 
-                <p className="font-crimson text-sm text-deep-ivory mb-1.5">
+                <p className="font-crimson text-base text-deep-ivory mb-1.5">
                   {numTables} tables · <span className="text-dark-taupe font-semibold">${total.toLocaleString()}</span> total
                 </p>
 
                 <div className="flex flex-wrap gap-x-3 gap-y-1">
-                  <div className="flex items-center gap-1 font-work-sans text-[9px] tracking-wide uppercase text-ink-muted">
+                  <div className="flex items-center gap-1 font-work-sans text-xs tracking-wide uppercase text-ink-muted">
                     <span>$</span>
                     <EditableNumber
                       value={sc.costPerTable}
                       onChange={v => onUpdateScenario(sc.id, { costPerTable: v })}
-                      className="font-work-sans text-[9px] uppercase text-ink-muted"
+                      className="font-work-sans text-xs uppercase text-ink-muted"
                     />
                     <span>/table</span>
                   </div>
-                  <div className="flex items-center gap-1 font-work-sans text-[9px] tracking-wide uppercase text-ink-muted">
+                  <div className="flex items-center gap-1 font-work-sans text-xs tracking-wide uppercase text-ink-muted">
                     <EditableNumber
                       value={sc.seatsPerTable}
                       onChange={v => onUpdateScenario(sc.id, { seatsPerTable: v })}
-                      className="font-work-sans text-[9px] uppercase text-ink-muted"
+                      className="font-work-sans text-xs uppercase text-ink-muted"
                     />
                     <span>seats/table</span>
                   </div>
@@ -1275,7 +1275,7 @@ const VENDOR_STATUS_OPTIONS: { value: VendorStatus; label: string }[] = [
 function VendorField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-ink-muted mb-0.5">{label}</p>
+      <p className="font-work-sans text-xs tracking-[0.2em] uppercase text-ink-muted mb-0.5">{label}</p>
       {children}
     </div>
   )
@@ -1296,12 +1296,12 @@ function VendorsSection({
   return (
     <section>
       <div className="flex items-center justify-between mb-5">
-        <h2 className="font-work-sans text-[10px] tracking-[0.3em] uppercase text-gold-deep">
+        <h2 className="font-work-sans text-sm tracking-[0.3em] uppercase text-gold-deep">
           Vendor Contacts
         </h2>
         <button
           onClick={onAdd}
-          className="font-work-sans text-[9px] tracking-[0.2em] uppercase text-ink-muted hover:text-gold-deep transition-colors"
+          className="font-work-sans text-xs tracking-[0.2em] uppercase text-ink-muted hover:text-gold-deep transition-colors"
         >
           + Add Vendor
         </button>
@@ -1309,7 +1309,7 @@ function VendorsSection({
 
       {categories.map(cat => (
         <div key={cat} className="mb-6">
-          <p className="font-work-sans text-[9px] tracking-[0.25em] uppercase text-ink-muted mb-2 pb-1 border-b border-soft-gray/20">
+          <p className="font-work-sans text-xs tracking-[0.25em] uppercase text-ink-muted mb-2 pb-1 border-b border-soft-gray/20">
             {cat}
           </p>
           <div className="flex flex-col gap-2">
@@ -1330,7 +1330,7 @@ function VendorsSection({
                       <select
                         value={v.status}
                         onChange={e => onUpdate(v.id, { status: e.target.value as VendorStatus })}
-                        className={`flex-shrink-0 appearance-none cursor-pointer px-2 py-0.5 rounded-full text-[9px] font-work-sans tracking-wider uppercase focus:outline-none ${VENDOR_STATUS_PILL[v.status]}`}
+                        className={`flex-shrink-0 appearance-none cursor-pointer px-2.5 py-1 rounded-full text-xs font-work-sans tracking-wider uppercase focus:outline-none ${VENDOR_STATUS_PILL[v.status]}`}
                       >
                         {VENDOR_STATUS_OPTIONS.map(o => (
                           <option key={o.value} value={o.value}>{o.label}</option>
@@ -1341,20 +1341,20 @@ function VendorsSection({
                       <EditableText
                         value={v.budget}
                         onChange={val => onUpdate(v.id, { budget: val })}
-                        className="font-crimson text-sm text-deep-ivory"
+                        className="font-crimson text-base text-deep-ivory"
                         placeholder="budget…"
                       />
                     </div>
                     <button
                       onClick={() => setExpandedId(isExpanded ? null : v.id)}
-                      className="text-ink-muted hover:text-deep-ivory transition-colors w-7 h-7 flex items-center justify-center text-[10px] flex-shrink-0"
+                      className="text-ink-muted hover:text-deep-ivory transition-colors w-7 h-7 flex items-center justify-center text-sm flex-shrink-0"
                       aria-label={isExpanded ? 'Collapse' : 'Expand'}
                     >
                       {isExpanded ? '▲' : '▼'}
                     </button>
                     <button
                       onClick={() => onDelete(v.id)}
-                      className="text-ink-muted hover:text-rose-deep transition-colors text-base w-7 h-7 flex items-center justify-center flex-shrink-0 opacity-0 group-hover/vendor:opacity-100"
+                      className="text-ink-muted hover:text-rose-deep transition-colors text-base w-7 h-7 flex items-center justify-center flex-shrink-0 opacity-60 group-hover/vendor:opacity-100"
                       aria-label="Delete vendor"
                     >
                       ×
@@ -1365,19 +1365,19 @@ function VendorsSection({
                   {isExpanded && (
                     <div className="border-t border-soft-gray/15 px-4 py-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <VendorField label="Name">
-                        <EditableText value={v.vendor} onChange={val => onUpdate(v.id, { vendor: val })} className="font-crimson text-sm text-dark-taupe" />
+                        <EditableText value={v.vendor} onChange={val => onUpdate(v.id, { vendor: val })} className="font-crimson text-base text-dark-taupe" />
                       </VendorField>
                       <VendorField label="Service">
-                        <EditableText value={v.service} onChange={val => onUpdate(v.id, { service: val })} className="font-crimson text-sm text-dark-taupe" placeholder="service description…" />
+                        <EditableText value={v.service} onChange={val => onUpdate(v.id, { service: val })} className="font-crimson text-base text-dark-taupe" placeholder="service description…" />
                       </VendorField>
                       <VendorField label="Category">
-                        <EditableText value={v.category} onChange={val => onUpdate(v.id, { category: val || v.category })} className="font-crimson text-sm text-dark-taupe" placeholder="e.g. Music, Venue…" />
+                        <EditableText value={v.category} onChange={val => onUpdate(v.id, { category: val || v.category })} className="font-crimson text-base text-dark-taupe" placeholder="e.g. Music, Venue…" />
                       </VendorField>
                       <VendorField label="Status">
                         <select
                           value={v.status}
                           onChange={e => onUpdate(v.id, { status: e.target.value as VendorStatus })}
-                          className="font-crimson text-sm text-dark-taupe bg-transparent border-b border-gold-line/30 focus:border-gold-line outline-none py-0.5"
+                          className="font-crimson text-base text-dark-taupe bg-transparent border-b border-gold-line/30 focus:border-gold-line outline-none py-0.5"
                         >
                           {VENDOR_STATUS_OPTIONS.map(o => (
                             <option key={o.value} value={o.value}>{o.label}</option>
@@ -1385,20 +1385,20 @@ function VendorsSection({
                         </select>
                       </VendorField>
                       <VendorField label="Budget">
-                        <EditableText value={v.budget} onChange={val => onUpdate(v.id, { budget: val })} className="font-crimson text-sm text-dark-taupe" placeholder="$0" />
+                        <EditableText value={v.budget} onChange={val => onUpdate(v.id, { budget: val })} className="font-crimson text-base text-dark-taupe" placeholder="$0" />
                       </VendorField>
                       <VendorField label="Contact Name">
-                        <EditableText value={v.contact} onChange={val => onUpdate(v.id, { contact: val })} className="font-crimson text-sm text-dark-taupe" placeholder="contact name…" />
+                        <EditableText value={v.contact} onChange={val => onUpdate(v.id, { contact: val })} className="font-crimson text-base text-dark-taupe" placeholder="contact name…" />
                       </VendorField>
                       <VendorField label="Phone">
-                        <EditableText value={v.phone} onChange={val => onUpdate(v.id, { phone: val })} className="font-crimson text-sm text-dark-taupe" placeholder="add phone…" />
+                        <EditableText value={v.phone} onChange={val => onUpdate(v.id, { phone: val })} className="font-crimson text-base text-dark-taupe" placeholder="add phone…" />
                       </VendorField>
                       <VendorField label="Email">
-                        <EditableText value={v.email} onChange={val => onUpdate(v.id, { email: val })} className="font-crimson text-sm text-dark-taupe" placeholder="add email…" />
+                        <EditableText value={v.email} onChange={val => onUpdate(v.id, { email: val })} className="font-crimson text-base text-dark-taupe" placeholder="add email…" />
                       </VendorField>
                       <div className="sm:col-span-2">
                         <VendorField label="Notes">
-                          <EditableText value={v.notes} onChange={val => onUpdate(v.id, { notes: val })} className="font-crimson text-sm text-dark-taupe" placeholder="add notes…" />
+                          <EditableText value={v.notes} onChange={val => onUpdate(v.id, { notes: val })} className="font-crimson text-base text-dark-taupe" placeholder="add notes…" />
                         </VendorField>
                       </div>
                       <div className="sm:col-span-2">
@@ -1409,20 +1409,20 @@ function VendorsSection({
                                 href={v.contract.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-crimson text-sm text-gold-deep underline underline-offset-2 truncate max-w-xs"
+                                className="font-crimson text-base text-gold-deep underline underline-offset-2 truncate max-w-xs"
                               >
                                 📄 {v.contract.name}
                               </a>
                               <button
                                 onClick={() => onUpdate(v.id, { contract: undefined })}
-                                className="text-ink-muted hover:text-rose-deep transition-colors text-base w-5 h-5 flex items-center justify-center flex-shrink-0"
+                                className="text-ink-muted hover:text-rose-deep transition-colors text-base w-7 h-7 flex items-center justify-center flex-shrink-0"
                                 aria-label="Remove contract"
                               >
                                 ×
                               </button>
                             </div>
                           ) : (
-                            <label className="mt-0.5 cursor-pointer inline-flex items-center gap-1.5 font-work-sans text-[9px] tracking-[0.15em] uppercase text-ink-muted hover:text-gold-deep transition-colors border border-dashed border-soft-gray/30 hover:border-gold-line/50 rounded px-2.5 py-1.5">
+                            <label className="mt-0.5 cursor-pointer inline-flex items-center gap-1.5 font-work-sans text-xs tracking-[0.15em] uppercase text-ink-muted hover:text-gold-deep transition-colors border border-dashed border-soft-gray/30 hover:border-gold-line/50 rounded px-2.5 py-1.5">
                               + upload contract
                               <input
                                 type="file"
@@ -1732,7 +1732,7 @@ export default function PlannerDashboard() {
 
       {kvMissing && (
         <div className="bg-muted-rose/10 border-b border-muted-rose/30 px-4 sm:px-6 py-2 text-center">
-          <p className="font-work-sans text-[9px] tracking-[0.15em] uppercase text-rose-deep">
+          <p className="font-work-sans text-xs tracking-[0.15em] uppercase text-rose-deep">
             ⚠ Saved-data store not configured — edits are saved on this device only. Add your Airtable environment variables to your Vercel project to sync across devices.
           </p>
         </div>
@@ -1740,7 +1740,7 @@ export default function PlannerDashboard() {
 
       {!kvMissing && kvError && (
         <div className="bg-muted-rose/10 border-b border-muted-rose/30 px-4 sm:px-6 py-2 text-center">
-          <p className="font-work-sans text-[9px] tracking-[0.15em] uppercase text-rose-deep">
+          <p className="font-work-sans text-xs tracking-[0.15em] uppercase text-rose-deep">
             ⚠ Could not reach the saved-data store — edits are saved on this device only for now. Check your Airtable connection to sync across devices.
           </p>
         </div>
@@ -1758,7 +1758,7 @@ export default function PlannerDashboard() {
             ].map(({ label, value, color }) => (
               <div key={label} className="bg-warm-cream border border-soft-gray/20 rounded px-3 py-2.5">
                 <p className={`font-crimson text-2xl sm:text-3xl ${color} leading-none mb-0.5`}>{value}</p>
-                <p className="font-work-sans text-[8px] tracking-[0.2em] uppercase text-ink-muted">{label}</p>
+                <p className="font-work-sans text-[11px] tracking-[0.2em] uppercase text-ink-muted">{label}</p>
               </div>
             ))}
           </div>
@@ -1770,7 +1770,7 @@ export default function PlannerDashboard() {
           <RsvpDashboard />
         ) : !initialized ? (
           <div className="flex items-center justify-center py-20">
-            <p className="font-work-sans text-[9px] tracking-[0.3em] uppercase text-ink-muted animate-pulse">
+            <p className="font-work-sans text-xs tracking-[0.3em] uppercase text-ink-muted animate-pulse">
               Loading…
             </p>
           </div>
@@ -1825,7 +1825,7 @@ export default function PlannerDashboard() {
         )}
 
         <div className="mt-10 pt-5 border-t border-soft-gray/20 text-center">
-          <p className="font-work-sans text-[8px] tracking-[0.25em] uppercase text-ink-muted">
+          <p className="font-work-sans text-[11px] tracking-[0.25em] uppercase text-ink-muted">
             Christine &amp; Michael · September 12, 2026 · Planning Portal
           </p>
         </div>
