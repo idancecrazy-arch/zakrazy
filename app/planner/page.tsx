@@ -1456,13 +1456,20 @@ function VendorsSection({
 
 // ── Main dashboard ─────────────────────────────────────────────────────────────
 
-function loadStored<T>(key: string, fallback: T): T {
-  if (typeof window === 'undefined') return fallback
+// A single combined snapshot of the whole planner, kept in localStorage as an
+// offline fallback. When Redis is unreachable (or not yet configured) the page
+// restores from this on load so a device's own edits survive a refresh instead
+// of resetting to the defaults. Redis stays the source of truth whenever it is
+// reachable — this only fills in when it is not.
+const LOCAL_BACKUP_KEY = 'planner-state-backup'
+
+function loadLocalBackup(): Record<string, unknown> | null {
+  if (typeof window === 'undefined') return null
   try {
-    const raw = localStorage.getItem(key)
-    return raw ? (JSON.parse(raw) as T) : fallback
+    const raw = localStorage.getItem(LOCAL_BACKUP_KEY)
+    return raw ? (JSON.parse(raw) as Record<string, unknown>) : null
   } catch {
-    return fallback
+    return null
   }
 }
 
@@ -1476,12 +1483,21 @@ export default function PlannerDashboard() {
   const [vendors, setVendors] = useState<Vendor[]>(INITIAL_VENDORS)
   const [activeSection, setActiveSection] = useState<'rsvp' | 'timeline' | 'tasks' | 'budget' | 'vendors'>('rsvp')
 
-  useEffect(() => { localStorage.setItem('planner-deadlines', JSON.stringify(deadlines)) }, [deadlines])
-  useEffect(() => { localStorage.setItem('planner-tasks', JSON.stringify(tasks)) }, [tasks])
-  useEffect(() => { localStorage.setItem('planner-budget', JSON.stringify(budgetItems)) }, [budgetItems])
-  useEffect(() => { localStorage.setItem('planner-scenarios', JSON.stringify(scenarios)) }, [scenarios])
-  useEffect(() => { localStorage.setItem('planner-vendors', JSON.stringify(vendors)) }, [vendors])
   // ── Persistence ────────────────────────────────────────────────────────────
+  // Mirror the full state to a single localStorage snapshot on every change. This
+  // is the offline fallback restored on load when Redis is unreachable, so it must
+  // include every slice — including scheduleItems, which the old per-key writes
+  // missed.
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        LOCAL_BACKUP_KEY,
+        JSON.stringify({ deadlines, tasks, budgetItems, scheduleItems, vendors, scenarios }),
+      )
+    } catch {
+      /* storage full or unavailable — nothing we can do, Redis is the real store */
+    }
+  }, [deadlines, tasks, budgetItems, scheduleItems, vendors, scenarios])
   const [initialized, setInitialized] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [kvMissing, setKvMissing] = useState(false)
@@ -1531,14 +1547,21 @@ export default function PlannerDashboard() {
   useEffect(() => {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), 6000)
+    // When Redis can't be reached, restore this device's last edits from the
+    // local snapshot so a refresh doesn't reset everything to the defaults.
+    const restoreFromBackup = () => {
+      const backup = loadLocalBackup()
+      if (backup) applyData(backup)
+    }
     fetch('/api/planner-state', { signal: controller.signal })
       .then(r => r.json())
       .then((json) => {
-        if (json.kvMissing) { setKvMissing(true); return }
-        if (json.kvError) { setKvError(true); return }
+        if (json.kvMissing) { setKvMissing(true); restoreFromBackup(); return }
+        if (json.kvError) { setKvError(true); restoreFromBackup(); return }
         if (json.data) applyData(json.data)
+        else restoreFromBackup()
       })
-      .catch(() => { setKvError(true) })
+      .catch(() => { setKvError(true); restoreFromBackup() })
       .finally(() => { clearTimeout(timer); setInitialized(true) })
     return () => { clearTimeout(timer); controller.abort() }
   }, [])
@@ -1710,7 +1733,7 @@ export default function PlannerDashboard() {
       {kvMissing && (
         <div className="bg-muted-rose/10 border-b border-muted-rose/30 px-4 sm:px-6 py-2 text-center">
           <p className="font-work-sans text-[9px] tracking-[0.15em] uppercase text-muted-rose">
-            ⚠ Redis not configured — edits are not being saved. Add REDIS_URL to your Vercel environment variables.
+            ⚠ Redis not configured — edits are saved on this device only. Add REDIS_URL to your Vercel environment variables to sync across devices.
           </p>
         </div>
       )}
@@ -1718,7 +1741,7 @@ export default function PlannerDashboard() {
       {!kvMissing && kvError && (
         <div className="bg-muted-rose/10 border-b border-muted-rose/30 px-4 sm:px-6 py-2 text-center">
           <p className="font-work-sans text-[9px] tracking-[0.15em] uppercase text-muted-rose">
-            ⚠ Could not reach the saved-data store — recent edits may not be saved. Check your Redis connection.
+            ⚠ Could not reach the saved-data store — edits are saved on this device only for now. Check your Redis connection to sync across devices.
           </p>
         </div>
       )}
