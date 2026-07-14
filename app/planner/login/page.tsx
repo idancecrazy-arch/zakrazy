@@ -50,7 +50,7 @@ export default function PlannerLoginPage() {
               <circle cx="16" cy="21" r="2" fill="#C3AF82" />
             </svg>
           </div>
-          <p className="font-work-sans text-[10px] tracking-[0.35em] uppercase text-ink-muted">
+          <p className="font-work-sans text-sm tracking-[0.35em] uppercase text-ink-muted">
             Planning Portal
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function PlannerLoginPage() {
             type="submit"
             disabled={loading || !password.trim()}
             className="
-              mt-1 font-work-sans text-[11px] tracking-[0.25em] uppercase
+              mt-1 font-work-sans text-sm tracking-[0.25em] uppercase
               px-10 py-4 bg-gold-line text-ivory
               hover:bg-dark-taupe hover:-translate-y-0.5 hover:shadow-md
               disabled:opacity-50 disabled:cursor-not-allowed
