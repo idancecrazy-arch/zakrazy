@@ -66,7 +66,7 @@ export default function TravelPage() {
               <p className="font-cormorant text-xl text-dark-taupe tracking-wide">{RECEPTION_VENUE.shortName}</p>
               <p className="font-crimson text-sm italic text-dark-taupe/70">Cocktail hour starts at 5pm</p>
               <p className="font-crimson text-base text-dark-taupe/90">
-                {RECEPTION_VENUE.address}<br />
+                {RECEPTION_VENUE.address}, {RECEPTION_VENUE.floor}<br />
                 {RECEPTION_VENUE.neighborhood}<br />
                 {RECEPTION_VENUE.city}, {RECEPTION_VENUE.state} {RECEPTION_VENUE.zip}
               </p>

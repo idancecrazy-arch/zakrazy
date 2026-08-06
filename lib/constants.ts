@@ -23,6 +23,7 @@ export const VENUE = {
 export const RECEPTION_VENUE = {
   name: 'Golden Unicorn Restaurant',
   shortName: 'Golden Unicorn',
+  floor: '5th floor',
   address: '18 East Broadway',
   city: 'New York',
   state: 'NY',

@@ -11,7 +11,7 @@ const FAQS = [
   {
     question: 'Are the ceremony and reception indoors?',
     answer:
-      'Yes, both the ceremony at St. Joseph\'s Church and the reception at Golden Unicorn are entirely indoors.',
+      'Yes, both the ceremony at St. Joseph\'s Church and the reception at Golden Unicorn are entirely indoors. The reception is on the 5th floor of Golden Unicorn.',
   },
   {
     question: 'When does the ceremony begin and how long is it?',
