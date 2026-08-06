@@ -49,7 +49,7 @@ const CEREMONY_ICS = makeICS({
 
 const RECEPTION_ICS = makeICS({
   summary: "Christine & Michael's Wedding Reception",
-  location: 'Golden Unicorn Restaurant, 18 East Broadway, New York, NY 10002',
+  location: 'Golden Unicorn Restaurant, 5th floor, 18 East Broadway, New York, NY 10002',
   description: 'Wedding reception for Christine Liu & Michael Zakrajsek',
   start: '20260912T210000Z', // 5:00pm EDT (UTC-4)
   end: '20260913T020000Z',   // 10:00pm EDT
