@@ -50,6 +50,8 @@ interface PartyMember {
   attending: boolean | null
   /** True when the name was parsed from the guest record (read-only). */
   known: boolean
+  /** True for an allowed-but-unnamed plus one the guest can bring. */
+  isPlusOne?: boolean
 }
 
 function AttendanceRadios({
@@ -121,14 +123,22 @@ export default function RSVPFlow() {
   const anyAttending = partyMembers.some((m) => m.attending === true)
   const allAnswered = partyMembers.length > 0 && partyMembers.every((m) => m.attending !== null)
 
+  const namedCount = partyMembers.filter((m) => !m.isPlusOne).length
+  const hasPlusOne = partyMembers.some((m) => m.isPlusOne)
+  const partyReservationText = hasPlusOne
+    ? `Your reservation is for ${namedCount} ${namedCount === 1 ? 'guest' : 'guests'} plus one guest. Please RSVP for each person below.`
+    : `Your reservation is for ${partyMembers.length} guests. Please RSVP for each person below.`
+
   const handleGuestSelect = (g: GuestRecord) => {
     const names = parseGuestNames(g.name, g.partySize)
-    setPartyMembers(
-      names.map((n) => {
-        const placeholder = isPlaceholderName(n)
-        return { name: placeholder ? '' : n.trim(), attending: null, known: !placeholder }
-      }),
-    )
+    const members: PartyMember[] = names.map((n) => {
+      const placeholder = isPlaceholderName(n)
+      return { name: placeholder ? '' : n.trim(), attending: null, known: !placeholder }
+    })
+    if (g.plusOneAllowed) {
+      members.push({ name: '', attending: null, known: false, isPlusOne: true })
+    }
+    setPartyMembers(members)
     setGuest(g)
     setWelcomeReception(null)
     setHasChildren(false)
@@ -165,11 +175,15 @@ export default function RSVPFlow() {
 
     partyMembers.forEach((m, i) => {
       if (m.attending === null) {
-        me[i] = isMultiParty
-          ? 'Please indicate if this guest will attend.'
-          : 'Please let us know if you\'ll be attending.'
+        me[i] = m.isPlusOne
+          ? 'Please let us know if you\'ll bring a plus one.'
+          : isMultiParty
+            ? 'Please indicate if this guest will attend.'
+            : 'Please let us know if you\'ll be attending.'
       } else if (!m.known && m.attending === true && !m.name.trim()) {
-        me[i] = 'Please enter this guest\'s name.'
+        me[i] = m.isPlusOne
+          ? 'Please enter your plus one\'s name.'
+          : 'Please enter this guest\'s name.'
       }
     })
 
@@ -318,19 +332,23 @@ export default function RSVPFlow() {
         <div className="flex flex-col gap-6">
           <h2 className={sectionHeadingClass}>Your Party</h2>
           <p className="font-crimson text-base text-dark-taupe/90">
-            Your reservation is for {guest?.partySize ?? partyMembers.length} guests. Please RSVP for each person below.
+            {partyReservationText}
           </p>
           {partyMembers.map((member, i) => (
             <div key={i} className="flex flex-col gap-4 border border-pale-gold/40 p-5 bg-warm-cream/30">
               {member.known ? (
                 <p className="font-cormorant text-xl sm:text-2xl text-dark-taupe">{member.name}</p>
               ) : (
-                <Field label="Full Name" error={memberErrors[i]}>
+                <Field
+                  label={member.isPlusOne ? 'Plus One' : 'Full Name'}
+                  optional={member.isPlusOne}
+                  error={memberErrors[i]}
+                >
                   <input
                     type="text"
                     value={member.name}
                     onChange={(ev) => updateMember(i, { name: ev.target.value })}
-                    placeholder="First and last name"
+                    placeholder={member.isPlusOne ? "Plus one's full name" : 'First and last name'}
                     className={inputClass}
                   />
                 </Field>
@@ -339,7 +357,7 @@ export default function RSVPFlow() {
                 index={i}
                 value={member.attending}
                 onChange={(v) => updateMember(i, { attending: v })}
-                label={`Attendance for ${member.known ? member.name : `guest ${i + 1}`}`}
+                label={`Attendance for ${member.isPlusOne ? 'your plus one' : member.known ? member.name : `guest ${i + 1}`}`}
               />
               {memberErrors[i] && member.known && (
                 <p className="font-crimson italic text-sm text-rose-deep">{memberErrors[i]}</p>
