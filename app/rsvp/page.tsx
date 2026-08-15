@@ -1,43 +1,16 @@
 import { Metadata } from 'next'
 import RSVPFlow from '@/components/rsvp/RSVPFlow'
 import CrossMotif from '@/components/CrossMotif'
-import { RSVP_DEADLINE_DISPLAY } from '@/lib/constants'
 
 export const metadata: Metadata = {
   title: 'RSVP',
   description: 'Please RSVP for Christine & Michael\'s wedding on September 12, 2026.',
 }
 
-function DeadlineBanner() {
-  const deadline = process.env.NEXT_PUBLIC_RSVP_DEADLINE
-  if (deadline) {
-    const d = new Date(deadline)
-    if (!isNaN(d.getTime()) && new Date() > d) return null
-  }
-  const displayDate = deadline
-    ? new Date(deadline).toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      })
-    : RSVP_DEADLINE_DISPLAY
-
-  return (
-    <div className="bg-blush/25 border border-shell-pink/40 px-6 py-3 text-center mb-10">
-      <p className="font-work-sans text-[12px] tracking-[0.18em] uppercase text-dark-taupe/90">
-        Please RSVP by{' '}
-        <span className="text-dark-taupe font-medium">{displayDate}</span>
-      </p>
-    </div>
-  )
-}
-
 export default function RSVPPage() {
   return (
     <div className="min-h-screen bg-ivory pt-32 sm:pt-36 pb-24 px-5 sm:px-6">
       <div className="max-w-2xl mx-auto">
-
-        <DeadlineBanner />
 
         {/* Header */}
         <div className="flex flex-col items-center text-center gap-8 mb-14 sm:mb-20">
