@@ -39,9 +39,9 @@ function downloadICS(filename: string, content: string) {
 }
 
 const WELCOME_RECEPTION_ICS = makeICS({
-  summary: "Christine & Michael's Welcome Reception",
+  summary: "Christine & Michael's Welcome Party",
   location: 'Walker Rooftop, Walker Hotel Tribeca, 77 Walker Street, New York, NY 10013',
-  description: 'Casual welcome reception for Christine Liu & Michael Zakrajsek',
+  description: 'Casual welcome party for Christine Liu & Michael Zakrajsek',
   start: '20260911T223000Z', // 6:30pm EDT (UTC-4)
   end: '20260912T013000Z',   // 9:30pm EDT
   uid: 'welcome-reception-zakrazy-2026@christineandmichaelzak.com',
@@ -78,10 +78,10 @@ export default function CalendarDownload({ welcomeReception = false }: { welcome
         {welcomeReception && (
           <button
             type="button"
-            onClick={() => downloadICS('welcome-reception.ics', WELCOME_RECEPTION_ICS)}
+            onClick={() => downloadICS('welcome-party.ics', WELCOME_RECEPTION_ICS)}
             className={btnClass}
           >
-            Welcome Reception
+            Welcome Party
           </button>
         )}
         <button

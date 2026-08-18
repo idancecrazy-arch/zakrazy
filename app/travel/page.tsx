@@ -18,10 +18,10 @@ export default function TravelPage() {
           </h1>
         </div>
 
-        {/* Friday Welcome Reception */}
+        {/* Friday Welcome Party */}
         <div className="flex flex-col gap-4 mb-16">
           <h2 className="font-cormorant text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
-            Friday Welcome Reception
+            Friday Welcome Party
           </h2>
           <div className="flex flex-col gap-3">
             <p className="font-cormorant text-xl text-dark-taupe tracking-wide">{WELCOME_RECEPTION.shortName}</p>
