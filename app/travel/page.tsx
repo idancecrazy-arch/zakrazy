@@ -29,6 +29,12 @@ export default function TravelPage() {
               {WELCOME_RECEPTION.dateDisplay} · {WELCOME_RECEPTION.timeDisplay}
             </p>
             <p className="font-crimson text-base text-dark-taupe/90">
+              {WELCOME_RECEPTION.venueNote}<br />
+              {WELCOME_RECEPTION.address}<br />
+              {WELCOME_RECEPTION.neighborhood}<br />
+              {WELCOME_RECEPTION.city}, {WELCOME_RECEPTION.state} {WELCOME_RECEPTION.zip}
+            </p>
+            <p className="font-crimson text-base text-dark-taupe/90">
               Join us for a casual welcome cocktail reception the evening before the wedding, also in lower Manhattan. We will have light fare, so we encourage you to eat beforehand.
             </p>
             <a

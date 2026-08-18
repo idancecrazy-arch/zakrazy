@@ -11,7 +11,7 @@ const FAQS = [
   {
     question: 'Is there a welcome reception?',
     answer:
-      'Yes! We are hosting a casual welcome reception at Walker Rooftop on Friday, September 11th from 6:30 to 9:30 PM, in lower Manhattan. We will have light fare, so we encourage you to eat beforehand. Let us know on your RSVP if you can join us.',
+      'Yes! We are hosting a casual welcome reception at Walker Rooftop (Walker Hotel Tribeca, 77 Walker Street) on Friday, September 11th from 6:30 to 9:30 PM. We will have light fare, so we encourage you to eat beforehand. Let us know on your RSVP if you can join us.',
   },
   {
     question: 'Are the ceremony and reception indoors?',
