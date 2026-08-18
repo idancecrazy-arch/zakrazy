@@ -46,6 +46,42 @@ const SPOTS: Spot[] = [
       </>
     ),
   },
+  {
+    name: 'Central Park',
+    description: (
+      <>
+        Run the loop, or bring a snack and lay out in Sheep Meadow for an easy
+        afternoon in the park.
+      </>
+    ),
+  },
+  {
+    name: "McSorley's Old Ale House",
+    description: (
+      <>
+        Raise a glass at this classic Irish pub. It has been pouring for 172
+        years and counting!
+      </>
+    ),
+  },
+  {
+    name: 'Koreatown',
+    description: (
+      <>
+        Head to KTown for Korean barbecue at New Wonjo, or fried chicken and
+        beer at bb.q Chicken.
+      </>
+    ),
+  },
+  {
+    name: 'West Village Froyo',
+    description: (
+      <>
+        Find a long line for frozen yogurt in the West Village. Go Greek,
+        Culture, and Birdie&apos;s are all worth the wait.
+      </>
+    ),
+  },
 ]
 
 export default function NYCSpots() {
