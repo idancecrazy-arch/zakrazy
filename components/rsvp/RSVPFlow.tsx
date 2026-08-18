@@ -369,18 +369,18 @@ export default function RSVPFlow() {
         </div>
       )}
 
-      {/* ── Welcome Reception (party-level) ──────────────── */}
+      {/* ── Welcome Party (party-level) ──────────────────── */}
       {anyAttending && (
         <div className="flex flex-col gap-5">
-          <h2 className={sectionHeadingClass}>Welcome Reception</h2>
+          <h2 className={sectionHeadingClass}>Welcome Party</h2>
           <p className="font-crimson text-base text-dark-taupe/90 leading-relaxed">
-            We are hosting a casual welcome reception at <strong>Walker Rooftop</strong> on{' '}
+            We are hosting a casual welcome party at <strong>Walker Rooftop</strong> on{' '}
             <strong>Friday, September 11th from 6:30 to 9:30 PM</strong>. Will you be joining us?
           </p>
           <p className="font-crimson italic text-sm text-dark-taupe/90">
             We will have light fare, so we encourage you to eat beforehand.
           </p>
-          <div className="flex flex-col gap-3" role="group" aria-label="Welcome reception">
+          <div className="flex flex-col gap-3" role="group" aria-label="Welcome party">
             {[
               { value: true, label: 'Yes, I\'ll be there' },
               { value: false, label: 'No, I cannot make it' },

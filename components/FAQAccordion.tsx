@@ -9,9 +9,9 @@ const FAQS = [
       'Semi-formal Attire: We kindly request guests wear suits and cocktail dresses comfortable for the season (September will hopefully be temperate and mild). Tuxes and gowns are welcome, and traditional attire is also encouraged!',
   },
   {
-    question: 'Is there a welcome reception?',
+    question: 'Is there a welcome party?',
     answer:
-      'Yes! We are hosting a casual welcome reception at Walker Rooftop on Friday, September 11th from 6:30 to 9:30 PM, in lower Manhattan. We will have light fare, so we encourage you to eat beforehand. Let us know on your RSVP if you can join us.',
+      'Yes! We are hosting a casual welcome party at Walker Rooftop (Walker Hotel Tribeca, 77 Walker Street) on Friday, September 11th from 6:30 to 9:30 PM. We will have light fare, so we encourage you to eat beforehand. Let us know on your RSVP if you can join us.',
   },
   {
     question: 'Are the ceremony and reception indoors?',

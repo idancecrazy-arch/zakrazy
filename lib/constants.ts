@@ -35,10 +35,15 @@ export const RECEPTION_VENUE = {
 export const WELCOME_RECEPTION = {
   name: 'Walker Rooftop',
   shortName: 'Walker Rooftop',
-  neighborhood: 'Lower Manhattan',
+  venueNote: 'Walker Hotel Tribeca',
+  address: '77 Walker Street',
+  city: 'New York',
+  state: 'NY',
+  zip: '10013',
+  neighborhood: 'Tribeca',
   dateDisplay: 'Friday, September 11, 2026',
   timeDisplay: '6:30 to 9:30 PM',
-  googleMapsUrl: 'https://maps.google.com/?q=Walker+Rooftop+New+York',
+  googleMapsUrl: 'https://maps.google.com/?q=Walker+Hotel+Tribeca+77+Walker+Street+New+York+NY+10013',
 }
 
 export const CONTACT_EMAIL = 'christineandmichaelzak@gmail.com'

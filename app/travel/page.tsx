@@ -18,15 +18,21 @@ export default function TravelPage() {
           </h1>
         </div>
 
-        {/* Friday Welcome Reception */}
+        {/* Friday Welcome Party */}
         <div className="flex flex-col gap-4 mb-16">
           <h2 className="font-cormorant text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
-            Friday Welcome Reception
+            Friday Welcome Party
           </h2>
           <div className="flex flex-col gap-3">
             <p className="font-cormorant text-xl text-dark-taupe tracking-wide">{WELCOME_RECEPTION.shortName}</p>
             <p className="font-crimson text-sm italic text-dark-taupe/70">
               {WELCOME_RECEPTION.dateDisplay} · {WELCOME_RECEPTION.timeDisplay}
+            </p>
+            <p className="font-crimson text-base text-dark-taupe/90">
+              {WELCOME_RECEPTION.venueNote}<br />
+              {WELCOME_RECEPTION.address}<br />
+              {WELCOME_RECEPTION.neighborhood}<br />
+              {WELCOME_RECEPTION.city}, {WELCOME_RECEPTION.state} {WELCOME_RECEPTION.zip}
             </p>
             <p className="font-crimson text-base text-dark-taupe/90">
               Join us for a casual welcome cocktail reception the evening before the wedding, also in lower Manhattan. We will have light fare, so we encourage you to eat beforehand.
