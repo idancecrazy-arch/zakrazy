@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import FAQAccordion from '@/components/FAQAccordion'
+import NYCSpots from '@/components/NYCSpots'
 
 export const metadata: Metadata = {
   title: 'FAQ',
@@ -23,6 +24,9 @@ export default function FAQPage() {
 
         {/* FAQ */}
         <FAQAccordion />
+
+        {/* Recommended spots in NYC */}
+        <NYCSpots />
 
         {/* Still have questions */}
         <div className="mt-16 pt-10 border-t border-pale-gold/40 flex flex-col items-center gap-4 text-center">
