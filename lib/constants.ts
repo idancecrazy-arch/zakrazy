@@ -32,6 +32,15 @@ export const RECEPTION_VENUE = {
   googleMapsUrl: 'https://maps.google.com/?q=18+East+Broadway+New+York+NY+10002',
 }
 
+export const WELCOME_RECEPTION = {
+  name: 'Walker Rooftop',
+  shortName: 'Walker Rooftop',
+  neighborhood: 'Lower Manhattan',
+  dateDisplay: 'Friday, September 11, 2026',
+  timeDisplay: '6:30 to 9:30 PM',
+  googleMapsUrl: 'https://maps.google.com/?q=Walker+Rooftop+New+York',
+}
+
 export const CONTACT_EMAIL = 'christineandmichaelzak@gmail.com'
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://zakrazy.vercel.app'

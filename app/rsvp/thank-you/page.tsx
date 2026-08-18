@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 }
 
 interface Props {
-  searchParams: Promise<{ name?: string; attending?: string; plusOne?: string; hotel?: string }>
+  searchParams: Promise<{ name?: string; attending?: string; plusOne?: string; hotel?: string; welcome?: string }>
 }
 
 export default async function ThankYouPage({ searchParams }: Props) {
@@ -18,6 +18,7 @@ export default async function ThankYouPage({ searchParams }: Props) {
   const attending = params.attending === '1'
   const plusOneName = params.plusOne
   const wantsHotel = params.hotel === '1'
+  const welcomeReception = params.welcome === '1'
 
   return (
     <div className="min-h-screen bg-ivory flex flex-col items-center justify-center px-6 py-24">
@@ -79,7 +80,7 @@ export default async function ThankYouPage({ searchParams }: Props) {
         )}
 
         {/* Calendar downloads */}
-        {attending && <CalendarDownload />}
+        {attending && <CalendarDownload welcomeReception={welcomeReception} />}
 
         {/* Contact info */}
         <div className="flex flex-col gap-2">

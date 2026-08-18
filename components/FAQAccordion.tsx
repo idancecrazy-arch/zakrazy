@@ -9,6 +9,11 @@ const FAQS = [
       'Semi-formal Attire: We kindly request guests wear suits and cocktail dresses comfortable for the season (September will hopefully be temperate and mild). Tuxes and gowns are welcome, and traditional attire is also encouraged!',
   },
   {
+    question: 'Is there a welcome reception?',
+    answer:
+      'Yes! We are hosting a casual welcome reception at Walker Rooftop on Friday, September 11th from 6:30 to 9:30 PM, in lower Manhattan. We will have light fare, so we encourage you to eat beforehand. Let us know on your RSVP if you can join us.',
+  },
+  {
     question: 'Are the ceremony and reception indoors?',
     answer:
       'Yes, both the ceremony at St. Joseph\'s Church and the reception at Golden Unicorn are entirely indoors. The reception is on the 5th floor of Golden Unicorn.',

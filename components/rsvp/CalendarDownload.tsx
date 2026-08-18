@@ -38,6 +38,15 @@ function downloadICS(filename: string, content: string) {
   URL.revokeObjectURL(url)
 }
 
+const WELCOME_RECEPTION_ICS = makeICS({
+  summary: "Christine & Michael's Welcome Reception",
+  location: 'Walker Rooftop, New York, NY',
+  description: 'Casual welcome reception for Christine Liu & Michael Zakrajsek',
+  start: '20260911T223000Z', // 6:30pm EDT (UTC-4)
+  end: '20260912T013000Z',   // 9:30pm EDT
+  uid: 'welcome-reception-zakrazy-2026@christineandmichaelzak.com',
+})
+
 const CEREMONY_ICS = makeICS({
   summary: "Christine & Michael's Wedding Ceremony",
   location: "St. Joseph's Church, 371 Sixth Avenue, New York, NY 10014",
@@ -59,13 +68,22 @@ const RECEPTION_ICS = makeICS({
 const btnClass =
   'flex-1 font-work-sans text-[12px] tracking-[0.15em] uppercase px-6 py-3.5 min-h-[48px] border border-gold-line text-dark-taupe hover:bg-blush transition-colors duration-200 text-center'
 
-export default function CalendarDownload() {
+export default function CalendarDownload({ welcomeReception = false }: { welcomeReception?: boolean }) {
   return (
     <div className="flex flex-col gap-3 w-full">
       <p className="font-work-sans text-[12px] tracking-[0.2em] uppercase text-ink-muted text-center">
         Add to Calendar
       </p>
       <div className="flex flex-col sm:flex-row gap-3">
+        {welcomeReception && (
+          <button
+            type="button"
+            onClick={() => downloadICS('welcome-reception.ics', WELCOME_RECEPTION_ICS)}
+            className={btnClass}
+          >
+            Welcome Reception
+          </button>
+        )}
         <button
           type="button"
           onClick={() => downloadICS('ceremony.ics', CEREMONY_ICS)}
