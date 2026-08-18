@@ -241,6 +241,7 @@ export default function RSVPFlow() {
       })
       const extraGuest = additional.find((m) => m.attending && m.name && m.name !== 'Guest')
       if (anyAttending && extraGuest) params.set('plusOne', extraGuest.name)
+      if (anyAttending && welcomeReception) params.set('welcome', '1')
 
       router.push(`/rsvp/thank-you?${params.toString()}`)
     } catch {
@@ -373,11 +374,11 @@ export default function RSVPFlow() {
         <div className="flex flex-col gap-5">
           <h2 className={sectionHeadingClass}>Welcome Reception</h2>
           <p className="font-crimson text-base text-dark-taupe/90 leading-relaxed">
-            We are hosting a casual welcome reception on <strong>Friday, September 11th evening</strong>.
-            Will you be joining us?
+            We are hosting a casual welcome reception at <strong>Walker Rooftop</strong> on{' '}
+            <strong>Friday, September 11th from 6:30 to 9:30 PM</strong>. Will you be joining us?
           </p>
           <p className="font-crimson italic text-sm text-dark-taupe/90">
-            More details to follow.
+            We will have light fare, so we encourage you to eat beforehand.
           </p>
           <div className="flex flex-col gap-3" role="group" aria-label="Welcome reception">
             {[

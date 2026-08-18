@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { HOTELS, VENUE, RECEPTION_VENUE } from '@/lib/constants'
+import { HOTELS, VENUE, RECEPTION_VENUE, WELCOME_RECEPTION } from '@/lib/constants'
 
 export const metadata: Metadata = {
   title: 'Travel & Accommodations',
@@ -19,13 +19,27 @@ export default function TravelPage() {
         </div>
 
         {/* Friday Welcome Reception */}
-        <div className="flex flex-col gap-8 mb-16">
+        <div className="flex flex-col gap-4 mb-16">
           <h2 className="font-cormorant text-2xl sm:text-3xl text-dark-taupe tracking-wide pb-2 border-b border-pale-gold/50">
             Friday Welcome Reception
           </h2>
-               <p className="font-crimson text-base text-dark-taupe/90">
-                We are finalizing details for a casual welcome cocktail reception in the evening on Friday, September 11 (also in lower Manhattan!). While we intend to have light fare, we encourage you to eat before.
-              </p>
+          <div className="flex flex-col gap-3">
+            <p className="font-cormorant text-xl text-dark-taupe tracking-wide">{WELCOME_RECEPTION.shortName}</p>
+            <p className="font-crimson text-sm italic text-dark-taupe/70">
+              {WELCOME_RECEPTION.dateDisplay} · {WELCOME_RECEPTION.timeDisplay}
+            </p>
+            <p className="font-crimson text-base text-dark-taupe/90">
+              Join us for a casual welcome cocktail reception the evening before the wedding, also in lower Manhattan. We will have light fare, so we encourage you to eat beforehand.
+            </p>
+            <a
+              href={WELCOME_RECEPTION.googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="self-start font-work-sans text-[12px] tracking-[0.18em] uppercase text-rose-deep hover:text-dusty-lilac transition-colors duration-200 underline underline-offset-4"
+            >
+              View on Google Maps
+            </a>
+          </div>
         </div>
 
 
