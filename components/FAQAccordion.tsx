@@ -9,6 +9,11 @@ const FAQS = [
       'Semi-formal Attire: We kindly request guests wear suits and cocktail dresses comfortable for the season (September will hopefully be temperate and mild). Tuxes and gowns are welcome, and traditional attire is also encouraged!',
   },
   {
+    question: 'Is there a different dress code at the wedding reception?',
+    answer:
+      'No, the dress code is the same for the ceremony and reception. There is no need to change between the two. Semi-formal attire works for the whole day.',
+  },
+  {
     question: 'Is there a welcome party?',
     answer:
       'Yes! We are hosting a casual welcome party at Walker Rooftop (Walker Hotel Tribeca, 77 Walker Street) on Friday, September 11th from 6:30 to 9:30 PM. We will have light fare, so we encourage you to eat beforehand. Let us know on your RSVP if you can join us.',
