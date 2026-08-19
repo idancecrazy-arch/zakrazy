@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { HOTELS, VENUE, RECEPTION_VENUE, WELCOME_RECEPTION } from '@/lib/constants'
+import CalendarDownload from '@/components/rsvp/CalendarDownload'
 
 export const metadata: Metadata = {
   title: 'Travel & Accommodations',
@@ -16,6 +17,13 @@ export default function TravelPage() {
           <h1 className="font-italiana text-4xl sm:text-5xl text-dark-taupe tracking-wide leading-tight">
             Travel &amp; Accommodations
           </h1>
+        </div>
+
+        {/* Add to Calendar */}
+        <div className="flex justify-center mb-14 sm:mb-20">
+          <div className="w-full max-w-md">
+            <CalendarDownload welcomeReception />
+          </div>
         </div>
 
         {/* Friday Welcome Party */}
