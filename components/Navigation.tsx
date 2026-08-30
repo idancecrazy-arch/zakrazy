@@ -12,6 +12,7 @@ const navLinks = [
   { href: '/travel', label: 'Events & Travel' },
   { href: '/faq', label: 'FAQ' },
   { href: '/registry', label: 'Registry' },
+  { href: '/game', label: '🐱 Game' },
 ]
 
 export default function Navigation() {
