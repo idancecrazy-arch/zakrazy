@@ -1,8 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 
-const FAQS = [
+type Faq = {
+  question: string
+  answer: ReactNode
+}
+
+const FAQS: Faq[] = [
   {
     question: 'What is the dress code?',
     answer:
@@ -35,15 +40,84 @@ const FAQS = [
   },
   {
     question: 'What kind of food will be served at the reception?',
+    answer: (
+      <>
+        Golden Unicorn serves a Chinese banquet, and dinner is family style.
+        Ten courses come out one at a time, from roast suckling pig and twin
+        lobsters to steamed whole fish, and we finish with two desserts we
+        picked ourselves. The{' '}
+        <a
+          href="#menu"
+          className="text-rose-deep underline underline-offset-2 hover:text-dark-taupe transition-colors duration-200"
+        >
+          full menu is further down this page
+        </a>
+        , with the allergies and restrictions each course may touch marked
+        beside it.
+      </>
+    ),
+  },
+  {
+    question: 'How does a family style dinner work?',
     answer:
-      'We will be sharing the menu closer to our wedding date. Golden Unicorn serves a Chinese banquet dinner, family style. Please note any dietary restrictions or allergies on your RSVP.',
+      'There is nothing to choose ahead of time. You will be seated at a round table of about ten, and each course arrives on a large platter that is set in the middle for the table to share. Serving spoons come with the food, so help yourself to what you like and pass it along. Courses keep coming for a while, so go easy on the early ones.',
+  },
+  {
+    question: 'Will there be dessert?',
+    answer:
+      'Yes, and we swapped the house desserts for two we love. First come piggy buns filled with egg custard, and then our wedding cake, which is black sesame and vanilla.',
+  },
+  {
+    question: 'I have a food allergy or a dietary restriction. What should I do?',
+    answer: (
+      <>
+        Please tell us. Note it on your RSVP, and if you have already sent your
+        RSVP in, just{' '}
+        <a
+          href="mailto:christineandmichaelzak@gmail.com?subject=Dietary%20question"
+          className="text-rose-deep underline underline-offset-2 hover:text-dark-taupe transition-colors duration-200"
+        >
+          email us
+        </a>
+        . The{' '}
+        <a
+          href="#menu"
+          className="text-rose-deep underline underline-offset-2 hover:text-dark-taupe transition-colors duration-200"
+        >
+          menu below
+        </a>{' '}
+        marks the common triggers course by course, but it is a guide rather
+        than a full ingredient list. If you need something more specific, or you
+        are not sure whether a course is safe for you, reach out and we will
+        work it out with the restaurant. The sooner we know, the easier it is to
+        arrange.
+      </>
+    ),
+  },
+  {
+    question: 'Are there vegetarian or vegan options?',
+    answer: (
+      <>
+        Not on the banquet menu as it is written, since every course is built
+        around meat or seafood. The kitchen can put together a vegetarian plate
+        for you, so please{' '}
+        <a
+          href="mailto:christineandmichaelzak@gmail.com?subject=Dietary%20question"
+          className="text-rose-deep underline underline-offset-2 hover:text-dark-taupe transition-colors duration-200"
+        >
+          let us know
+        </a>{' '}
+        ahead of the wedding and we will arrange it. The same goes for vegan,
+        gluten free, halal, and kosher.
+      </>
+    ),
   },
   {
     question: 'Any tips for getting to New York?',
     answer:
       'September 12th is a busy weekend in NYC. We encourage guests to book flights and hotels early. The best airports are: JFK (check for construction related traffic delays getting to and from this airport), LGA, and EWR. Amtrak is a great option if you\'re on the East Coast!',
   },
-] as const
+]
 
 export default function FAQAccordion() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
@@ -57,6 +131,7 @@ export default function FAQAccordion() {
             className="w-full flex items-start justify-between gap-4 py-5 text-left min-h-[56px]"
             onClick={() => setOpenIndex(openIndex === i ? null : i)}
             aria-expanded={openIndex === i}
+            aria-controls={`faq-answer-${i}`}
           >
             <span className="font-crimson text-lg text-dark-taupe leading-snug flex-1">
               {faq.question}
@@ -69,11 +144,14 @@ export default function FAQAccordion() {
             </span>
           </button>
           <div
-            className={`overflow-hidden transition-all duration-300 ease-in-out ${openIndex === i ? 'max-h-96 pb-5' : 'max-h-0'}`}
+            id={`faq-answer-${i}`}
+            className={`grid transition-all duration-300 ease-in-out ${openIndex === i ? 'grid-rows-[1fr] pb-5' : 'grid-rows-[0fr]'}`}
           >
-            <p className="font-crimson text-base text-dark-taupe/90 leading-relaxed">
-              {faq.answer}
-            </p>
+            <div className="overflow-hidden">
+              <p className="font-crimson text-base text-dark-taupe/90 leading-relaxed">
+                {faq.answer}
+              </p>
+            </div>
           </div>
         </div>
       ))}
