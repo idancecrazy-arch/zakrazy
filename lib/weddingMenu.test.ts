@@ -10,7 +10,7 @@ describe('wedding menu', () => {
     }
   })
 
-  it('explains every tag used on a course in the legend', () => {
+  it('uses only tags from the documented set', () => {
     const documented = Object.keys(DIETARY_TAGS)
     for (const course of MENU_COURSES) {
       for (const tag of course.tags) {

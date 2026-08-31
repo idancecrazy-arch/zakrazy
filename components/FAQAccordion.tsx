@@ -65,7 +65,7 @@ const FAQS: Faq[] = [
   {
     question: 'Will there be dessert?',
     answer:
-      'Yes, and we swapped the house desserts for two we love. First come piggy buns filled with egg custard, and then our wedding cake, which is black sesame and vanilla.',
+      'Yes, two of them. First come piggy buns filled with egg custard, and then our wedding cake, which is black sesame and vanilla. The cake is nut free.',
   },
   {
     question: 'I have a food allergy or a dietary restriction. What should I do?',

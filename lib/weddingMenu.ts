@@ -13,7 +13,8 @@ export type DietaryTag =
   | 'Soy'
   | 'Sesame'
 
-// Every tag we use, with the plain language note shown in the legend.
+// Every tag we use, with a plain language note on what it covers. The notes
+// are not shown on the page, they keep the tagging consistent across courses.
 export const DIETARY_TAGS: Record<DietaryTag, string> = {
   Pork: 'Contains pork. These courses are not halal or kosher.',
   Shellfish: 'Contains shellfish such as shrimp, lobster, clam, conch, abalone, or oyster sauce.',
@@ -94,13 +95,13 @@ export const MENU_COURSES: MenuCourse[] = [
   {
     name: 'Piggy Buns with Egg Custard',
     description:
-      'Our first dessert, in place of the red bean soup and cookies on the house menu. Little buns shaped like piglets, filled with egg custard.',
+      'Our first dessert. Little buns shaped like piglets, filled with egg custard.',
     tags: ['Egg', 'Dairy', 'Wheat', 'Soy'],
   },
   {
     name: 'Wedding Cake in Black Sesame and Vanilla',
     description:
-      'Our second dessert, in place of the fruit platter on the house menu. Two layers, one black sesame and one vanilla. The cake is nut free, and it is made with no nut cross contact.',
+      'Our second dessert. Two layers, one black sesame and one vanilla. The cake is nut free, and it is made with no nut cross contact.',
     tags: ['Sesame', 'Egg', 'Dairy', 'Wheat'],
   },
 ]
