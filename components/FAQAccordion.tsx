@@ -95,24 +95,6 @@ const FAQS: Faq[] = [
     ),
   },
   {
-    question: 'Are there vegetarian or vegan options?',
-    answer: (
-      <>
-        Not on the banquet menu as it is written, since every course is built
-        around meat or seafood. The kitchen can put together a vegetarian plate
-        for you, so please{' '}
-        <a
-          href="mailto:christineandmichaelzak@gmail.com?subject=Dietary%20question"
-          className="text-rose-deep underline underline-offset-2 hover:text-dark-taupe transition-colors duration-200"
-        >
-          let us know
-        </a>{' '}
-        ahead of the wedding and we will arrange it. The same goes for vegan,
-        gluten free, halal, and kosher.
-      </>
-    ),
-  },
-  {
     question: 'Any tips for getting to New York?',
     answer:
       'September 12th is a busy weekend in NYC. We encourage guests to book flights and hotels early. The best airports are: JFK (check for construction related traffic delays getting to and from this airport), LGA, and EWR. Amtrak is a great option if you\'re on the East Coast!',

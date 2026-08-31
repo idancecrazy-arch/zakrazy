@@ -100,8 +100,7 @@ export const MENU_COURSES: MenuCourse[] = [
   {
     name: 'Wedding Cake in Black Sesame and Vanilla',
     description:
-      'Our second dessert, in place of the fruit platter on the house menu. Two layers, one black sesame and one vanilla.',
+      'Our second dessert, in place of the fruit platter on the house menu. Two layers, one black sesame and one vanilla. The cake is nut free, and it is made with no nut cross contact.',
     tags: ['Sesame', 'Egg', 'Dairy', 'Wheat'],
-    askUs: true,
   },
 ]
