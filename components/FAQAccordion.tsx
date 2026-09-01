@@ -42,18 +42,14 @@ const FAQS: Faq[] = [
     question: 'What kind of food will be served at the reception?',
     answer: (
       <>
-        Golden Unicorn serves a Chinese banquet, and dinner is family style.
-        Ten courses come out one at a time, from roast suckling pig and twin
-        lobsters to steamed whole fish, and we finish with two desserts we
-        picked ourselves. The{' '}
+        Golden Unicorn serves a Chinese banquet, and dinner is family style. The{' '}
         <a
           href="#menu"
           className="text-rose-deep underline underline-offset-2 hover:text-dark-taupe transition-colors duration-200"
         >
           full menu is further down this page
         </a>
-        , with the allergies and restrictions each course may touch marked
-        beside it.
+        .
       </>
     ),
   },
@@ -65,7 +61,7 @@ const FAQS: Faq[] = [
   {
     question: 'Will there be dessert?',
     answer:
-      'Yes, two of them. First come piggy buns filled with egg custard, and then our wedding cake, which is black sesame and vanilla. The cake is nut free.',
+      'Yes, two of them. First come piggy buns filled with egg custard, and then our wedding cake, which is black sesame and vanilla.',
   },
   {
     question: 'I have a food allergy or a dietary restriction. What should I do?',
@@ -79,18 +75,8 @@ const FAQS: Faq[] = [
         >
           email us
         </a>
-        . The{' '}
-        <a
-          href="#menu"
-          className="text-rose-deep underline underline-offset-2 hover:text-dark-taupe transition-colors duration-200"
-        >
-          menu below
-        </a>{' '}
-        marks the common triggers course by course, but it is a guide rather
-        than a full ingredient list. If you need something more specific, or you
-        are not sure whether a course is safe for you, reach out and we will
-        work it out with the restaurant. The sooner we know, the easier it is to
-        arrange.
+        . Tell us anything you need us to know about the food, and the sooner
+        we hear from you, the easier it is to arrange.
       </>
     ),
   },
