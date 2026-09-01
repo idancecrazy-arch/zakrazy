@@ -1,10 +1,11 @@
 import { Metadata } from 'next'
 import FAQAccordion from '@/components/FAQAccordion'
 import NYCSpots from '@/components/NYCSpots'
+import WeddingMenu from '@/components/WeddingMenu'
 
 export const metadata: Metadata = {
   title: 'FAQ',
-  description: 'Frequently asked questions about Christine & Michael\'s wedding.',
+  description: 'Frequently asked questions about Christine & Michael\'s wedding, including the reception menu and dietary notes.',
 }
 
 export default function FAQPage() {
@@ -24,6 +25,9 @@ export default function FAQPage() {
 
         {/* FAQ */}
         <FAQAccordion />
+
+        {/* Reception menu */}
+        <WeddingMenu />
 
         {/* Recommended spots in NYC */}
         <NYCSpots />
